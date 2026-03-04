@@ -125,6 +125,20 @@ button {
     color: red;
     font-weight: bold;
 }
+#dynamicServices {
+    display: flex;
+    flex-wrap: wrap;      /* line break allow karega */
+    gap: 15px;
+}
+
+.service-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
 
 /* PRINT SPECIFIC */
 @page {
@@ -809,6 +823,48 @@ Qty: <input type="number" min="1" value="1" class="qty">
 
 </div>
 <hr>
+<!-- Ration Card-->
+ <div class="div3">
+ <h5>Ration Card Services</h5>
+
+ <!-- New Ration Card -->
+<label>
+<div class="service-row">
+<input type="checkbox" class="service newrationcheck">
+ New Ration Card
+ <Select class="newrationtype">
+   <option value="1500">Normal (₹1500)</option>
+   <option value="2500">Tatkal (₹2500)</option>
+ </Select>
+Qty: <input type="number" min="1" value="1" class="qty">
+</div>
+</label>
+<!-- Add member -->
+<label>
+<div class="service-row">
+<input type="checkbox" class="service addmembercheck">
+ Add member Ration Card
+    <select class="addmembertype">
+        <option value="200">Normal (₹200)</option>
+        <option value="500">Tatkal (₹500)</option>
+    </select>    
+Qty: <input type="number" min="1" value="1" class="qty">
+</div>
+</label>
+<!---remove member-->
+<label>
+<div class="service-row">
+<input type="checkbox" class="service removerationcheck">
+ Ration Card member remove
+ <select class="removemembertype">
+    <option value="500">Normal (₹500)</option>
+    <option value="1000">Tatkal (₹1000)</option>
+ </select>
+ Qty: <input type="number" min="1" value="1" class="qty">
+</div>
+</label>
+</div>
+<hr>
 <!-- PAN -->
  <div class="div1">
  <h5>Pan Card Services</h5>
@@ -841,33 +897,6 @@ Qty: <input type="number" min="1" value="1" class="qty">
 <div class="service-row">
 <input type="checkbox" class="service" data-name="Mobile Number Update" data-price="150">
 Mobile Number Update (₹150)
-Qty: <input type="number" min="1" value="1" class="qty">
-</div>
-</label>
-</div>
-<hr>
-
-<!-- Ration Card-->
- <div class="div3">
- <h5>Ration Card Services</h5>
-<label>
-<div class="service-row">
-<input type="checkbox" class="service" data-name="New Ration Card" data-price="1500">
-New Ration Card (₹1500)
-Qty: <input type="number" min="1" value="1" class="qty">
-</div>
-</label>
-<label>
-<div class="service-row">
-<input type="checkbox" class="service" data-name="Add member Ration Card" data-price="200">
-Add member Ration Card (₹200)
-Qty: <input type="number" min="1" value="1" class="qty">
-</div>
-</label>
-<label>
-<div class="service-row">
-<input type="checkbox" class="service" data-name="Remove member Ration Card" data-price="500">
-Remove member Ration Card (₹500)
 Qty: <input type="number" min="1" value="1" class="qty">
 </div>
 </label>
@@ -931,6 +960,9 @@ PVC Card Print (₹50 per page)
 Qty: <input type="number" min="1" value="1" class="qty">
 </div></label>
 </div>
+<div class="service-row">
+<label><div id="dynamicServices"></div></label>
+</div>
 </div><hr>
 <div class="billing-section">
 
@@ -949,6 +981,7 @@ Qty: <input type="number" min="1" value="1" class="qty">
 <div class="billing-field" id="paymentModeWrapper">
 <label>Payment Mode</label>
 <select id="paymentMode">
+<option value="Unpaid">Unpaid</option>    
 <option value="Cash">Cash</option>
 <option value="UPI">UPI</option>
 </select>
@@ -1037,6 +1070,9 @@ let incomeType = document.querySelector(".incomeType");
 let casteType = document.querySelector(".casteType");
 let residentialType = document.querySelector(".residentialType");
 let ewsType = document.querySelector(".ewsType");
+let newrationtype = document.querySelector(".newrationtype");
+let addmembertype = document.querySelector(".addmembertype");
+let removemembertype = document.querySelector(".removemembertype");
 
 let billServices = document.getElementById("billServices");
 billServices.innerHTML = "";
@@ -1066,6 +1102,18 @@ else if(services[i].classList.contains("residentialCheck")){
 else if(services[i].classList.contains("ewsCheck")){
     name = "EWS Certificate (" + ewsType.options[ewsType.selectedIndex].text + ")";
     price = parseInt(ewsType.value);
+}
+else if(services[i].classList.contains("newrationcheck")){
+    name = "New Ration Card (" + newrationtype.options[newrationtype.selectedIndex].text + ")";
+    price = parseInt(newrationtype.value);
+}
+else if(services[i].classList.contains("addmembercheck")){
+    name = "Add Member Ration Card (" + addmembertype.options[addmembertype.selectedIndex].text + ")";
+    price = parseInt(addmembertype.value);
+}
+else if(services[i].classList.contains("removerationcheck")){
+    name = "Remove Member Ration Card (" + removemembertype.options[removemembertype.selectedIndex].text + ")";
+    price = parseInt(removemembertype.value);
 }
 else{
     name = services[i].dataset.name;
@@ -1177,6 +1225,31 @@ html2canvas(document.querySelector("#bill"), {
     link.click();
 });
 }
+
+let dynamicServices = JSON.parse(localStorage.getItem("services")) || [];
+
+function loadDynamicServices(){
+
+    let container = document.getElementById("dynamicServices");
+    container.innerHTML = "<h5>Extra Services</h5>";
+
+    dynamicServices.forEach(service => {
+
+        container.innerHTML += `
+        <label>
+        <div class="service-row">
+        <input type="checkbox" class="service"
+            data-name="${service.name}"
+            data-price="${service.price}">
+        ${service.name} (₹${service.price})
+        Qty: <input type="number" min="1" value="1" class="qty">
+        </div>
+        </label>
+        `;
+    });
+}
+
+loadDynamicServices();
 </script>
 </body>
 </html>
