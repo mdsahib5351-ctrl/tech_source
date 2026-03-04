@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Due & Service Panel - TECH SOURCE</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f4f6f9;
+    padding:20px;
+}
+
+h2{
+    margin-top:40px;
+}
+
+input, select, button{
+    padding:8px;
+    margin:5px;
+}
+
+button{
+    background:#007bff;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    margin-top:15px;
+    box-shadow:0 0 5px rgba(0,0,0,0.1);
+}
+
+.due-box{
+    border:1px solid red;
+    padding:10px;
+    margin:5px;
+}
+</style>
+</head>
+<body>
+
+<h1>TECH SOURCE - Due Management</h1>
+
+<!-- SERVICE MANAGEMENT -->
+<h2>Service Management</h2>
+<div class="card">
+<input type="text" id="serviceName" placeholder="Service Name">
+<input type="number" id="servicePrice" placeholder="Price">
+<button onclick="addService()">Add Service</button>
+<br><br>
+<select id="serviceDropdown" onchange="autoFillPrice()">
+<option value="">Select Service</option>
+</select>
+</div>
+
+<!-- BILL SECTION -->
+<h2>Create Bill</h2>
+<div class="card">
+Customer Name:
+<input type="text" id="customerName"><br>
+
+Mobile Number:
+<input type="text" id="customerMobile"><br>
+
+Total Amount:
+<input type="number" id="totalAmount"><br>
+
+Paid Amount:
+<input type="number" id="paidAmount" oninput="calculateDue()"><br>
+
+Due Amount:
+<span id="dueAmount">0</span><br><br>
+
+<button onclick="saveBill()">Save Bill</button>
+</div>
+
+<!-- ALL BILLS -->
+<h2>All Bills</h2>
+<div class="card">
+<div id="billList"></div>
+</div>
+
+<!-- REMINDER -->
+<h2>Due Reminder System</h2>
+<div class="card">
+<button onclick="checkReminders()">Check Due Reminders</button>
+<div id="reminderList"></div>
+</div>
+
+<!-- ANALYTICS -->
+<h2>Monthly Analytics</h2>
+<div class="card">
+Monthly Income: ₹ <span id="monthlyIncome">0</span>
+<canvas id="incomeChart"></canvas>
+</div>
+
+<button onclick="sendAllReminders()">
+Send Reminder To All Unpaid
+</button>
+
+<script>
+
+let services = JSON.parse(localStorage.getItem("services")) || [];
+let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
+let incomeChart;
+
+/* SERVICE SYSTEM */
+
+function addService(){
+    let name = document.getElementById("serviceName").value;
+    let price = document.getElementById("servicePrice").value;
+
+    if(name && price){
+        services.push({name, price});
+        localStorage.setItem("services", JSON.stringify(services));
+        loadServices();
+        alert("Service Added");
+    }
+}
+
+function loadServices(){
+    let select = document.getElementById("serviceDropdown");
+    select.innerHTML = '<option value="">Select Service</option>';
+
+    services.forEach(s=>{
+        select.innerHTML += `<option value="${s.price}">${s.name}</option>`;
+    });
+}
+
+function autoFillPrice(){
+    let price = document.getElementById("serviceDropdown").value;
+    document.getElementById("totalAmount").value = price;
+}
+
+/* DUE CALCULATION */
+
+function calculateDue(){
+    let total = parseFloat(document.getElementById("totalAmount").value) || 0;
+    let paid = parseFloat(document.getElementById("paidAmount").value) || 0;
+    let due = total - paid;
+    if(due < 0) due = 0;
+    document.getElementById("dueAmount").innerText = due;
+}
+
+/* SAVE BILL */
+
+function saveBill(){
+
+    let name = document.getElementById("customerName").value;
+    let mobile = document.getElementById("customerMobile").value;
+    let total = parseFloat(document.getElementById("totalAmount").value) || 0;
+    let paid = parseFloat(document.getElementById("paidAmount").value) || 0;
+    let due = total - paid;
+    if(due < 0) due = 0;
+
+    let bill = {
+        name: name,
+        mobile: mobile,
+        total: total,
+        paid: paid,
+        due: due,
+        status: due > 0 ? "Unpaid" : "Paid",
+        date: new Date().toISOString(),
+        lastReminderDate: null
+    };
+
+    allBills.push(bill);
+    localStorage.setItem("allBills", JSON.stringify(allBills));
+
+    alert("Bill Saved Successfully");
+
+    loadBills();
+    calculateMonthlyIncome();
+    drawChart();
+}
+
+/* LOAD ALL BILLS */
+
+function loadBills(){
+
+    let html = "";
+
+    allBills.forEach((b,index)=>{
+
+        html += `
+        <div style="border-bottom:1px solid #ccc;padding:10px;">
+            <b>${b.name}</b><br>
+            Mobile: ${b.mobile}<br>
+            Total: ₹${b.total} |
+            Paid: ₹${b.paid} |
+            Due: ₹${b.due}<br>
+            Date: ${new Date(b.date).toLocaleDateString()}<br>
+        </div>
+        `;
+    });
+
+    if(html === ""){
+        html = "No Bills Available";
+    }
+
+    document.getElementById("billList").innerHTML = html;
+}
+
+/* REMINDER SYSTEM */
+
+function checkReminders() {
+
+    let reminderHTML = "";
+
+    allBills.forEach((bill, index) => {
+
+        let dueAmount = parseFloat(bill.due) || 0;
+
+        // Jiska bhi due baki hai (full ya partial)
+        if (dueAmount > 0) {
+
+            reminderHTML += `
+            <div class="due-box">
+                <b>${bill.name}</b><br>
+                Mobile: ${bill.mobile}<br>
+                Total: ₹${bill.total}<br>
+                Paid: ₹${bill.paid}<br>
+                Due: ₹${bill.due}<br><br>
+
+                <button onclick="sendReminder(${index})">
+                    Send WhatsApp Reminder
+                </button>
+            </div>
+            `;
+        }
+    });
+
+    if(reminderHTML === ""){
+        reminderHTML = "<b>No Unpaid Bills Available</b>";
+    }
+
+    document.getElementById("reminderList").innerHTML = reminderHTML;
+}
+function sendAllReminders(){
+
+    allBills.forEach(b=>{
+
+        if(b.due > 0){
+
+            let message = `Hello ${b.name},
+Your pending due amount is ₹${b.due}.
+Please clear it as soon as possible.
+- TECH SOURCE`;
+
+            window.open(`https://wa.me/91${b.mobile}?text=${encodeURIComponent(message)}`);
+        }
+    });
+}
+
+function sendReminder(index){
+
+    let b = allBills[index];
+
+    let message = `Hello ${b.name},
+Your pending due amount is ₹${b.due}.
+Please clear it as soon as possible.
+- TECH SOURCE`;
+
+    window.open(`https://wa.me/91${b.mobile}?text=${encodeURIComponent(message)}`);
+}
+
+/* ANALYTICS */
+
+function calculateMonthlyIncome(){
+
+    let income = 0;
+    let today = new Date();
+
+    allBills.forEach(b=>{
+        let d = new Date(b.date);
+        if(d.getMonth() === today.getMonth() &&
+           d.getFullYear() === today.getFullYear()){
+            income += parseFloat(b.paid);
+        }
+    });
+
+    document.getElementById("monthlyIncome").innerText = income;
+}
+
+function drawChart(){
+
+    let monthlyData = new Array(12).fill(0);
+
+    allBills.forEach(b=>{
+        let d = new Date(b.date);
+        monthlyData[d.getMonth()] += parseFloat(b.paid);
+    });
+
+    if(incomeChart){
+        incomeChart.destroy();
+    }
+
+    incomeChart = new Chart(document.getElementById("incomeChart"), {
+        type: "bar",
+        data: {
+            labels:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+            datasets: [{
+                label: "Monthly Income",
+                data: monthlyData
+            }]
+        }
+    });
+}
+
+/* INIT */
+
+loadServices();
+loadBills();
+calculateMonthlyIncome();
+drawChart();
+
+</script>
+
+</body>
+</html>
