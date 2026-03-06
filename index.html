@@ -288,6 +288,70 @@ margin-top:50px;
 color:var(--light);
 font-size:14px;
 }
+.contact-container{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+max-width:1100px;
+margin:auto;
+}
+
+.contact-info{
+background:rgba(255,255,255,0.6);
+backdrop-filter:blur(10px);
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 40px rgba(0,0,0,0.1);
+}
+
+.contact-info h3{
+margin-bottom:15px;
+color:var(--primary);
+}
+
+.contact-box{
+margin-top:12px;
+font-size:15px;
+}
+
+.contact-box a{
+color:var(--primary);
+text-decoration:none;
+}
+
+.contact-form{
+display:flex;
+flex-direction:column;
+gap:15px;
+background:rgba(255,255,255,0.6);
+backdrop-filter:blur(10px);
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 40px rgba(0,0,0,0.1);
+}
+
+#formStatus{
+text-align:center;
+font-size:14px;
+}
+
+.map{
+margin-top:50px;
+border-radius:20px;
+overflow:hidden;
+max-width:1100px;
+margin-left:auto;
+margin-right:auto;
+}
+
+@media(max-width:768px){
+
+.contact-container{
+grid-template-columns:1fr;
+}
+
+}
+
 </style>
 </head>
 
@@ -340,7 +404,7 @@ font-size:14px;
      <div class="card"><h3>Ration Card Service</h3><p>New Apply, Add/Remove Member.</p><a href="ration-service.html" class="btn">View Details</a></div>
      <div class="card"><h3>Bill Genrate</h3><p>bill genrate and print.</p><a href="BILL GERATER.html" class="btn">Genrate Now</a></div>
      <div class="card"><h3>Bill History</h3><p>get all bill history.</p><a href="BILL HISTORY.html" class="btn">View History</a></div>
-     <div class="card"><h3>Due Bill</h3><p>All Due Bill List.</p><a href="due.html" class="btn">Due Bill</a></div> 
+     <div class="card"><h3>Online Services</h3><p>All Government & Digital Services.</p><a href="#" class="btn">Explore</a></div> 
      <div class="card"><h3>Document Services</h3><p>Printout, Lamination, PVC Card.</p><a href="#" class="btn">Explore</a></div> 
      <div class="card"><h3>Money Transfer</h3><p>Secure Domestic Money Transfer.</p><a href="#" class="btn">Explore</a></div> 
      <div class="card"><h3>Recharge & Bill Pay</h3><p>Mobile, Electricity & DTH Payment.</p><a href="#" class="btn">Explore</a></div> 
@@ -364,13 +428,69 @@ font-size:14px;
 </section>
 
 <section id="contact">
+
 <div class="section-title">Contact Us</div>
-<form style="max-width:500px;margin:auto;display:flex;flex-direction:column;gap:15px;">
-<input type="text" placeholder="Name">
-<input type="email" placeholder="Email">
-<textarea rows="5" placeholder="Message"></textarea>
-<button class="btn">Send</button>
+
+<div class="contact-container">
+
+<!-- LEFT INFO -->
+
+<div class="contact-info">
+
+<h3>Get In Touch</h3>
+
+<p>If you have any questions or service requests, feel free to contact us.</p>
+
+<div class="contact-box">
+📞 Phone: <a href="tel:+919661905351">+91 96619 5351</a>
+</div>
+
+<div class="contact-box">
+📧 Email: <a href="mailto:mdsahib5351@gmail.com">mdsahib5351@gmail.com</a>
+</div>
+
+<div class="contact-box">
+💬 WhatsApp: <a href="https://wa.me/+919661905351">Chat Now</a>
+</div>
+
+<div class="contact-box">
+📍 Location: Mithapur, India
+</div>
+
+</div>
+
+
+<!-- FORM -->
+
+<form id="contactForm" class="contact-form">
+
+<input type="text" name="name" placeholder="Your Name" required>
+
+<input type="email" name="email" placeholder="Your Email" required>
+
+<textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+
+<input type="text" name="_gotcha" style="display:none">
+
+<button type="submit" class="btn" id="sendBtn">Send Message</button>
+
+<div id="formStatus"></div>
+
 </form>
+
+</div>
+
+
+<!-- GOOGLE MAP -->
+
+<div class="map">
+
+<iframe 
+src="https://maps.google.com/maps?q=india&t=&z=13&ie=UTF8&iwloc=&output=embed"
+width="100%" height="300" style="border:0;" loading="lazy"></iframe>
+
+</div>
+
 </section>
 
 <footer>© 2026 UltimateMiniApp</footer>
@@ -450,6 +570,52 @@ c.classList.add("visible");
 
 window.addEventListener("scroll",animateCards);
 animateCards();
+
+const form = document.getElementById("contactForm");
+const status = document.getElementById("formStatus");
+const btn = document.getElementById("sendBtn");
+
+form.addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+btn.innerText="Sending...";
+btn.disabled=true;
+
+let data=new FormData(form);
+
+try{
+
+let response=await fetch("https://formspree.io/f/xgonwgrr",{
+method:"POST",
+body:data,
+headers:{'Accept':'application/json'}
+});
+
+if(response.ok){
+
+status.innerHTML="✅ Message sent successfully!";
+status.style.color="green";
+form.reset();
+
+}else{
+
+status.innerHTML="❌ Something went wrong!";
+status.style.color="red";
+
+}
+
+}catch(error){
+
+status.innerHTML="❌ Network error!";
+status.style.color="red";
+
+}
+
+btn.innerText="Send Message";
+btn.disabled=false;
+
+});
 
 </script>
 
