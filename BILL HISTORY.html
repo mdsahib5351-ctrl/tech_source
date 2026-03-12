@@ -387,9 +387,10 @@ Date:
 <th>Name</th>
 <th>Mobile</th>
 <th>Payment Mode</th>
-<th>Total</th>
+<th>Due</th>
 <th>Status</th>
 <th>Action</th>
+<th>Total</th>
 </tr>
 </thead>
 <tbody id="billTable"></tbody>
@@ -404,6 +405,7 @@ Date:
     <input type="text" id="editName" placeholder="Customer Name">
 
     <input type="number" id="editSubtotal" placeholder="Subtotal">
+    <input type="number" id="editPaidAmount" placeholder="Paid Amount">
     <input type="number" id="editDiscount" placeholder="Discount">
 
     <input type="number" id="editTotal" placeholder="Final Total" readonly>
@@ -429,17 +431,33 @@ Date:
 <script>
 
     document.getElementById("editSubtotal").addEventListener("input", calculateTotal);
+    document.getElementById("editPaidAmount").addEventListener("input", calculateTotal);
 document.getElementById("editDiscount").addEventListener("input", calculateTotal);
 
 function calculateTotal(){
-    let subtotal = parseFloat(document.getElementById("editSubtotal").value) || 0;
-    let discount = parseFloat(document.getElementById("editDiscount").value) || 0;
 
-    let finalTotal = subtotal - discount;
+let subtotal = parseFloat(document.getElementById("editSubtotal").value) || 0;
+let paidAmount = parseFloat(document.getElementById("editPaidAmount").value) || 0;
+let discount = parseFloat(document.getElementById("editDiscount").value) || 0;
 
-    if(finalTotal < 0) finalTotal = 0;
+let finalTotal = subtotal - discount;
 
-    document.getElementById("editTotal").value = finalTotal;
+if(finalTotal < 0) finalTotal = 0;
+
+// due amount
+let due = finalTotal - paidAmount;
+
+if(due < 0) due = 0;
+
+document.getElementById("editTotal").value = due;
+
+// status auto change
+if(due === 0){
+document.getElementById("editStatus").value = "Paid";
+}else{
+document.getElementById("editStatus").value = "Unpaid";
+}
+
 }
 
 let currentTab = "all"; // Default tab
@@ -556,6 +574,7 @@ function openEdit(index){
 
     document.getElementById("editName").value = bill.name;
     document.getElementById("editSubtotal").value = bill.subtotal || bill.total;
+    document.getElementById("editPaidAmount").value = bill.paidAmount || 0;
     document.getElementById("editDiscount").value = bill.discount || 0;
     document.getElementById("editTotal").value = bill.total;
     document.getElementById("editStatus").value = bill.status;
@@ -584,16 +603,25 @@ function saveEdit(){
     let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
 
     let subtotal = parseFloat(document.getElementById("editSubtotal").value) || 0;
+    let paidAmount = parseFloat(document.getElementById("editPaidAmount").value) || 0;
     let discount = parseFloat(document.getElementById("editDiscount").value) || 0;
-    let total = subtotal - discount;
 
-    if(total < 0) total = 0;
+    let finalTotal = subtotal - discount;
+    if(finalTotal < 0) finalTotal = 0;
+
+    // Due calculate
+    let due = finalTotal - paidAmount;
+    if(due < 0) due = 0;
 
     allBills[currentEditIndex].name = document.getElementById("editName").value;
     allBills[currentEditIndex].subtotal = subtotal;
     allBills[currentEditIndex].discount = discount;
-    allBills[currentEditIndex].total = total;
-    allBills[currentEditIndex].status = document.getElementById("editStatus").value;
+    allBills[currentEditIndex].paidAmount = paidAmount;
+
+    // IMPORTANT
+    allBills[currentEditIndex].total = due;
+
+    allBills[currentEditIndex].status = due === 0 ? "Paid" : "Unpaid";
     allBills[currentEditIndex].paymentMode = document.getElementById("editPaymentMode").value;
 
     localStorage.setItem("allBills", JSON.stringify(allBills));
@@ -657,10 +685,19 @@ _Timely payment helps you avoid extra charges or any interruption in service._
 }
 
 function deleteBill(index){
+
+if(!confirm("क्या आप यह बिल delete करना चाहते हैं?")){
+return;
+}
+
 let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
+
 allBills.splice(index,1);
+
 localStorage.setItem("allBills", JSON.stringify(allBills));
+
 loadBills();
+
 document.getElementById("billPreview").style.display="none";
 }
 
