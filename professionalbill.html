@@ -267,35 +267,6 @@ button{
     padding:3px 8px;
     border-radius:4px;
 }
-
-.due-table-container{
-position:absolute;
-bottom:20px;
-left:20px;
-}
-
-.due-table{
-width:220px;
-border-collapse:collapse;
-font-size:16px;
-}
-
-.due-table th, .due-table td{
-border:1px solid #000;
-padding:6px 10px;
-}
-
-.due-table th{
-background:#ffe6e6;
-color:#cc0000;
-}
-
-.due-table td{
-text-align:right;
-font-weight:bold;
-color:#cc0000;
-}
-
 </style>
 </head>
 
@@ -361,23 +332,7 @@ color:#cc0000;
                    </tbody>
                </table>
            </div>
-       <div class="due-table-container">
-<table class="due-table">
-<tbody>
 
-<tr>
-<th>Paid Amount</th>
-<td>₹ <span id="paidBox"></span></td>
-</tr>
-
-<tr>
-<th>Due Amount</th>
-<td>₹ <span id="dueAmount"></span></td>
-</tr>
-
-</tbody>
-</table>
-</div>
            <div class="signature-section">
     <div>
     <div class="qr-container">
@@ -402,7 +357,6 @@ color:#cc0000;
 </div>
 
 </div> <!-- invoice-container end -->
-
 <script>
 
 // LOAD LATEST BILL
@@ -548,18 +502,7 @@ if(discountAmount > 0){
 
 // 3️⃣ Paid / Due / Final Total logic
 let dueAmount = finalTotal - paidAmount; 
-document.getElementById("paidBox").innerText = paidAmount;
-document.getElementById("dueAmount").innerText = dueAmount > 0 ? dueAmount : 0;
-let dueBox = document.getElementById("dueAmount");
 
-if(dueBox){
-    if(dueAmount > 0){
-        dueBox.innerText = dueAmount;
-    }else{
-        dueBox.innerText = "0";
-        document.querySelector(".due-table-container").style.display = "none";
-    }
-}
 if(paidAmount >= finalTotal){
     // ✅ Full Paid: Show Final Total + Payment Mode
     let trFinal = document.createElement("tr");
@@ -573,8 +516,11 @@ if(paidAmount >= finalTotal){
         summaryTable.appendChild(trPayment);
     }
 
-} 
-else if(paidAmount > 0 && paidAmount < finalTotal){
+} else if(paidAmount > 0 && paidAmount < finalTotal){
+    // 🔸 Partial Paid: Paid + Due + Final Total
+    let trPaid = document.createElement("tr");
+    trPaid.innerHTML = `<th>Paid Amount</th><td>₹ ${paidAmount}</td>`;
+    summaryTable.appendChild(trPaid);
 
     let trDue = document.createElement("tr");
     trDue.innerHTML = `<th>Due Amount</th><td>₹ ${dueAmount}</td>`;
@@ -584,8 +530,12 @@ else if(paidAmount > 0 && paidAmount < finalTotal){
     trFinal.innerHTML = `<th>Final Total</th><td>₹ ${finalTotal}</td>`;
     summaryTable.appendChild(trFinal);
 
+} else {
+    // ❌ Unpaid: केवल Final Total
+    let trFinal = document.createElement("tr");
+    trFinal.innerHTML = `<th>Final Total</th><td>₹ ${finalTotal}</td>`;
+    summaryTable.appendChild(trFinal);
 }
-
 
 // 4️⃣ Status (hamesha show)
 let trStatus = document.createElement("tr");
