@@ -419,12 +419,9 @@ z-index:9999;
 <a href="pan-service.html">PAN Card Service</a>
 <a href="aadhaar-service.html">Aadhaar Card Service</a>
 <a href="ration-service.html">Ration Card Service</a>
-<a href="image.html">Image to Link</a>
-<a href="BILL GERATER.html">Bill Generator</a>
-<a href="BILL HISTORY.html">Bill History</a>
-<a href="COMING SOON">Money Transfer</a>
-<a href="COMING SOON">Recharge & Bill Pay</a>
-<a href="COMING SOON">Document Services</a>
+<a href="#">Money Transfer</a>
+<a href="#">Recharge & Bill Pay</a>
+<a href="#">Document Services</a>
 </div>
 </div>
 
@@ -459,6 +456,19 @@ z-index:9999;
      <div class="card"><h3>Recharge & Bill Pay</h3><p>Mobile, Electricity & DTH Payment.</p><a href="#" class="btn">Explore</a></div> 
      <div class="card"><h3>LOGO</h3><p>SHOW TECH SOURCE LOGO</p><a href="tsgaming.jpeg" class="btn">Logo</a></div>
     </div> 
+</section>
+<section id="download-bill">
+
+<div class="section-title">Download Bill</div>
+
+<div style="max-width:400px;margin:auto;text-align:center">
+
+<input type="text" id="searchBillNo" placeholder="Enter Bill Number (Example TS000)">
+
+<button class="btn" onclick="downloadBillByNumber()">Download Bill</button>
+
+</div>
+
 </section>
 
 <section id="qr-section">
@@ -671,6 +681,57 @@ window.addEventListener("load",function(){
 document.getElementById("loader").style.display="none";
 
 });
+
+function downloadBillByNumber(){
+
+let billNo = document.getElementById("searchBillNo").value.trim();
+
+if(!billNo){
+alert("Enter Bill Number");
+return;
+}
+
+let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
+
+let bill = allBills.find(b => b.billNo === billNo);
+
+if(!bill){
+alert("Bill Not Found");
+return;
+}
+
+// temporary bill layout
+let billHTML = `
+<div id="tempBill" style="padding:20px;font-family:Arial">
+<h2>TECH SOURCE SERVICES</h2>
+<p><b>Bill No:</b> ${bill.billNo}</p>
+<p><b>Date:</b> ${bill.date}</p>
+<p><b>Name:</b> ${bill.name}</p>
+<p><b>Mobile:</b> ${bill.mobile}</p>
+<hr>
+${bill.services}
+<hr>
+<h3>Total ₹${bill.total}</h3>
+<p>Status: ${bill.status}</p>
+</div>
+`;
+
+let div = document.createElement("div");
+div.innerHTML = billHTML;
+document.body.appendChild(div);
+
+html2canvas(div).then(canvas => {
+
+let link = document.createElement("a");
+link.download = bill.billNo + ".png";
+link.href = canvas.toDataURL();
+link.click();
+
+document.body.removeChild(div);
+
+});
+
+}
 </script>
 
 </body>
