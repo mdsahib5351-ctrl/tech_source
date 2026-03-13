@@ -10,6 +10,8 @@
 
 <!-- ✅ Correct QR Styling Library -->
 <script src="https://unpkg.com/qr-code-styling/lib/qr-code-styling.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 :root{
@@ -693,43 +695,19 @@ return;
 
 let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
 
-let bill = allBills.find(b => b.billNo === billNo);
+// bill find
+let billIndex = allBills.findIndex(b => b.billNo === billNo);
 
-if(!bill){
+if(billIndex === -1){
 alert("Bill Not Found");
 return;
 }
 
-// temporary bill layout
-let billHTML = `
-<div id="tempBill" style="padding:20px;font-family:Arial">
-<h2>TECH SOURCE SERVICES</h2>
-<p><b>Bill No:</b> ${bill.billNo}</p>
-<p><b>Date:</b> ${bill.date}</p>
-<p><b>Name:</b> ${bill.name}</p>
-<p><b>Mobile:</b> ${bill.mobile}</p>
-<hr>
-${bill.services}
-<hr>
-<h3>Total ₹${bill.total}</h3>
-<p>Status: ${bill.status}</p>
-</div>
-`;
+// selected bill index save
+localStorage.setItem("selectedBillIndex", billIndex);
 
-let div = document.createElement("div");
-div.innerHTML = billHTML;
-document.body.appendChild(div);
-
-html2canvas(div).then(canvas => {
-
-let link = document.createElement("a");
-link.download = bill.billNo + ".png";
-link.href = canvas.toDataURL();
-link.click();
-
-document.body.removeChild(div);
-
-});
+// open professional invoice page
+window.open("professionalbill.html","_blank");
 
 }
 </script>
