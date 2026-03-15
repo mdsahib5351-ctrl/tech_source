@@ -444,6 +444,7 @@ h5 {
       <button class="printbtn" onclick="window.print()"></button>
       <button class="billprevbtn" onclick="viewBill('${doc.id}')"></button>
       <button class="historybtn" onclick="openAdmin()"></button>
+      <button class="" onclick="logout()">Logout</button>
     </div>
 
 
@@ -574,6 +575,17 @@ function openAdmin() {
 
 function viewBill(id){
     window.open(`billview.html?id=${id}`, '_blank');
+}
+function logout(){
+
+firebase.auth().signOut().then(()=>{
+
+alert("Logged Out Successfully");
+
+window.location.href="login.html";
+
+});
+
 }
 </script>
 </body>
