@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>Admin Panel - TECH SOURCE</title>
     <style>
-        body{
+body{
     margin:0;
     font-family:Arial, sans-serif;
     background:#ffffff;
     padding:20px;
+    display:none;
 }
 .top-controls{
     display:flex;
@@ -411,7 +412,7 @@ PROFESSIONAL MODAL CSS
 <button class="tabBtn active" onclick="switchTab('all', this)">All Bills</button>
 <button class="tabBtn" onclick="switchTab('unpaid', this)">Unpaid Bills</button>
 <button class="tabBtn" onclick="window.open('generatebill.html')">Generated Bills</button> 
-<button onclick="logout()">Logout</button>
+<button class="tabBtn" onclick="logout()">Logout</button>
 </div>
 <div class="myhistory">
     <div class="income">
@@ -487,41 +488,42 @@ const firebaseConfig = {
   messagingSenderId: "690209240188",
   appId: "1:690209240188:web:6e54de365e7f839634c5f9"
 };
+
 firebase.initializeApp(firebaseConfig);
 
+// FIRESTORE
 const db = firebase.firestore();
+
+// AUTH
 const auth = firebase.auth();
 
+// ADMIN EMAIL
 const ADMIN_EMAIL = "techsource@gmail.com";
 
+
+// LOGIN CHECK
 firebase.auth().onAuthStateChanged(function(user){
 
+// अगर login नहीं
 if(!user){
-
-alert("Please Login First");
-window.location.href = "login.html";
+window.location.replace("login.html");
 return;
-
 }
 
-// email check
+// अगर admin नहीं
 if(user.email !== ADMIN_EMAIL){
 
-alert("Access Denied! Only Admin Allowed");
-
-// logout
 firebase.auth().signOut().then(()=>{
-window.location.href = "login.html";
+window.location.replace("login.html");
 });
 
 return;
-
 }
 
-console.log("Admin Login:", user.email);
+// admin allowed
+document.body.style.display = "block";
 
 });
-
 const billTable = document.getElementById('billTable');
 const paidCountEl = document.getElementById('paidCount');
 const unpaidCountEl = document.getElementById('unpaidCount');
