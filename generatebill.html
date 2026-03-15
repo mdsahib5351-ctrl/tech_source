@@ -5,10 +5,11 @@
     <title>Generate Bill - TECH SOURCE</title>
     <style>
 /* ===================== GENERAL ===================== */
-body {
+body{
     font-family: Arial, sans-serif;
     margin: 0;
     background: #f0f2f5;
+    display:none;
 }
 
 /* Customer Details */
@@ -207,6 +208,7 @@ h5 {
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <h2>Generate New Bill</h2>
@@ -443,25 +445,45 @@ h5 {
       <button class="billprevbtn" onclick="viewBill('${doc.id}')"></button>
       <button class="historybtn" onclick="openAdmin()"></button>
     </div>
+
+
 <script>
 const firebaseConfig = {
-    apiKey: "AIzaSyD8-Rw3iwc5XXMCvzZt8j8fX7Z-F6nGMMc",
-    authDomain: "ts-gaming-8ef00.firebaseapp.com",
-    databaseURL: "https://ts-gaming-8ef00-default-rtdb.firebaseio.com",
-    projectId: "ts-gaming-8ef00",
-    storageBucket: "ts-gaming-8ef00.firebasestorage.app",
-    messagingSenderId: "622265302154",
-    appId: "1:622265302154:web:6feb931ea5619a9ed60173",
-    measurementId: "G-1JQRZNGWYT"
+  apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
+  authDomain: "tech-source-bill.firebaseapp.com",
+  databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
+  projectId: "tech-source-bill",
+  storageBucket: "tech-source-bill.firebasestorage.app",
+  messagingSenderId: "690209240188",
+  appId: "1:690209240188:web:6e54de365e7f839634c5f9"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
-function generateBill() {
-    const billForm = document.getElementById('billForm');
-    // trigger form submit manually
-    billForm.dispatchEvent(new Event('submit', {cancelable:true}));
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+/* LOGIN CHECK */
+const ADMIN_EMAIL = "techsource@gmail.com";
+
+firebase.auth().onAuthStateChanged(function(user){
+
+// agar login nahi hai
+if(!user){
+window.location.replace("login.html");
+return;
 }
+
+// agar admin login kare to admin panel bhejo
+if(user.email === ADMIN_EMAIL){
+window.location.replace("admin.html");
+return;
+}
+
+// normal user allowed
+document.body.style.display = "block";
+
+});
+
 
 const billForm = document.getElementById('billForm');
 billForm.addEventListener('submit', async (e) => {
