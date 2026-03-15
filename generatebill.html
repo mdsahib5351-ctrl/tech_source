@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Bill - TECH SOURCE</title>
+    <style>
+/* ===================== GENERAL ===================== */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f0f2f5;
+}
+
+/* Customer Details */
+#customerDetails {
+    background: #f8f8f8;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* ===================== HEADER BANNER ===================== */
+.header-banner {
+    width: 100%;
+    border-bottom: 2px solid #000;
+    margin-bottom: 10px;
+}
+.header-banner img { width:100%; height:auto; display:block; }
+
+/* ===================== BUTTONS ===================== */
+.groupbtn button {
+    width:95px; height:32px; margin:10px; border-radius:10px;
+    border:none; cursor:pointer; background-size:cover; background-position:center;
+    background-repeat:no-repeat; transition:all 0.3s ease;
+}
+.groupbtn button:hover {
+    transform: scale(1.2) translateY(-2px);
+    filter: brightness(1.2);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+}
+
+/* Individual buttons */
+.genratebillbtn{ background-image:url(https://i.ibb.co/VYNrLFTn/Chat-GPT-Image-Mar-14-2026-12-32-22-PM.jpg);}
+.printbtn{ background-image:url(https://i.ibb.co/v4nzZWbx/Chat-GPT-Image-Mar-14-2026-09-31-42-AM.jpg);}
+.billprevbtn{ background-image:url(https://i.ibb.co/8D9f55XD/Chat-GPT-Image-Mar-14-2026-12-32-22-PM.jpg);}
+.historybtn{ background-image:url(https://i.ibb.co/v6NV2rjd/Chat-GPT-Image-Mar-14-2026-12-32-22-PM.jpg);}
+
+/* ===================== SERVICE SECTION ===================== */
+.container {
+    max-width: 1200px;
+    position: relative;
+    border-radius: 20px;
+    margin: auto;
+    padding: 20px;
+    overflow: hidden;
+    box-shadow: 0 100px 200px rgba(0,0,0,0.1), 0 60px 60px rgba(0,0,0,0.1);
+}
+.container::before {
+    content:"";
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.25) url(https://i.ibb.co/YTy3hLrS/a8cf7c22-b8a6-4a29-beb0-9d6538dbbfe3.jpg) center/cover no-repeat;
+    z-index:-1;
+}
+
+/* Service Groups */
+.rtpsservice, .rationservice, .panservice, .aadharservice, .voterservice, .printservice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Stylish Service Heading */
+h5 {
+    text-align: center;
+    font-family: 'Poppins', 'Arial', sans-serif;
+    font-weight: 1000;
+    font-size: 25px;
+    color: #fff;
+    flex-basis: 100%;
+    margin-bottom: 15px;
+    -webkit-text-stroke: 2px rgb(0, 80, 155);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 6px rgba(12,12,12,0.5);
+    background-color: #808080;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Service Row / Card */
+.service-row {
+    flex: 0 0 calc(50% - 15px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    border-radius:0 0 12px 12px;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border:1px solid rgba(255,255,255,0.4);
+    box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.service-row:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.6), 0 10px 20px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+/* Service Name Box */
+.servicesname {
+    display: flex;
+    letter-spacing:0.5px;
+    margin:0px;
+    padding:4px 8px;
+    color:#000;
+    background-image:url(https://i.ibb.co/XfFc9q22/Chat-GPT-Image-Mar-14-2026-10-09-26-AM.jpg);
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    border-radius:12px 12px 0 0;
+    -webkit-text-stroke:0.2px #000;
+    user-select: none;
+}
+
+/* Inputs / Checkbox / Qty */
+.service-row input[type="checkbox"] { width:22px; height:22px; cursor:pointer; accent-color:#00ac00; margin-right:6px; }
+.service-row select { padding:4px 6px; border-radius:5px; border:1px solid #ccc; background:#fff6ee; font-size:20px; cursor:pointer; transition:0.2s; }
+.service-row select:focus { border-color:#007bff; outline:none; box-shadow:0 0 3px #007bff55; }
+.service-row input[type="number"]{ width:140px; padding:4px; border-radius:5px; border:1px solid #ccc; text-align:center; font-size:13px; }
+.service-row input[type="number"]:focus{ border-color:#007bff; outline:none; box-shadow:0 0 3px #007bff55; }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .service-row { flex: 0 0 100%; }
+}
+@media (max-width: 768px) {
+    #bill { flex-direction: column; }
+    .bill-left, .bill-right { width: 100%; margin-bottom: 15px; }
+}
+
+/* ===================== BILLING SECTION ===================== */
+.billing-section{
+    background-image: url(https://i.ibb.co/SXvgNLry/images.jpg);
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    padding:20px;
+}
+.billing-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap:20px;
+}
+.billing-field{
+    background:#ffffff;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #e2e2e2;
+    transition:all 0.3s ease;
+    position:relative;
+}
+.billing-field:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 15px rgba(0,0,0,0.15);
+    border-color:#007bff;
+}
+.billing-field label{
+    display:block;
+    font-size:13px;
+    margin-bottom:5px;
+    font-weight:600;
+    color:#444;
+}
+.billing-field input, .billing-field select{
+    width:100%;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    outline:none;
+    font-size:14px;
+    transition:0.2s;
+}
+.billing-field input:focus, .billing-field select:focus{
+    border-color:#007bff;
+    box-shadow:0 0 6px rgba(0,123,255,0.4);
+}
+
+/* Section Heading */
+.billing-section h4{
+    font-size:22px;
+    font-weight:700;
+    text-align:center;
+    color:#ffffff;
+    margin-bottom:20px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:linear-gradient(90deg,#007bff,#00c6ff);
+    padding:10px 20px;
+    border-radius:8px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    display:inline-block;
+}
+    </style>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <h2>Generate New Bill</h2>
+    <div class="container">
+        <div class="header-banner">
+      <img src="https://i.ibb.co/Z6gvXY4v/IMG-20260226-WA0004.webp" alt="TECH SOURCE Banner">
+     </div>
+    <form id="billForm">
+      <div class="rtpsservice">
+        <h5>RTPS Services</h5>
+        <!--caste-->
+        <label>
+            <span class="servicesname">Caste Certificate</span>
+            <div class="service-row">
+                <input type="checkbox" class="service casteCheck" data-name="Caste Certificate" data-type="caste">
+                  <select class="casteType">
+                     <option value="50">Normal (₹50)</option>
+                     <option value="200">Tatkal (₹200)</option>
+                  </select>
+                <input type="number" min="1" value="1" class="qty">
+            </div>
+        </label>
+        
+     <!-- Residential -->
+        <label>
+           <span class="servicesname">Residential Certificate</span>
+            <div class="service-row">
+              <input type="checkbox" class="service residentialCheck" data-name="Residential Certificate" data-type="residentil">
+                <select class="residentialType">
+                  <option value="50">Normal (₹50)</option>
+                  <option value="200">Tatkal (₹200)</option>
+                </select>
+             <input type="number" min="1" value="1" class="qty">
+            </div>
+        </label>
+
+     <!-- Income -->
+        <label> <span class="servicesname">Income Certificate</span>
+            <div class="service-row">
+              <input type="checkbox" class="service incomeCheck" data-name="Income Certificate" data-type="income">
+                <select class="incomeType">
+                  <option value="50">Normal (₹50)</option>
+                  <option value="200">Tatkal (₹200)</option>
+                </select>
+             <input type="number" min="1" value="1" class="qty">
+            </div>
+        </label>
+
+     <!-- EWS -->
+        <label><span class="servicesname"> E W S Certificate</span>
+            <div class="service-row">
+              <input type="checkbox" class="service ewsCheck" data-name="EWS Certificate" data-type="EWS">
+                <select class="ewsType">
+                  <option value="100">Normal (₹100)</option>
+                  <option value="250">Tatkal (₹250)</option>
+                </select> <br>
+              <input type="number" min="1" value="1" class="qty">
+            </div>
+        </label>
+        </div>
+
+              <!-- Ration Card-->
+   <div class="rationservice">
+     <h5>Ration Card Services</h5>
+
+     <!-- New Ration Card -->
+      <label> <span class="servicesname">New Ration Card Appy</span>
+        <div class="service-row">
+         <input type="checkbox" class="service newrationcheck" data-name="New Ration Card" data-type="New Ration Cad">
+            <Select class="newrationtype">
+              <option value="1500">Normal (₹1500)</option>
+              <option value="2500">Tatkal (₹2500)</option>
+            </Select> <br>
+          <input type="number" min="1" value="1" class="qty">
+        </div>
+      </label>
+      
+     <!-- Add member -->
+      <label> <span class="servicesname">Add member Ration Card</span>
+        <div class="service-row">
+          <input type="checkbox" class="service addmembercheck" data-name="Add Member Ration Card" data-type="add member ration card">
+            <select class="addmembertype">
+              <option value="200">Normal (₹200)</option>
+              <option value="500">Tatkal (₹500)</option>
+            </select>    <br>
+          <input type="number" min="1" value="1" class="qty">
+        </div>
+      </label>
+     <!---remove member-->
+      <label> <span class="servicesname">Remove Ration Card member</span>
+        <div class="service-row">
+          <input type="checkbox" class="service removerationcheck" data-name="Add Member Ration Card" data-type="add member ration card">
+            <select class="removemembertype">
+              <option value="500">Normal (₹500)</option>
+              <option value="1000">Tatkal (₹1000)</option>
+            </select> <br>
+          <input type="number" min="1" value="1" class="qty">
+        </div>
+      </label>
+    </div>
+       <!--pan card-->
+        <div class="panservice">
+        <h5>PAN Services</h5>
+        <label><span class="servicesname">New PAN Card</span>
+            <div class="service-row">
+                <input type="checkbox" class="service" data-name="New PAN Card" data-price="200">
+                <input type="number" min="1" value="1" class="qty">
+            </div>
+        </label>
+        <label><span class="servicesname">PAN Card Correction</span>
+            <div class="service-row">
+                <input type="checkbox" class="service" data-name="Correction PAN Card" data-price="200">
+                <input type="number" min="1" value="1" class="qty">
+            </div>
+        </label>
+        </div>
+
+                      <!-- Aadhar -->
+         <div class="aadharservice">
+           <h5>Aadhar Card Services</h5>
+             <label><span class="servicesname">Address Update</span>
+               <div class="service-row">
+                 <input type="checkbox" class="service" data-name="Aadhar Card Address Update" data-price="150">
+                 <input type="number" min="1" value="1" class="qty">
+               </div>
+             </label>
+              <!--Aadhar mobile number update-->
+             <label><span class="servicesname">Mobile Number Update</span>
+               <div class="service-row">
+                 <input type="checkbox" class="service" data-name="Aadhar Card Mobile Number Update" data-price="150">
+                 <input type="number" min="1" value="1" class="qty">
+               </div>
+             </label>
+         </div>
+               <!--  voter id card  -->
+         <div class="voterservice">
+           <h5>Voter Card Service</h5>
+             <label><span class="servicesname">New Voter I'D</span>
+               <div class="service-row">
+                 <input type="checkbox" class="service" data-name="New Voter I'D Card" data-price="200">
+                 <input type="number" min="1" value="1" class="qty">
+               </div>
+             </label>
+              <!--voter cerrection-->
+             <label><span class="servicesname">Correction Voter I'D card</span>
+               <div class="service-row">
+                 <input type="checkbox" class="service" data-name="Voter Card Correction" data-price="200">
+                 <input type="number" min="1" value="1" class="qty">
+               </div>
+             </label>
+              <!--voter mobile number update-->
+             <label><span class="servicesname">Voter Card Number Update</span>
+               <div class="service-row">
+                 <input type="checkbox" class="service" data-name="Voter Card Number Update" data-price="50">
+                 <input type="number" min="1" value="1" class="qty">
+               </div>
+             </label>
+         </div>
+             <!-- Print -->
+         <div class="printservice">
+           <h5>Print Service</h5>
+              <label><span class="servicesname">Photo Copy</span>
+                <div class="service-row">
+                  <input type="checkbox" class="service" data-name="Photo Copy" data-price="5">
+                  <input type="number" min="1" value="1" class="qty">
+                </div>
+              </label>
+               <!--passport size photo-->
+              <label><span class="servicesname">Passport Size Photo</span>
+                <div class="service-row">
+                  <input type="checkbox" class="service" data-name="Passport Size Photo" data-price="5">
+                  <input type="number" min="6" value="6" class="qty">
+                </div>
+              </label>
+               <!--photo copy clr-->
+              <label><span class="servicesname">Photo Copy Colour</span>
+                <div class="service-row">
+                  <input type="checkbox" class="service" data-name="Photo Copy Colour" data-price="10">
+                  <input type="number" min="1" value="1" class="qty">
+                </div>
+              </label>
+               <!--print out-->
+              <label><span class="servicesname">Print Out</span>
+                <div class="service-row">
+                  <input type="checkbox" class="service" data-name="Print Out" data-price="10">
+                  <input type="number" min="1" value="1" class="qty">
+                </div>
+               </label>
+                <!--PVC card print-->
+               <label><span class="servicesname">PVC Card Print</span>
+                 <div class="service-row">
+                   <input type="checkbox" class="service" data-name="PVC Card Print" data-price="50">
+                   <input type="number" min="1" value="1" class="qty">
+                 </div>
+               </label>
+         </div>
+         <div class="billing-section">
+        <h4>Billing Details</h4>
+        <div class="billing-grid">
+        <div class="billing-field">
+            Payment Status
+            <select id="paymentStatus">
+                <option value="Unpaid">Unpaid</option>
+                <option value="Paid">Paid</option>
+            </select>
+        </div>
+        <div class="billing-field">
+            Payment Mode
+            <select id="paymentMode">
+                <option value="Unpaid">Unpaid</option>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+            </select>
+        </div>
+        <div class="billing-field">
+            Discount Amount
+            <input type="number" id="discountInput" placeholder="Enter Discount Amount">
+        </div>
+        <div class="billing-field">
+            Customer Name
+            <input type="text" id="customerName" placeholder="Enter customer name">
+        </div>
+        <div class="billing-field">
+            Mobile Number
+            <input type="tel" id="customerMobile" placeholder="Enter Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+   </div>
+ </div>
+
+    </form>
+        <div class="groupbtn">
+      <button class="genratebillbtn" onclick="generateBill()"></button>
+      <button class="printbtn" onclick="window.print()"></button>
+      <button class="billprevbtn" onclick="viewBill('${doc.id}')"></button>
+      <button class="historybtn" onclick="openAdmin()"></button>
+    </div>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyD8-Rw3iwc5XXMCvzZt8j8fX7Z-F6nGMMc",
+    authDomain: "ts-gaming-8ef00.firebaseapp.com",
+    databaseURL: "https://ts-gaming-8ef00-default-rtdb.firebaseio.com",
+    projectId: "ts-gaming-8ef00",
+    storageBucket: "ts-gaming-8ef00.firebasestorage.app",
+    messagingSenderId: "622265302154",
+    appId: "1:622265302154:web:6feb931ea5619a9ed60173",
+    measurementId: "G-1JQRZNGWYT"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function generateBill() {
+    const billForm = document.getElementById('billForm');
+    // trigger form submit manually
+    billForm.dispatchEvent(new Event('submit', {cancelable:true}));
+}
+
+const billForm = document.getElementById('billForm');
+billForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const customerName = document.getElementById('customerName').value;
+    const customerMobile = document.getElementById('customerMobile').value;
+    const paymentStatus = document.getElementById('paymentStatus').value;
+    const paymentMode = document.getElementById('paymentMode').value;
+    let discount = parseFloat(document.getElementById('discountInput').value) || 0;
+
+    const services = [];
+    let subtotal = 0;
+
+    document.querySelectorAll('.service').forEach(serviceEl => {
+        if(serviceEl.checked){
+            const qty = parseInt(serviceEl.parentElement.querySelector('.qty').value) || 1;
+            let price = parseFloat(serviceEl.dataset.price || 0);
+            let name = serviceEl.dataset.name;
+
+            // Service-specific price selection
+            if(serviceEl.classList.contains('casteCheck')){
+                const sel = serviceEl.parentElement.querySelector('.casteType');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+            if(serviceEl.classList.contains('residentialCheck')){
+                const sel = serviceEl.parentElement.querySelector('.residentialType');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+            if(serviceEl.classList.contains('incomeCheck')){
+                const sel = serviceEl.parentElement.querySelector('.incomeType');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+            if(serviceEl.classList.contains('ewsCheck')){
+                const sel = serviceEl.parentElement.querySelector('.ewsType');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+            if(serviceEl.classList.contains('newrationcheck')){
+                const sel = serviceEl.parentElement.querySelector('.newrationtype');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+            if(serviceEl.classList.contains('addmembercheck')){
+                const sel = serviceEl.parentElement.querySelector('.addmembertype');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+            if(serviceEl.classList.contains('removerationcheck')){
+                const sel = serviceEl.parentElement.querySelector('.removemembertype');
+                price = parseFloat(sel.value);
+                name += ` (${sel.options[sel.selectedIndex].text})`;
+            }
+
+            services.push({ name, qty, price });
+            subtotal += price * qty;
+        }
+    });
+
+    if(discount > subtotal) discount = subtotal;
+    const totalAmount = subtotal - discount;
+
+    const billNo = `TS/${Math.floor(Math.random()*9000+1000)}/${new Date().getFullYear()}`;
+
+    await db.collection('bills').doc().set({
+        billNo,
+        customerName,
+        customerMobile,
+        services,
+        subtotal,
+        discount,
+        totalAmount,
+        paymentStatus,
+        paymentMode,
+        date: new Date().toISOString()
+    });
+
+    alert(`Bill Generated!\nBill No: ${billNo}\nTotal: ₹${totalAmount}`);
+    billForm.reset();
+});
+
+function openAdmin() {
+    window.open('admin.html', '_blank');
+}
+
+function viewBill(id){
+    window.open(`billview.html?id=${id}`, '_blank');
+}
+</script>
+</body>
+</html>
