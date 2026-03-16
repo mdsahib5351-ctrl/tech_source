@@ -390,6 +390,18 @@ PROFESSIONAL MODAL CSS
     0% { background: rgba(0,0,0,0); }
     100% { background: rgba(0,0,0,0.6); }
 }
+.customerLink{
+color:#2196F3;
+cursor:pointer;
+font-weight:bold;
+transition:0.3s;
+}
+
+.customerLink:hover{
+color:#0b7dda;
+text-decoration:underline;
+transform:scale(1.05);
+}
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -573,7 +585,7 @@ function renderTable(bills){
             <tr>
                 <td>${b.billNo}</td>
                 <td>${dateOnly}</td>
-                <td>${b.customerName}</td>
+                <td class="customerLink" onclick="viewBill('${b.id}')"> ${b.customerName}</td>
                 <td>${b.customerMobile}</td>
                 <td>${b.paymentMode}</td>
                 <td>₹${due}</td>
