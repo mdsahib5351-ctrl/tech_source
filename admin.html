@@ -658,20 +658,6 @@ function switchTab(tab, btn){
     loadBills();
 }
 
-// ========================
-// View / Edit / Delete
-// ========================
-function viewBill(docId){
-    db.collection('bills').doc(docId).get().then(doc=>{
-        if(doc.exists){
-            const data = doc.data();
-            const total = parseFloat(data.subtotal||0) - parseFloat(data.discount||0);
-            const due = total - parseFloat(data.paidAmount||0);
-            alert(`Bill No: ${data.billNo}\nCustomer: ${data.customerName}\nMobile: ${data.customerMobile}\nTotal: ₹${total}\nPaid: ₹${data.paidAmount}\nDue: ₹${due}\nPayment Mode: ${data.paymentMode}\nStatus: ${data.paymentStatus}`);
-        }
-    });
-}
-
 function deleteBill(docId){
     if(confirm("Are you sure you want to delete this bill?")){
         db.collection('bills').doc(docId).delete().then(()=>{
@@ -750,6 +736,9 @@ window.location.href="login.html";
 
 });
 
+}
+function viewBill(docId){
+    window.open(`billview.html?id=${docId}`, '_blank');
 }
 </script>
 </body>
