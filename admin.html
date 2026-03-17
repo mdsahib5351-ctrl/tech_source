@@ -639,7 +639,10 @@ function loadBills(){
         });
 
         if(searchMobile) bills = bills.filter(b=>b.customerMobile.includes(searchMobile));
-        if(searchBill) bills = bills.filter(b=>b.billNo.includes(searchBill));
+        if(searchBill) {
+    const s = searchBill.toLowerCase();
+    bills = bills.filter(b => (b.billNo + "").toLowerCase().includes(s));
+}
         if(dateFilter){
             bills = bills.filter(b=>{
                 const bDate = b.date instanceof firebase.firestore.Timestamp ? b.date.toDate() : new Date(b.date);
