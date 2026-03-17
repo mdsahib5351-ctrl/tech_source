@@ -400,6 +400,9 @@ color:#0b7dda;
 text-decoration:underline;
 transform:scale(1.05);
 }
+.searchbill{
+    text-transform: uppercase;
+}
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -412,7 +415,7 @@ transform:scale(1.05);
 
 <input placeholder="search by mobile number" type="text" id="searchMobile" onkeyup="loadBills()">
 
-<input placeholder="search by bill number" type="text" style="text-transform: uppercase; id="searchBill" onkeyup="loadBills()">
+<input class="searchbill" placeholder="search by bill number" type="text" id="searchBill" onkeyup="loadBills()">
 <input type="date" id="dateFilter" onchange="loadBills()">
 <button class="clear" onclick="clearFilters()"></button>
 <button class="homebtn" onclick="window.open('index.html')"></button>
