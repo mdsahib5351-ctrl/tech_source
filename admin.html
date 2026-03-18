@@ -767,7 +767,7 @@ function sendWhatsAppReminder(customerName, mobile, billNo, dueAmount, docId){
 
     const message = encodeURIComponent(
 `Hi,
-Name: *${customerName}*
+*${customerName}*
 Bill No: *${billNo}*
 Due Amount: *₹${dueAmount}*
 Date: *${formattedDate}*
