@@ -400,9 +400,6 @@ color:#0b7dda;
 text-decoration:underline;
 transform:scale(1.05);
 }
-.searchbill{
-    text-transform: uppercase;
-}
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -415,7 +412,7 @@ transform:scale(1.05);
 
 <input placeholder="search by mobile number" type="text" id="searchMobile" onkeyup="loadBills()">
 
-<input class="searchbill" placeholder="search by bill number" type="text" id="searchBill" onkeyup="loadBills()">
+<input placeholder="search by bill number" type="text" id="searchBill" onkeyup="loadBills()">
 <input type="date" id="dateFilter" onchange="loadBills()">
 <button class="clear" onclick="clearFilters()"></button>
 <button class="homebtn" onclick="window.open('index.html')"></button>
@@ -590,10 +587,12 @@ function renderTable(bills){
                 <td>₹${due}</td>
                 <td>${b.paymentStatus}</td>
                 <td class="button-group">
-                    <button class="viewBtn" onclick="viewBill('${b.id}')"></button>
-                    <button class="editBtn" onclick="openEditModal('${b.id}')"></button>
-                    <button class="deleteBtn" onclick="deleteBill('${b.id}')"></button>
-                </td>
+<td class="button-group">
+    <button class="viewBtn" onclick="viewBill('${b.id}')"></button>
+    <button class="editBtn" onclick="openEditModal('${b.id}')"></button>
+    <button class="deleteBtn" onclick="deleteBill('${b.id}')"></button>
+${currentTab==='unpaid' ? `<button class="remindBtn" onclick="sendWhatsAppReminder('${b.customerName || ''}', '${b.customerMobile || ''}', '${b.billNo || ''}', '${due}')"></button>` : ''}
+        </td>
                 <td>₹${totalAmount}</td>
             </tr>
         `;
@@ -639,10 +638,7 @@ function loadBills(){
         });
 
         if(searchMobile) bills = bills.filter(b=>b.customerMobile.includes(searchMobile));
-        if(searchBill) {
-    const s = searchBill.toLowerCase();
-    bills = bills.filter(b => (b.billNo + "").toLowerCase().includes(s));
-}
+        if(searchBill) bills = bills.filter(b=>b.billNo.includes(searchBill));
         if(dateFilter){
             bills = bills.filter(b=>{
                 const bDate = b.date instanceof firebase.firestore.Timestamp ? b.date.toDate() : new Date(b.date);
@@ -751,6 +747,51 @@ window.location.href="login.html";
 });
 
 }
+
+function sendWhatsAppReminder(customerName, mobile, billNo, dueAmount){
+    if(!mobile || !billNo || !customerName){
+        alert("Customer Name, Mobile ya Bill No missing hai!");
+        return;
+    }
+
+    mobile = mobile.replace(/\s+/g, '');
+
+    // Aaj se +7 days ka due date
+    const today = new Date();
+    const dueDate = new Date();
+    dueDate.setDate(today.getDate() + 7);
+    const yyyy = dueDate.getFullYear();
+    const mm = String(dueDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(dueDate.getDate()).padStart(2, '0');
+    const formattedDate = `${dd}-${mm}-${yyyy}`;
+
+    const message = encodeURIComponent(
+`Hi,
+Name: *${customerName}*
+Bill No: *${billNo}*
+Due Amount: *₹${dueAmount}*
+Date: *${formattedDate}*
+
+_प्रिय_  *${customerName}*,
+_यह एक अनुस्मारक है कि ऊपर उल्लिखित बिल की बकाया राशि अभी तक भुगतान नहीं हुई है। कृपया सुनिश्चित करें कि भुगतान_ _निर्धारित तिथि से पहले कर दिया जाए, ताकि सेवा में कोई रुकावट न आए।_
+
+Dear  *${customerName}*,
+_This is a reminder that the above-mentioned bill has a pending amount. Please ensure that the payment is made_ _before the due date to avoid any service disruption._
+
+_आप भुगतान इस लिंक पर क्लिक करके आसानी से कर सकते हैं_ */* _You can make the payment by clicking here:_
+
+URL 
+
+~यदि आपने पहले ही भुगतान कर दिया है, तो कृपया इसे अनदेखा करें।~
+~If you have already made the payment, please ignore this message.~
+
+*धन्यवाद* / *Thank you*`
+    );
+
+    const whatsappUrl = `https://wa.me/91${mobile}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+}
+
 function viewBill(docId){
     window.open(`billview.html?id=${docId}`, '_blank');
 }
