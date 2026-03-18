@@ -251,10 +251,11 @@ margin:0px;
 
 </div>
 </div>
-
+<button class="btn" id="payBtn" onclick="payNow()">Pay Now</button>
+</div>
+</div>
 <button class="btn" onclick="downloadPDF()">Download PDF</button>
 <button class="btn" onclick="printBill()">Print Bill</button>
-</div>
 <script>
 
 const firebaseConfig={
@@ -266,6 +267,10 @@ projectId:"tech-source-bill"
 firebase.initializeApp(firebaseConfig);
 
 const db=firebase.firestore();
+
+let amount = 0;
+let upiId = "9661905351@ybl";
+let name = "TECH SOURCE";
 
 const billDetails=document.getElementById("billDetails");
 
@@ -344,7 +349,6 @@ billDetails.innerHTML=`
   <span class="left">
     <b>Bill No:</b> ${data.billNo}
   </span>
-l
   <span class="date">
     <b>Date:</b>
     ${
@@ -442,10 +446,7 @@ ${data.paymentMode !== "Unpaid" ? `<p><b>Payment Mode:</b> ${data.paymentMode}</
 </table>
 
 `;
-
 /* QR Amount Logic */
-
-let amount;
 
 if(paidAmount <= 0){
 amount = totalAmount;
@@ -453,12 +454,9 @@ amount = totalAmount;
 amount = dueAmount;
 }
 
-/* UPI QR */
-
-const upiId="9661905351@ybl";
-const name="TECH SOURCE";
 
 const upiLink=`upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
+document.getElementById("qrcode").innerHTML = "";
 
 new QRCode(document.getElementById("qrcode"),{
 text:upiLink,
@@ -471,6 +469,9 @@ height:120
 if(data.paymentStatus==="Paid"){
 document.getElementById("paidStamp").style.display="block";
 document.getElementById("qrText").innerHTML="Payment Completed";
+
+// Pay button hide
+document.getElementById("payBtn").style.display="none";
 }
 
 });
@@ -510,6 +511,15 @@ window.print();
 
 }
 
+function payNow(){
+    if(amount <= 0){
+        alert("No payment due");
+        return;
+    }
+
+    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
+    window.location.href = upiLink;
+}
 </script>
 
 </body>
