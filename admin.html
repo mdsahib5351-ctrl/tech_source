@@ -591,7 +591,7 @@ function renderTable(bills){
     <button class="viewBtn" onclick="viewBill('${b.id}')"></button>
     <button class="editBtn" onclick="openEditModal('${b.id}')"></button>
     <button class="deleteBtn" onclick="deleteBill('${b.id}')"></button>
-${currentTab==='unpaid' ? `<button class="remindBtn" onclick="sendWhatsAppReminder('${b.customerName || ''}', '${b.customerMobile || ''}', '${b.billNo || ''}', '${due}')"></button>` : ''}
+${currentTab==='unpaid' ? `<button class="remindBtn" onclick="sendWhatsAppReminder('${b.customerName || ''}', '${b.customerMobile || ''}', '${b.billNo || ''}', '${due}', '${b.id}')"></button>` : ''}
         </td>
                 <td>₹${totalAmount}</td>
             </tr>
@@ -748,7 +748,7 @@ window.location.href="login.html";
 
 }
 
-function sendWhatsAppReminder(customerName, mobile, billNo, dueAmount){
+function sendWhatsAppReminder(customerName, mobile, billNo, dueAmount, docId){
     if(!mobile || !billNo || !customerName){
         alert("Customer Name, Mobile ya Bill No missing hai!");
         return;
@@ -780,7 +780,7 @@ _This is a reminder that the above-mentioned bill has a pending amount. Please e
 
 _आप भुगतान इस लिंक पर क्लिक करके आसानी से कर सकते हैं_ */* _You can make the payment by clicking here:_
 
-URL 
+*https://mdsahib5351-ctrl.github.io/TECH-SOURCE-/billview.html?id=${docId}*
 
 ~यदि आपने पहले ही भुगतान कर दिया है, तो कृपया इसे अनदेखा करें।~
 ~If you have already made the payment, please ignore this message.~
