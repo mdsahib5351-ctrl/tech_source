@@ -501,7 +501,7 @@ ${paidAmount > 0 ? `
 <!-- RIGHT SIDE (Payment Info) -->
 <div style="width:55%; text-align:right;">
 
-<p><b>Payment Status:</b><span style=" color:${data.paymentStatus === 'Paid' ? 'green' : 'red'}; font-weight:bold;
+<p><b>Payment Status:</b><span style="color:${data.paymentStatus}</p> === 'Paid' ? 'green' : 'red'}; font-weight:bold;
 
 ${data.paymentMode !== "Unpaid" ? `<p><b>Payment Mode:</b> ${data.paymentMode}</p>` : ``}
 
