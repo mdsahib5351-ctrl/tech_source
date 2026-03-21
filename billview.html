@@ -332,6 +332,7 @@ let upiId = "9661905351@ybl";
 let name = "TECH SOURCE";
 let currentData = null;
 let serviceNames = "";
+let notes = "";
 
 const billDetails=document.getElementById("billDetails");
 
@@ -614,11 +615,9 @@ function payNow(){
 
 function openQRPopup(){
 
-    const note = encodeURIComponent(
-        `Bill ${currentData.billNo}`
-    );
+const notes = encodeURIComponent(`Bill ${currentData.billNo}`);
 
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
+    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${notes}`;
 
     document.getElementById("bigQR").innerHTML = "";
 
