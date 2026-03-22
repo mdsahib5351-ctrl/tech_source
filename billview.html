@@ -328,11 +328,10 @@ firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
 let amount = 0;
-let upiId = "9661905351@ybl";
-let name = "TECH SOURCE";
+let upiId = "7781826687@axl";
+let namee = "TECH SOURCE";
 let currentData = null;
 let serviceNames = "";
-let notes = "";
 
 const billDetails=document.getElementById("billDetails");
 
@@ -487,13 +486,13 @@ ${(data.discount||0) > 0 ? `
 ${paidAmount > 0 ? `
 <tr>
 <td>Paid</td>
-<td style="color:green;"><b>₹${paidAmount}</b></td>
+<td>₹${paidAmount}</td>
 </tr>` : ``}
 
-${dueAmount > 0 ? `
+${paidAmount > 0 ? `
 <tr>
-<td>Due</td>
-<td style="color:red;"><b>₹${dueAmount}</b></td>
+<td><b>Due</b></td>
+<td><b>₹${dueAmount}</b></td>
 </tr>` : ``}
 
 </table>
@@ -502,12 +501,7 @@ ${dueAmount > 0 ? `
 <!-- RIGHT SIDE (Payment Info) -->
 <div style="width:55%; text-align:right;">
 
-<p>
-  <b>Payment Status:</b> 
-  <span style="color:${data.paymentStatus === 'Paid' ? 'green' : 'red'}; font-weight:bold;">
-    ${data.paymentStatus}
-  </span>
-</p>
+<p><b>Payment Status:</b> ${data.paymentStatus}</p>
 
 ${data.paymentMode !== "Unpaid" ? `<p><b>Payment Mode:</b> ${data.paymentMode}</p>` : ``}
 
@@ -598,9 +592,11 @@ function payNow(){
         return;
     }
 
-    note = encodeURIComponent(`Bill ${currentData.billNo}`);
-    
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}`;
+    const note = encodeURIComponent(
+        `Bill ${currentData.billNo} - ${serviceNames}`
+    );
+
+    const upiLink = `upi://pay?pa=${upiId}&pn=${namee}&am=${amount}&cu=INR&tn=${note}`;
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -612,10 +608,11 @@ function payNow(){
 }
 
 function openQRPopup(){
+    const note = encodeURIComponent(
+        `Bill ${currentData.billNo} - ${serviceNames}`
+    );
 
-const notes = encodeURIComponent(`Bill ${currentData.billNo}`);
-
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${notes}`;
+    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
 
     document.getElementById("bigQR").innerHTML = "";
 
