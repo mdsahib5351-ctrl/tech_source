@@ -295,13 +295,36 @@ margin:0px;
 
 </div>
 </div>
-<button class="btn" id="payBtn" onclick="payNow()">Pay Now</button>
+<button class="btn" onclick="openPayOptions()">Pay Now</button>
 </div>
 </div>
 <button class="btn" onclick="downloadPDF()">Download PDF</button>
 <button class="btn" onclick="printBill()">Print Bill</button>
 
 <!-- QR POPUP -->
+<div id="payOptions" class="qr-popup">
+  <div class="qr-box">
+    
+    <span class="close-btn" onclick="closePayOptions()">×</span>
+
+    <h2>Select Payment Option</h2>
+
+    <button class="btn" onclick="payUPI()">📱 Pay with UPI App</button><br><br>
+
+    <button class="btn" onclick="openQRPopup()">📷 Scan QR</button><br><br>
+
+    <button class="btn" onclick="copyUPI()">📋 Copy UPI ID</button><br><br>
+
+    <button class="btn" onclick="payWhatsApp()">💬 Pay via WhatsApp</button><br><br>
+
+    <input type="text" id="userUpi" placeholder="Enter UPI ID" 
+    style="padding:8px; width:90%; border-radius:8px; border:1px solid #ccc;"><br><br>
+
+<button class="btn" onclick="requestToUser()">📩 Send Request</button>
+
+  </div>
+</div>
+
 <div id="qrPopup" class="qr-popup">
   <div class="qr-box">
     
@@ -313,6 +336,8 @@ margin:0px;
 
     <p id="qrAmountText"></p>
 
+  </div>
+</div>
   </div>
 </div>
 <script>
@@ -329,7 +354,7 @@ const db=firebase.firestore();
 
 let amount = 0;
 let upiId = "7781826687@axl";
-let namee = "TECH SOURCE";
+let name = "TECH SOURCE";
 let currentData = null;
 let serviceNames = "";
 
@@ -486,13 +511,13 @@ ${(data.discount||0) > 0 ? `
 ${paidAmount > 0 ? `
 <tr>
 <td>Paid</td>
-<td>₹${paidAmount}</td>
+<td style="color:green;">₹${paidAmount}</td>
 </tr>` : ``}
 
-${paidAmount > 0 ? `
+${dueAmount > 0 ? `
 <tr>
 <td><b>Due</b></td>
-<td><b>₹${dueAmount}</b></td>
+<td style="color:red; text-decoration:bold; font-weight:bold;"><b>₹${dueAmount}</b></td>
 </tr>` : ``}
 
 </table>
@@ -581,14 +606,46 @@ window.print();
 
 }
 
-function payNow(){
+function openPayOptions(){
     if(amount <= 0){
         alert("No payment due");
         return;
     }
 
-    if(!currentData){
-        alert("Bill data not loaded yet");
+    document.getElementById("payOptions").style.display = "flex";
+}
+
+function closePayOptions(){
+    document.getElementById("payOptions").style.display = "none";
+}
+function payUPI(){
+    const note = encodeURIComponent(
+        `Bill ${currentData.billNo} - ${serviceNames}`
+    );
+
+    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
+
+    window.location.href = upiLink;
+}
+
+function copyUPI(){
+    navigator.clipboard.writeText(upiId);
+    alert("UPI ID Copied: " + upiId);
+}
+
+function payWhatsApp(){
+    const msg = encodeURIComponent(
+        `Pay ₹${amount} to ${name}\nUPI: ${upiId}\nBill: ${currentData.billNo}`
+    );
+
+    window.open(`https://wa.me/?text=${msg}`, "_blank");
+}
+
+function requestToUser(){
+    const userUpi = document.getElementById("userUpi").value.trim();
+
+    if(!userUpi || !userUpi.includes("@")){
+        alert("Enter valid UPI ID");
         return;
     }
 
@@ -596,18 +653,21 @@ function payNow(){
         `Bill ${currentData.billNo} - ${serviceNames}`
     );
 
-    const upiLink = `upi://pay?pa=${upiId}&pn=${namee}&am=${amount}&cu=INR&tn=${note}`;
+    // 🔥 Trick: reverse payment link (user ke side open hoga)
+    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
 
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    alert("Request sent! Ask customer to approve payment.");
 
-    if(isMobile){
-        window.location.href = upiLink;
-    }else{
-        openQRPopup(); // ✅ desktop me popup open
-    }
+    // 👉 user ko share karne ke liye WhatsApp open karo
+    const msg = encodeURIComponent(
+        `Payment Request\n\nPay ₹${amount} to ${name}\nUPI: ${upiId}\nBill: ${currentData.billNo}`
+    );
+
+    window.open(`https://wa.me/?text=${msg}`, "_blank");
 }
 
 function openQRPopup(){
+
     const note = encodeURIComponent(
         `Bill ${currentData.billNo} - ${serviceNames}`
     );
