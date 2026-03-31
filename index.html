@@ -513,21 +513,6 @@ h6 {
   </div>
 </section>
 
-<section id="qr-section">
-<div class="section-title">Generate UPI QR</div>
-
-<input type="text" id="upi" placeholder="UPI ID (example@bank)">
-<input type="number" id="amount" placeholder="Amount ₹ (optional)">
-<input type="text" id="name" placeholder="Name">
-<input type="text" id="note" placeholder="Note">
-<input type="color" id="qrColor" value="#000000">
-
-<button class="btn" onclick="generateQR()">Generate QR</button>
-<button class="btn" onclick="downloadQR()">Download QR</button>
-
-<div id="qrPreview"></div>
-</section>
-
 <section id="contact">
 
 <div class="section-title">Contact Us</div>
@@ -633,48 +618,6 @@ document.body.classList.toggle("dark");
 function changeTheme(theme){
 document.body.classList.remove("theme-gaming","theme-tech","theme-food");
 if(theme) document.body.classList.add(theme);
-}
-
-/* QR */
-
-let qrCode = new QRCodeStyling({
-width:250,
-height:250,
-type:"canvas",
-data:"",
-dotsOptions:{color:"#000",type:"rounded"},
-cornersSquareOptions:{type:"extra-rounded"},
-backgroundOptions:{color:"#ffffff"}
-});
-
-qrCode.append(document.getElementById("qrPreview"));
-
-function generateQR(){
-
-const upiPattern=/^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
-
-if(!upi.value) return;
-
-if(!upiPattern.test(upi.value)){
-alert("Enter Valid UPI ID (example@bank)");
-return;
-}
-
-let upiLink=`upi://pay?pa=${encodeURIComponent(upi.value)}&pn=${encodeURIComponent(name.value)}&cu=INR`;
-
-if(amount.value){
-upiLink+=`&am=${encodeURIComponent(amount.value)}`;
-}
-
-if(note.value){
-upiLink+=`&tn=${encodeURIComponent(note.value)}`;
-}
-
-qrCode.update({data:upiLink});
-}
-
-function downloadQR(){
-qrCode.download({name:"UPI_QR",extension:"png"});
 }
 
 /* Card Animation */
