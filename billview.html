@@ -598,7 +598,7 @@ const pdfHeight=(canvas.height*pdfWidth)/canvas.width;
 
 pdf.addImage(imgData,"JPEG",0,0,pdfWidth,pdfHeight);
 
-pdf.save("bill.pdf");
+pdf.save(`Bill-${currentData.billNo}.pdf`);
 
 // 🔵 Step 2: Wapas show karo
 buttons.forEach(btn => btn.style.display = "inline-block");
