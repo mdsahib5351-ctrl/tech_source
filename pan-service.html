@@ -6,6 +6,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
@@ -116,7 +117,7 @@ p {
 
   <div class="form-group">
     <label>Title</label>
-    <select id="tittle">
+    <select id="title">
       <option>Shri</option>
       <option>Kumari</option>
       <option>Smt</option>
@@ -140,7 +141,7 @@ p {
 
   <div class="form-group">
     <label>Date of Birth</label>
-    <input type="date" id="dob" required>
+    <input type="date" id="dob" required onchange="checkAge()">
   </div>
 
   <div class="form-group">
@@ -173,6 +174,15 @@ p {
       <input type="text" id="fatherName" required>
     </div>
   </div>
+
+<h3 id="guardianSection" style="display:none;">Guardian Details</h3>
+
+<div class="form-grid" id="guardianFields" style="display:none;">
+  <div class="form-group">
+    <label>Guardian Full Name</label>
+    <input type="text" id="guardianName">
+  </div>
+</div>
 
   <h3>Address Details</h3>
 
@@ -219,23 +229,34 @@ p {
 
   <div class="form-group">
     <label>Photo</label>
-    <input type="file" required>
+    <input type="file" id="photo" required>
   </div>
 
   <div class="form-group">
     <label>Signature</label>
-    <input type="file" required>
+    <input type="file" id="signature" required>
   </div>
 
   <div class="form-group">
     <label>Aadhaar Card Front</label>
-    <input type="file" required>
+    <input type="file" id="aadhaarFront" required>
   </div>
 
   <div class="form-group">
     <label>Aadhaar Card Back</label>
-    <input type="file" required>
-    </div>
+    <input type="file" id="aadhaarBack" required>
+  </div>
+
+  <!-- 👇 Guardian Upload (Hidden initially) -->
+  <div class="form-group" id="gFrontBox" style="display:none;">
+    <label>Guardian Aadhaar Front</label>
+    <input type="file" id="guardianAadhaarFront">
+  </div>
+
+  <div class="form-group" id="gBackBox" style="display:none;">
+    <label>Guardian Aadhaar Back</label>
+    <input type="file" id="guardianAadhaarBack">
+  </div>
 
 </div>
 <br>
@@ -243,10 +264,9 @@ p {
 <button class="btn" type="submit">Submit</button>
 <button class="btn" type="button" onclick="closeForm()">Cancel</button>
    <hr>
-  <p>⬇️✍️:Note:✍️⬇️
-<p>• All fields are mandatory</p>
-      <p>• All documents must be in JPG,PDF or PNG format.</p>
-      <P>• Pan Card Apply Fee: Rs. 190</p> <br> <br>
+<p>Note: All fields are mandatory</p>
+      <p>Note: All documents must be in JPG,PDF or PNG format.</p>
+      <P>Note: Pan Card Apply Fee: Rs. 190</p>
 
 </form>
 
@@ -300,25 +320,67 @@ async function uploadToImgBB(file){
 document.getElementById("newpanForm").addEventListener("submit", async function(e){
 e.preventDefault();
 
-alert("Uploading documents... कृपया इंतजार करें ⏳"); // ✅ यहाँ लगाओ
+alert("Uploading documents... कृपया इंतजार करें ⏳");
 
 let files = document.querySelectorAll('#newpanForm input[type="file"]');
 
 try{
 
-let photo = await uploadToImgBB(files[0].files[0]);
-let signature = await uploadToImgBB(files[1].files[0]);
-let aadhaarFront = await uploadToImgBB(files[2].files[0]);
-let aadhaarBack = await uploadToImgBB(files[3].files[0]);
+// 🔢 AGE CALCULATION
+let dobValue = document.getElementById("dob").value;
+let birthDate = new Date(dobValue);
+let today = new Date();
+
+let age = today.getFullYear() - birthDate.getFullYear();
+let m = today.getMonth() - birthDate.getMonth();
+
+if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+  age--;
+}
+
+// 📤 NORMAL UPLOAD
+let photo = await uploadToImgBB(document.getElementById("photo").files[0]);
+let signature = await uploadToImgBB(document.getElementById("signature").files[0]);
+let aadhaarFront = await uploadToImgBB(document.getElementById("aadhaarFront").files[0]);
+let aadhaarBack = await uploadToImgBB(document.getElementById("aadhaarBack").files[0]);
+
+// 👇 GUARDIAN VARIABLES
+let guardianName = "";
+let guardianFront = "";
+let guardianBack = "";
+
+// 🧒 IF MINOR (<18)
+if(age < 18){
+
+  let gName = document.getElementById("guardianName").value;
+  let gFrontFile = document.getElementById("guardianAadhaarFront").files[0];
+  let gBackFile = document.getElementById("guardianAadhaarBack").files[0];
+
+  if(!gName || !gFrontFile || !gBackFile){
+    alert("Minor applicant ke liye guardian details required hai");
+    return;
+  }
+
+  alert("Guardian documents upload ho rahe hain ⏳");
+
+  guardianName = gName;
+  guardianFront = await uploadToImgBB(gFrontFile);
+  guardianBack = await uploadToImgBB(gBackFile);
+}
+
 let ackNo = generateAck();
 
+// 📦 FINAL DATA
 formData = {
   ackNo,
-  title: document.getElementById("tittle").value,
+  title: document.getElementById("title").value,
   name: document.getElementById("name").value,
   aadhaar: document.getElementById("aadhar").value,
   nameAadhar: document.getElementById("nameAadhar").value,
-  dob: document.getElementById("dob").value,
+  dob: dobValue,
+  age, // ✅ extra useful field
+  isMinor: age < 18, // ✅ flag
+
   gender: document.getElementById("gender").value,
   phone: document.getElementById("phone").value,
   email: document.getElementById("email").value,
@@ -337,6 +399,11 @@ formData = {
   aadhaarFront,
   aadhaarBack,
 
+  // 👇 Guardian Data
+  guardianName,
+  guardianFront,
+  guardianBack,
+
   status: "pending",
   createdAt: new Date()
 };
@@ -344,6 +411,9 @@ formData = {
 await db.collection("applications").add(formData);
 
 alert("Application Submitted ✅\nYour Ack No: " + ackNo);
+generatePDF(formData);
+
+document.getElementById("newpanForm").reset();
 
 closeForm();
 
@@ -384,7 +454,7 @@ function trackstatus(){
 
         let status =
   data.status === "approved" ? "🟢 Approved" :
-  data.status === "under proccess" ? "🟠 Under proccess" :
+  data.status === "under proccess" ? "🟠 Under process" :
   data.status === "rejected" ? "🔴 Rejected" :
   "🟡 Pending";
 
@@ -407,6 +477,72 @@ Remark: ${remark}`
     .catch(err=>{
       alert("Error: "+err.message);
     });
+}
+function checkAge(){
+  let dob = document.getElementById("dob").value;
+  if(!dob) return;
+
+  let birthDate = new Date(dob);
+  let today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  if(age < 18){
+    document.getElementById("guardianSection").style.display = "block";
+    document.getElementById("guardianFields").style.display = "grid";
+
+    document.getElementById("gFrontBox").style.display = "block";
+    document.getElementById("gBackBox").style.display = "block";
+
+  }else{
+    document.getElementById("guardianSection").style.display = "none";
+    document.getElementById("guardianFields").style.display = "none";
+
+    document.getElementById("gFrontBox").style.display = "none";
+    document.getElementById("gBackBox").style.display = "none";
+
+    // clear
+    document.getElementById("guardianName").value = "";
+    document.getElementById("guardianAadhaarFront").value = "";
+    document.getElementById("guardianAadhaarBack").value = "";
+  }
+}
+
+function generatePDF(data){
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("PAN Application Receipt", 20, 20);
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+
+  doc.text(`ACK No: ${data.ackNo}`, 20, 40);
+  doc.text(`Name: ${data.name}`, 20, 50);
+  doc.text(`DOB: ${data.dob}`, 20, 60);
+  doc.text(`Phone: ${data.phone}`, 20, 70);
+  doc.text(`Email: ${data.email}`, 20, 80);
+
+  doc.text(`Status: Pending`, 20, 90);
+
+  // Minor info
+  if(data.isMinor){
+    doc.text("Applicant Type: Minor", 20, 100);
+    doc.text(`Guardian: ${data.guardianName}`, 20, 110);
+  }
+
+  doc.text("Fee Paid: Rs. 190", 20, 130);
+  doc.text("Thank you for applying!", 20, 150);
+
+  doc.save(`PAN_ACK_${data.ackNo}.pdf`);
 }
 </script>
 
