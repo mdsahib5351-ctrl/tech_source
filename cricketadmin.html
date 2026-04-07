@@ -56,6 +56,24 @@ body{
 .approve{background:#22c55e;}
 .reject{background:#ef4444;}
 .delete{background:#eab308;}
+
+.input-group{
+    display:flex;
+    flex-wrap:wrap;
+}
+
+.input-group input{
+    margin:5px;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+}
+.input-group select{
+    margin:5px;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+}
 </style>
 </head>
 
@@ -76,7 +94,29 @@ body{
 <h3>🏏 All Teams</h3>
 <div id="list"></div>
 
+<hr>
+
+<h3>📅 Create Match</h3>
+
+<div class="input-group">
+<select id="team1" onchange="fillCaptain(1)"></select>
+<input id="captain1" placeholder="Captain 1" readonly>
+
+<select id="team2" onchange="fillCaptain(2)"></select>
+<input id="captain2" placeholder="Captain 2" readonly>
+
+<input id="date" placeholder="Match Date (e.g. 10 April)">
+<input id="time" placeholder="Time (e.g. 2:00 PM)">
+<input id="overs" placeholder="Overs (e.g. 10)">
 </div>
+
+<button class="btn approve" onclick="createMatch()">Create Match</button>
+
+</div>
+<hr>
+
+<h3>🏆 Declare Result</h3>
+<div id="matchList"></div>
 <script>
 
 // Firebase config
@@ -129,11 +169,19 @@ db.collection("tournament")
 
             Status: <span class="status ${d.status}">${d.status}</span><br>
 
-            ${d.status === 'payment_submitted' ? `
-                <button class="btn approve" onclick="approve('${doc.id}')">Approve</button>
-                <button class="btn reject" onclick="reject('${doc.id}')">Reject</button>
-                <button class="btn delete" onclick="deleteDoc('${doc.id}')">Delete</button>
-            ` : ''}
+<div style="margin-top:10px;">
+
+    ${d.status !== 'approved' ? `
+        <button class="btn approve" onclick="approve('${doc.id}')">Approve</button>
+    ` : ''}
+
+    ${d.status !== 'rejected' ? `
+        <button class="btn reject" onclick="reject('${doc.id}')">Reject</button>
+    ` : ''}
+
+    <button class="btn delete" onclick="deleteDoc('${doc.id}')">Delete</button>
+
+</div>
 
         </div>
         `;
@@ -162,6 +210,130 @@ function deleteDoc(id){
     if(confirm("Delete this team?")){
         db.collection("tournament").doc(id).delete();
     }
+}
+function createMatch(){
+
+    const team1 = document.getElementById("team1").value;
+    const team2 = document.getElementById("team2").value;
+    const captain1 = document.getElementById("captain1").value;
+    const captain2 = document.getElementById("captain2").value;
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("time").value;
+    const overs = document.getElementById("overs").value;
+
+    if(!team1 || !team2 || !captain1 || !captain2 || !date || !time || !overs){
+        alert("Sab field fill karo");
+        return;
+    }
+
+    db.collection("matches").add({
+        team1,
+        team2,
+        captain1,
+        captain2,
+        date,
+        time,
+        overs,
+        createdAt: new Date()
+    });
+
+    alert("Match Created ✅");
+
+    // Clear fields
+    document.getElementById("team1").value = "";
+    document.getElementById("team2").value = "";
+    document.getElementById("captain1").value = "";
+    document.getElementById("captain2").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("time").value = "";
+    document.getElementById("overs").value = "";
+
+}
+let teamsData = {};
+
+// 🔄 Load approved teams into dropdown
+db.collection("tournament")
+.where("status","==","approved")
+.onSnapshot(snapshot => {
+
+    let options = '<option value="">Select Team</option>';
+
+    snapshot.forEach(doc => {
+        const d = doc.data();
+
+        // store data
+        teamsData[d.team] = d;
+
+        options += `<option value="${d.team}">${d.team}</option>`;
+    });
+
+    document.getElementById("team1").innerHTML = options;
+    document.getElementById("team2").innerHTML = options;
+
+});
+function fillCaptain(num){
+
+    const team = document.getElementById("team"+num).value;
+
+    if(teamsData[team]){
+        document.getElementById("captain"+num).value = teamsData[team].captain;
+    }
+
+}
+db.collection("matches")
+.orderBy("createdAt","desc")
+.onSnapshot(snapshot => {
+
+    let html = "";
+
+    snapshot.forEach(doc => {
+
+        const d = doc.data();
+
+        html += `
+        <div class="card">
+
+            <b>🏏 ${d.team1} vs ${d.team2}</b><br><br>
+
+            📅 ${d.date} | ⏰ ${d.time}<br>
+            🎯 Overs: ${d.overs}<br><br>
+
+            ${
+                d.winner ? 
+                `<span style="color:#22c55e;">🏆 Winner: ${d.winner}</span>` :
+                `
+                <select id="winner_${doc.id}">
+                    <option value="">Select Winner</option>
+                    <option value="${d.team1}">${d.team1}</option>
+                    <option value="${d.team2}">${d.team2}</option>
+                </select>
+
+                <button class="btn approve" onclick="declareWinner('${doc.id}')">Save</button>
+                `
+            }
+
+        </div>
+        `;
+    });
+
+    document.getElementById("matchList").innerHTML = html;
+
+});
+function declareWinner(id){
+
+    const winner = document.getElementById("winner_"+id).value;
+
+    if(!winner){
+        alert("Winner select karo");
+        return;
+    }
+
+    db.collection("matches").doc(id).update({
+        winner: winner
+    });
+
+    alert("Result Declared ✅");
+
 }
 </script>
 
