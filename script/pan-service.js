@@ -69,6 +69,7 @@ let photo = await uploadToImgBB(document.getElementById("photo").files[0]);
 let signature = await uploadToImgBB(document.getElementById("signature").files[0]);
 let aadhaarFront = await uploadToImgBB(document.getElementById("aadhaarFront").files[0]);
 let aadhaarBack = await uploadToImgBB(document.getElementById("aadhaarBack").files[0]);
+let dobProof = await uploadToImgBB(document.getElementById("dobProof").files[0]);
 
 // 👇 GUARDIAN VARIABLES
 let guardianName = "";
@@ -124,6 +125,7 @@ formData = {
   signature,
   aadhaarFront,
   aadhaarBack,
+  dobProof,
 
   // 👇 Guardian Data
   guardianName,
@@ -269,4 +271,80 @@ function generatePDF(data){
   doc.text("Thank you for applying!", 20, 150);
 
   doc.save(`PAN_ACK_${data.ackNo}.pdf`);
+}
+async function getPan(){
+
+    const ackInput = document.getElementById("ackNo");
+    const msg = document.getElementById("downloadMsg");
+
+    const ack = ackInput.value.trim();
+
+    msg.style.color = "red";
+    msg.innerText = "";
+
+    if(!ack){
+        msg.innerText = "⚠️ Enter Ack No";
+        return;
+    }
+
+    try{
+
+        msg.innerText = "⏳ Checking...";
+
+        const snapshot = await db.collection("applications")
+            .where("ackNo", "==", ack)
+            .get();
+
+        if(snapshot.empty){
+            msg.innerText = "❌ No Record Found";
+            return;
+        }
+
+        const data = snapshot.docs[0].data();
+
+        if(!data.documentUrl){
+            msg.innerText = "⏳ PAN not ready yet";
+            return;
+        }
+
+        msg.innerText = "⬇️ Downloading...";
+
+        // 🔥 fetch image as blob
+        const response = await fetch(data.documentUrl);
+        const blob = await response.blob();
+
+        // 🔥 create download link
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `PAN_${data.ackNo}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+
+        // cleanup
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        msg.style.color = "green";
+        msg.innerText = "✅ Download Started";
+
+        // optional: auto close popup
+        setTimeout(()=>{
+            closeDownloadPopup();
+        }, 1500);
+
+    }catch(err){
+        msg.innerText = "❌ Download failed: " + err.message;
+    }
+}
+
+function openDownloadPopup(){
+    document.getElementById("downloadPopup").style.display = "flex";
+}
+
+function closeDownloadPopup(){
+    document.getElementById("downloadPopup").style.display = "none";
+    document.getElementById("ackNo").value = "";
+    document.getElementById("downloadMsg").innerText = "";
 }
