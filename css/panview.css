@@ -22,3 +22,27 @@ img{
 .section{
     margin-top:20px;
 }
+.doc-box {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.doc-box img {
+  width: 200px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.download-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background: darkgreen;
+}
