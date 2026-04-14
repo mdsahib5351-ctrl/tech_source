@@ -43,112 +43,130 @@ async function uploadToImgBB(file){
 }
 
 /* SUBMIT */
-document.getElementById("newpanForm").addEventListener("submit", async function(e){
+document.getElementById("newpanForm").addEventListener("submit", async function(e) {
 e.preventDefault();
 
-alert("Uploading documents... कृपया इंतजार करें ⏳");
+const loading = document.getElementById("loadingOverlay");
+const submitBtn = document.querySelector("#newpanForm button[type='submit']");
 
-let files = document.querySelectorAll('#newpanForm input[type="file"]');
+try {
 
-try{
+    // 🔥 START LOADING
+    loading.style.display = "flex";
+    loading.querySelector("p").innerText = "Uploading documents...";
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Processing...";
 
-// 🔢 AGE CALCULATION
-let dobValue = document.getElementById("dob").value;
-let birthDate = new Date(dobValue);
-let today = new Date();
+    // 🔢 AGE CALCULATION
+    let dobValue = document.getElementById("dob").value;
+    let birthDate = new Date(dobValue);
+    let today = new Date();
 
-let age = today.getFullYear() - birthDate.getFullYear();
-let m = today.getMonth() - birthDate.getMonth();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    let m = today.getMonth() - birthDate.getMonth();
 
-if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-  age--;
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    // 📤 UPLOAD STEP BY STEP
+    loading.querySelector("p").innerText = "Uploading Photo...";
+    let photo = await uploadToImgBB(document.getElementById("photo").files[0]);
+
+    loading.querySelector("p").innerText = "Uploading Signature...";
+    let signature = await uploadToImgBB(document.getElementById("signature").files[0]);
+
+    loading.querySelector("p").innerText = "Uploading Aadhaar Front...";
+    let aadhaarFront = await uploadToImgBB(document.getElementById("aadhaarFront").files[0]);
+
+    loading.querySelector("p").innerText = "Uploading Aadhaar Back...";
+    let aadhaarBack = await uploadToImgBB(document.getElementById("aadhaarBack").files[0]);
+
+    loading.querySelector("p").innerText = "Uploading DOB Proof...";
+    let dobProof = await uploadToImgBB(document.getElementById("dobProof").files[0]);
+
+    // 👶 GUARDIAN
+    let guardianName = "";
+    let guardianFront = "";
+    let guardianBack = "";
+
+    if(age < 18){
+
+        let gName = document.getElementById("guardianName").value;
+        let gFrontFile = document.getElementById("guardianAadhaarFront").files[0];
+        let gBackFile = document.getElementById("guardianAadhaarBack").files[0];
+
+        if(!gName || !gFrontFile || !gBackFile){
+            throw "Guardian details required for minor applicant";
+        }
+
+        loading.querySelector("p").innerText = "Uploading Guardian Docs...";
+
+        guardianName = gName;
+        guardianFront = await uploadToImgBB(gFrontFile);
+        guardianBack = await uploadToImgBB(gBackFile);
+    }
+
+    loading.querySelector("p").innerText = "Saving Application...";
+
+    let ackNo = generateAck();
+
+    formData = {
+        ackNo,
+        title: document.getElementById("title").value,
+        name: document.getElementById("name").value,
+        aadhaar: document.getElementById("aadhar").value,
+        nameAadhar: document.getElementById("nameAadhar").value,
+        dob: dobValue,
+        age,
+        isMinor: age < 18,
+
+        gender: document.getElementById("gender").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        father: document.getElementById("fatherName").value,
+
+        flatNo: document.getElementById("flatNo").value,
+        villageCity: document.getElementById("villageCity").value,
+        postOffice: document.getElementById("postOffice").value,
+        subDivision: document.getElementById("subDivision").value,
+        district: document.getElementById("district").value,
+        state: document.getElementById("state").value,
+        pinCode: document.getElementById("pinCode").value,
+
+        photo,
+        signature,
+        aadhaarFront,
+        aadhaarBack,
+        dobProof,
+
+        guardianName,
+        guardianFront,
+        guardianBack,
+
+        status: "pending",
+        createdAt: new Date()
+    };
+
+        await db.collection("applications").add(formData);
+
+        // optional: save ack locally also
+        localStorage.setItem("ackNo", ackNo);
+
+        // redirect to payment page
+        window.location.href = "payment.html?ack=" + ackNo;
+
+        } catch(err) {
+
+    alert("Error: " + err);
+
+} finally {
+
+    // 🔥 ALWAYS STOP LOADING
+    loading.style.display = "none";
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Submit";
 }
-
-// 📤 NORMAL UPLOAD
-let photo = await uploadToImgBB(document.getElementById("photo").files[0]);
-let signature = await uploadToImgBB(document.getElementById("signature").files[0]);
-let aadhaarFront = await uploadToImgBB(document.getElementById("aadhaarFront").files[0]);
-let aadhaarBack = await uploadToImgBB(document.getElementById("aadhaarBack").files[0]);
-let dobProof = await uploadToImgBB(document.getElementById("dobProof").files[0]);
-
-// 👇 GUARDIAN VARIABLES
-let guardianName = "";
-let guardianFront = "";
-let guardianBack = "";
-
-// 🧒 IF MINOR (<18)
-if(age < 18){
-
-  let gName = document.getElementById("guardianName").value;
-  let gFrontFile = document.getElementById("guardianAadhaarFront").files[0];
-  let gBackFile = document.getElementById("guardianAadhaarBack").files[0];
-
-  if(!gName || !gFrontFile || !gBackFile){
-    alert("Minor applicant ke liye guardian details required hai");
-    return;
-  }
-
-  alert("Guardian documents upload ho rahe hain ⏳");
-
-  guardianName = gName;
-  guardianFront = await uploadToImgBB(gFrontFile);
-  guardianBack = await uploadToImgBB(gBackFile);
-}
-
-let ackNo = generateAck();
-
-// 📦 FINAL DATA
-formData = {
-  ackNo,
-  title: document.getElementById("title").value,
-  name: document.getElementById("name").value,
-  aadhaar: document.getElementById("aadhar").value,
-  nameAadhar: document.getElementById("nameAadhar").value,
-  dob: dobValue,
-  age, // ✅ extra useful field
-  isMinor: age < 18, // ✅ flag
-
-  gender: document.getElementById("gender").value,
-  phone: document.getElementById("phone").value,
-  email: document.getElementById("email").value,
-  father: document.getElementById("fatherName").value,
-
-  flatNo: document.getElementById("flatNo").value,
-  villageCity: document.getElementById("villageCity").value,
-  postOffice: document.getElementById("postOffice").value,
-  subDivision: document.getElementById("subDivision").value,
-  district: document.getElementById("district").value,
-  state: document.getElementById("state").value,
-  pinCode: document.getElementById("pinCode").value,
-
-  photo,
-  signature,
-  aadhaarFront,
-  aadhaarBack,
-  dobProof,
-
-  // 👇 Guardian Data
-  guardianName,
-  guardianFront,
-  guardianBack,
-
-  status: "pending",
-  createdAt: new Date()
-};
-
-await db.collection("applications").add(formData);
-
-alert("Application Submitted ✅\nYour Ack No: " + ackNo);
-generatePDF(formData);
-
-document.getElementById("newpanForm").reset();
-
-closeForm();
-
-}catch(err){
-alert("Error: "+err);
-}
-
 });
 function generateAck(){
   let date = new Date();
@@ -274,20 +292,31 @@ function generatePDF(data){
 }
 async function getPan(){
 
+    const loading = document.getElementById("loadingOverlay");
+    const submitBtn = document.getElementById("submitBtn");
     const ackInput = document.getElementById("ackNo");
     const msg = document.getElementById("downloadMsg");
+
+    // 👉 START LOADING
+    loading.style.display = "flex";
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Processing...";
 
     const ack = ackInput.value.trim();
 
     msg.style.color = "red";
     msg.innerText = "";
 
-    if(!ack){
-        msg.innerText = "⚠️ Enter Ack No";
-        return;
-    }
+    try {
 
-    try{
+        if(!ack){
+            loading.style.display = "none";
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit";
+
+            msg.innerText = "⚠️ Enter Ack No";
+            return;
+        }
 
         msg.innerText = "⏳ Checking...";
 
@@ -296,6 +325,10 @@ async function getPan(){
             .get();
 
         if(snapshot.empty){
+            loading.style.display = "none";
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit";
+
             msg.innerText = "❌ No Record Found";
             return;
         }
@@ -303,17 +336,19 @@ async function getPan(){
         const data = snapshot.docs[0].data();
 
         if(!data.documentUrl){
+            loading.style.display = "none";
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit";
+
             msg.innerText = "⏳ PAN not ready yet";
             return;
         }
 
         msg.innerText = "⬇️ Downloading...";
 
-        // 🔥 fetch image as blob
         const response = await fetch(data.documentUrl);
         const blob = await response.blob();
 
-        // 🔥 create download link
         const url = window.URL.createObjectURL(blob);
 
         const a = document.createElement("a");
@@ -322,20 +357,27 @@ async function getPan(){
         document.body.appendChild(a);
         a.click();
 
-        // cleanup
         a.remove();
         window.URL.revokeObjectURL(url);
 
         msg.style.color = "green";
         msg.innerText = "✅ Download Started";
 
-        // optional: auto close popup
-        setTimeout(()=>{
+        // 👉 SUCCESS END CLEANUP
+        setTimeout(() => {
             closeDownloadPopup();
         }, 1500);
 
-    }catch(err){
+    } catch(err) {
+
         msg.innerText = "❌ Download failed: " + err.message;
+
+    } finally {
+
+        // 👉 ALWAYS RUN (MOST IMPORTANT FIX)
+        loading.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit";
     }
 }
 
@@ -347,4 +389,23 @@ function closeDownloadPopup(){
     document.getElementById("downloadPopup").style.display = "none";
     document.getElementById("ackNo").value = "";
     document.getElementById("downloadMsg").innerText = "";
+}
+
+async function payNow() {
+  let res = await fetch("http://localhost:5000/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount: 100 })
+  });
+
+  let data = await res.json();
+
+  const cashfree = Cashfree({
+    mode: "sandbox"
+  });
+
+  cashfree.checkout({
+    paymentSessionId: data.payment_session_id,
+    redirectTarget: "_self"
+  });
 }
