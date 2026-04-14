@@ -270,87 +270,33 @@ window.print();
 
 }
 
-function openPayOptions(){
-    if(amount <= 0){
-        alert("No payment due");
-        return;
-    }
+async function payNow() {
+  try {
 
-    document.getElementById("payOptions").style.display = "flex";
-}
-
-function closePayOptions(){
-    document.getElementById("payOptions").style.display = "none";
-}
-function payUPI(){
-    const note = encodeURIComponent(
-        `Bill ${currentData.billNo} - ${serviceNames}`
-    );
-
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
-
-    window.location.href = upiLink;
-}
-
-function copyUPI(){
-    navigator.clipboard.writeText(upiId);
-    alert("UPI ID Copied: " + upiId);
-}
-
-function payWhatsApp(){
-    const msg = encodeURIComponent(
-        `Pay ₹${amount} to ${name}\nUPI: ${upiId}\nBill: ${currentData.billNo}`
-    );
-
-    window.open(`https://wame/91${mobile}?text=${msg}`, "_blank");
-}
-
-function requestToUser(){
-    const userUpi = document.getElementById("userUpi").value.trim();
-
-    if(!userUpi || !userUpi.includes("@")){
-        alert("Enter valid UPI ID");
-        return;
-    }
-
-    const note = encodeURIComponent(
-        `Bill ${currentData.billNo} - ${serviceNames}`
-    );
-
-    // 🔥 Trick: reverse payment link (user ke side open hoga)
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
-
-    alert("Request sent! Ask customer to approve payment.");
-
-    // 👉 user ko share karne ke liye WhatsApp open karo
-    const msg = encodeURIComponent(
-        `Payment Request\n\nPay ₹${amount} to ${name}\nUPI: ${upiId}\nBill: ${currentData.billNo}`
-    );
-
-    window.open(`https://wa.me/?text=${msg}`, "_blank");
-}
-
-function openQRPopup(){
-
-    const note = encodeURIComponent(
-        `Bill ${currentData.billNo} - ${serviceNames}`
-    );
-
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
-
-    document.getElementById("bigQR").innerHTML = "";
-
-    new QRCode(document.getElementById("bigQR"),{
-        text: upiLink,
-        width:200,
-        height:200
+    const res = await fetch("http://localhost:5000/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: Number(amount) })
     });
 
-    document.getElementById("qrAmountText").innerText = `Amount: ₹${amount}`;
+    const data = await res.json();
 
-    document.getElementById("qrPopup").style.display = "flex";
-}
+    if (!data.payment_session_id) {
+      alert("Payment session not created");
+      return;
+    }
 
-function closeQR(){
-    document.getElementById("qrPopup").style.display = "none";
+    const cashfree = Cashfree({
+    mode: "production"
+    });
+
+    cashfree.checkout({
+      paymentSessionId: data.payment_session_id,
+      redirectTarget: "_self"
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert("Payment failed");
+  }
 }
