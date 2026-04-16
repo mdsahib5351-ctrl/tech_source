@@ -23,8 +23,10 @@ const container = document.getElementById("data");
 if (!id) {
   container.innerHTML = "<p>Invalid ID</p>";
 } else {
-  db.collection("applications").doc(id).get()
-    .then(doc => {
+
+  db.collection("applications").doc(id)
+    .onSnapshot(doc => {
+
       if (!doc.exists) {
         container.innerHTML = "<p>No application found</p>";
         return;
@@ -33,28 +35,57 @@ if (!id) {
       const d = doc.data();
 
       container.innerHTML = `
-        <div class="section">
-          <b>Ack No:</b> ${d.ackNo || ""}<br>
-          <b>Name:</b> ${d.name || ""}<br>
-          <b>Name (Aadhaar):</b> ${d.nameAadhar || ""}<br>
-          <b>Gender:</b> ${d.gender || ""}<br>
-          <b>DOB:</b> ${d.dob || ""}<br>
-          <b>Phone:</b> ${d.phone || ""}<br>
-          <b>Email:</b> ${d.email || ""}<br>
-          <b>Father Name:</b> ${d.father || ""}<br>
+<div class="section">
 
-          <h3>Address</h3>
-          <b>Flat:</b> ${d.flatNo || ""}<br>
-          <b>Village:</b> ${d.villageCity || ""}<br>
-          <b>Post Office:</b> ${d.postOffice || ""}<br>
-          <b>Sub Division:</b> ${d.subDivision || ""}<br>
-          <b>District:</b> ${d.district || ""}<br>
-          <b>State:</b> ${d.state || ""}<br>
-          <b>PIN:</b> ${d.pinCode || ""}<br>
+  <div class="row"><span>Ack No</span><p onclick="copyText(this)">${d.ackNo || ""}</p></div>
+  <div class="row"><span>Name</span><p onclick="copyText(this)">${d.name || ""}</p></div>
+  <div class="row"><span>Name (Aadhaar)</span><p onclick="copyText(this)">${d.nameAadhar || ""}</p></div>
+  <div class="row"><span>Gender</span><p onclick="copyText(this)">${d.gender || ""}</p></div>
+  <div class="row"><span>DOB</span><p onclick="copyText(this)">${d.dob || ""}</p></div>
+  <div class="row"><span>Phone</span><p onclick="copyText(this)">${d.phone || ""}</p></div>
+  <div class="row"><span>Email</span><p onclick="copyText(this)">${d.email || ""}</p></div>
+  <div class="row"><span>Father Name</span><p onclick="copyText(this)">${d.father || ""}</p></div>
 
-          <b>Status:</b> ${d.status || "Pending"}
-        </div>
+  <h3>Address</h3>
 
+  <div class="row"><span>Flat</span><p onclick="copyText(this)">${d.flatNo || ""}</p></div>
+  <div class="row"><span>Village</span><p onclick="copyText(this)">${d.villageCity || ""}</p></div>
+  <div class="row"><span>Post Office</span><p onclick="copyText(this)">${d.postOffice || ""}</p></div>
+  <div class="row"><span>Sub Division</span><p onclick="copyText(this)">${d.subDivision || ""}</p></div>
+  <div class="row"><span>District</span><p onclick="copyText(this)">${d.district || ""}</p></div>
+  <div class="row"><span>State</span><p onclick="copyText(this)">${d.state || ""}</p></div>
+  <div class="row"><span>PIN</span><p onclick="copyText(this)">${d.pinCode || ""}</p></div>
+
+  <hr>
+
+  <div class="row">
+    <span>Application Status</span>
+    <p style="color:${d.status==='approved'?'green':'orange'}; font-weight:bold;">
+      ${d.status || "Pending"}
+    </p>
+  </div>
+
+<div class="row">
+  <span>Payment Status</span>
+  <p style="color:${(d.paymentStatus || '').toLowerCase()==='paid'?'green':'red'}; font-weight:bold;">
+    ${d.paymentStatus || "Unpaid"}
+  </p>
+</div>
+
+  ${d.txnId ? `
+    <div class="row">
+      <span>Txn ID</span>
+      <p onclick="copyText(this)">${d.txnId}</p>
+    </div>
+  ` : ""}
+
+  ${d.paymentScreenshot ? `
+    <div style="text-align:center; margin-top:10px;">
+      <img src="${d.paymentScreenshot}" width="200" style="border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.2);"/>
+    </div>
+  ` : ""}
+
+</div>
         <div class="section">
           <h3>Documents</h3>
 
@@ -71,10 +102,6 @@ if (!id) {
           ` : ""}
         </div>
       `;
-    })
-    .catch(err => {
-      console.error(err);
-      container.innerHTML = "<p>Error loading data</p>";
     });
 }
 
@@ -161,4 +188,32 @@ async function downloadPDF(url, name) {
 
   pdf.addImage(img, "JPEG", 10, 10, 180, 250);
   pdf.save(name + ".pdf");
+}
+
+function copyText(el) {
+  const text = el.innerText;
+
+  navigator.clipboard.writeText(text).then(() => {
+
+    // small highlight
+    el.style.background = "#d4edda";
+    el.style.padding = "2px 5px";
+    el.style.borderRadius = "4px";
+
+    // toast message
+    showToast("Copied ✔");
+
+    setTimeout(() => {
+      el.style.background = "";
+    }, 800);
+  });
+}
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1000);
 }
