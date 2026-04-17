@@ -136,7 +136,8 @@ if (!id) {
       // 📂 DOCUMENTS
       // =========================
       let docsHTML = "";
-
+      docsHTML += "<h4>Payment Screenshot</h4><hr>";
+      docsHTML += imgBox(d.paymentScreenshot, "Payment Screenshot");
       docsHTML += imgBox(d.photo, "Photo");
       docsHTML += imgBox(d.signature, "Signature");
       docsHTML += imgBox(d.aadhaarFront, "Aadhaar Front");
