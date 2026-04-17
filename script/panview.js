@@ -104,6 +104,7 @@ if (!id) {
       // =========================
       document.getElementById("ack").innerText = d.ackNo || "-";
       document.getElementById("aadhaarName").innerText = d.nameAadhar || "-";
+      document.getElementById("aadhar").innerText = d.aadhaar || "-";
       document.getElementById("gender").innerText = d.gender || "-";
       document.getElementById("dob").innerText = d.dob || "-";
       document.getElementById("phone").innerText = d.phone || "-";
@@ -119,6 +120,7 @@ if (!id) {
       document.getElementById("district").innerText = d.district || "-";
       document.getElementById("state").innerText = d.state || "-";
       document.getElementById("pin").innerText = d.pinCode || "-";
+      document.getElementById("dobdocType").innerText = d.dobdocType || "-";
 
       // =========================
       // 📊 STATUS
