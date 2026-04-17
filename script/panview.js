@@ -1,3 +1,4 @@
+// 🔥 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
   authDomain: "tech-source-bill.firebaseapp.com",
@@ -8,130 +9,215 @@ const firebaseConfig = {
   appId: "1:690209240188:web:6e54de365e7f839634c5f9"
 };
 
-// init firebase safely
+// ✅ Safe init
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
 const db = firebase.firestore();
 
+// 👉 URL से ID
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-const container = document.getElementById("data");
+// ⏳ Loading
+document.getElementById("data").innerHTML += "<p>Loading...</p>";
 
 if (!id) {
-  container.innerHTML = "<p>Invalid ID</p>";
+  document.getElementById("data").innerHTML = "<p>Invalid ID</p>";
 } else {
 
   db.collection("applications").doc(id)
     .onSnapshot(doc => {
 
       if (!doc.exists) {
-        container.innerHTML = "<p>No application found</p>";
+        document.getElementById("data").innerHTML = "<p>No application found</p>";
         return;
       }
 
       const d = doc.data();
 
-      container.innerHTML = `
-<div class="section">
+      // =========================
+      // 👤 APPLICANT NAME
+      // =========================
+      let first = d.firstName || "";
+      let middle = d.middleName || "";
+      let last = d.lastName || "";
 
-  <div class="row"><span>Ack No</span><p onclick="copyText(this)">${d.ackNo || ""}</p></div>
-  <div class="row"><span>Name</span><p onclick="copyText(this)">${d.name || ""}</p></div>
-  <div class="row"><span>Name (Aadhaar)</span><p onclick="copyText(this)">${d.nameAadhar || ""}</p></div>
-  <div class="row"><span>Gender</span><p onclick="copyText(this)">${d.gender || ""}</p></div>
-  <div class="row"><span>DOB</span><p onclick="copyText(this)">${d.dob || ""}</p></div>
-  <div class="row"><span>Phone</span><p onclick="copyText(this)">${d.phone || ""}</p></div>
-  <div class="row"><span>Email</span><p onclick="copyText(this)">${d.email || ""}</p></div>
-  <div class="row"><span>Father Name</span><p onclick="copyText(this)">${d.father || ""}</p></div>
+      let fullName = (last + " " + (middle ? middle + " " : "") + first).trim();
 
-  <h3>Address</h3>
+      document.getElementById("firstName").innerText = first || "-";
+      document.getElementById("middleName").innerText = middle || "-";
+      document.getElementById("lastName").innerText = last || "-";
+      document.getElementById("fullName").innerText = fullName || "-";
 
-  <div class="row"><span>Flat</span><p onclick="copyText(this)">${d.flatNo || ""}</p></div>
-  <div class="row"><span>Village</span><p onclick="copyText(this)">${d.villageCity || ""}</p></div>
-  <div class="row"><span>Post Office</span><p onclick="copyText(this)">${d.postOffice || ""}</p></div>
-  <div class="row"><span>Sub Division</span><p onclick="copyText(this)">${d.subDivision || ""}</p></div>
-  <div class="row"><span>District</span><p onclick="copyText(this)">${d.district || ""}</p></div>
-  <div class="row"><span>State</span><p onclick="copyText(this)">${d.state || ""}</p></div>
-  <div class="row"><span>PIN</span><p onclick="copyText(this)">${d.pinCode || ""}</p></div>
+      // =========================
+      // 👨 FATHER SPLIT
+      // =========================
+      let fParts = (d.father || "").trim().split(" ");
+      let fLast = fParts[0] || "";
+      let fFirst = fParts[fParts.length - 1] || "";
+      let fMiddle = fParts.slice(1, -1).join(" ");
 
-  <hr>
+      document.getElementById("fLast").innerText = fLast || "-";
+      document.getElementById("fMiddle").innerText = fMiddle || "-";
+      document.getElementById("fFirst").innerText = fFirst || "-";
+      document.getElementById("fFull").innerText = d.father || "-";
 
-  <div class="row">
-    <span>Application Status</span>
-    <p style="color:${d.status==='approved'?'green':'orange'}; font-weight:bold;">
-      ${d.status || "Pending"}
-    </p>
-  </div>
+      // =========================
+      // 👩 MOTHER SPLIT
+      // =========================
+      let mParts = (d.mother || "").trim().split(" ");
+      let mLast = mParts[0] || "";
+      let mFirst = mParts[mParts.length - 1] || "";
+      let mMiddle = mParts.slice(1, -1).join(" ");
 
-<div class="row">
-  <span>Payment Status</span>
-  <p style="color:${(d.paymentStatus || '').toLowerCase()==='paid'?'green':'red'}; font-weight:bold;">
-    ${d.paymentStatus || "Unpaid"}
-  </p>
-</div>
+      document.getElementById("mLast").innerText = mLast || "-";
+      document.getElementById("mMiddle").innerText = mMiddle || "-";
+      document.getElementById("mFirst").innerText = mFirst || "-";
+      document.getElementById("mFull").innerText = d.mother || "-";
 
-  ${d.txnId ? `
-    <div class="row">
-      <span>Txn ID</span>
-      <p onclick="copyText(this)">${d.txnId}</p>
-    </div>
-  ` : ""}
+      // =========================
+      // 👶 GUARDIAN
+      // =========================
+      if (d.isMinor) {
 
-  ${d.paymentScreenshot ? `
-    <div style="text-align:center; margin-top:10px;">
-      <img src="${d.paymentScreenshot}" width="200" style="border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.2);"/>
-    </div>
-  ` : ""}
+        document.getElementById("guardianSection").style.display = "block";
 
-</div>
-        <div class="section">
-          <h3>Documents</h3>
+        let gParts = (d.guardianName || "").trim().split(" ");
+        let gLast = gParts[0] || "";
+        let gFirst = gParts[gParts.length - 1] || "";
+        let gMiddle = gParts.slice(1, -1).join(" ");
 
-          ${imgBox(d.photo, "Photo")}
-          ${imgBox(d.signature, "Signature")}
-          ${imgBox(d.aadhaarFront, "Aadhaar Front")}
-          ${imgBox(d.aadhaarBack, "Aadhaar Back")}
-          ${imgBox(d.dobProof, "DOB Proof")}
+        document.getElementById("gLast").innerText = gLast || "-";
+        document.getElementById("gMiddle").innerText = gMiddle || "-";
+        document.getElementById("gFirst").innerText = gFirst || "-";
+        document.getElementById("gFull").innerText = d.guardianName || "-";
 
-          ${d.isMinor ? `
-            <h3>Guardian Documents</h3>
-            ${imgBox(d.guardianFront, "Guardian Aadhaar Front")}
-            ${imgBox(d.guardianBack, "Guardian Aadhaar Back")}
-          ` : ""}
-        </div>
-      `;
+      } else {
+        document.getElementById("guardianSection").style.display = "none";
+      }
+
+      // =========================
+      // 📋 BASIC DETAILS
+      // =========================
+      document.getElementById("ack").innerText = d.ackNo || "-";
+      document.getElementById("aadhaarName").innerText = d.nameAadhar || "-";
+      document.getElementById("gender").innerText = d.gender || "-";
+      document.getElementById("dob").innerText = d.dob || "-";
+      document.getElementById("phone").innerText = d.phone || "-";
+      document.getElementById("email").innerText = d.email || "-";
+
+      // =========================
+      // 📍 ADDRESS
+      // =========================
+      document.getElementById("flat").innerText = d.flatNo || "-";
+      document.getElementById("village").innerText = d.villageCity || "-";
+      document.getElementById("post").innerText = d.postOffice || "-";
+      document.getElementById("sub").innerText = d.subDivision || "-";
+      document.getElementById("district").innerText = d.district || "-";
+      document.getElementById("state").innerText = d.state || "-";
+      document.getElementById("pin").innerText = d.pinCode || "-";
+
+      // =========================
+      // 📊 STATUS
+      // =========================
+      let statusEl = document.getElementById("status");
+      let paymentEl = document.getElementById("payment");
+
+      statusEl.innerText = d.status || "Pending";
+      statusEl.style.color = d.status === "approved" ? "green" : "orange";
+
+      paymentEl.innerText = d.paymentStatus || "Unpaid";
+      paymentEl.style.color =
+        (d.paymentStatus || "").toLowerCase() === "paid" ? "green" : "red";
+
+      // =========================
+      // 📂 DOCUMENTS
+      // =========================
+      let docsHTML = "";
+
+      docsHTML += imgBox(d.photo, "Photo");
+      docsHTML += imgBox(d.signature, "Signature");
+      docsHTML += imgBox(d.aadhaarFront, "Aadhaar Front");
+      docsHTML += imgBox(d.aadhaarBack, "Aadhaar Back");
+      docsHTML += imgBox(d.dobProof, "DOB Proof");
+
+      if (d.isMinor) {
+        docsHTML += "<h4>Guardian Documents</h4>";
+        docsHTML += imgBox(d.guardianFront, "Guardian Front");
+        docsHTML += imgBox(d.guardianBack, "Guardian Back");
+      }
+
+      document.getElementById("docs").innerHTML = docsHTML;
+
     });
 }
 
 
 // ==========================
-// IMAGE BOX (SMART RULE)
+// 📋 COPY FUNCTION
+// ==========================
+function copyText(el) {
+  const text = el.innerText;
+
+  navigator.clipboard.writeText(text).then(() => {
+    el.style.background = "#d4edda";
+    el.style.padding = "2px 6px";
+    el.style.borderRadius = "4px";
+
+    showToast("Copied ✔");
+
+    setTimeout(() => {
+      el.style.background = "";
+    }, 800);
+  });
+}
+
+
+// ==========================
+// 🔔 TOAST
+// ==========================
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1200);
+}
+
+
+// ==========================
+// 🖼 IMAGE BOX
+// ==========================
+// ==========================
+// 🖼 IMAGE BOX (FINAL)
 // ==========================
 function imgBox(url, name) {
   if (!url) return `<p>${name}: Not uploaded</p>`;
 
-  // JPG for photo & signature
+  // 👉 PHOTO & SIGNATURE → JPG
   if (name === "Photo" || name === "Signature") {
     return `
       <div class="doc-box">
+        <p style="font-weight:bold; margin-bottom:5px;">${name}</p>
         <img src="${url}" alt="${name}">
-        <br>
         <button class="download-btn" onclick="downloadJPG('${url}', '${name}')">
-          Download ${name} JPG
+          Download JPG
         </button>
       </div>
     `;
   }
 
-  // PDF for others
+  // 👉 बाकी सब → PDF
   return `
     <div class="doc-box">
+      <p style="font-weight:bold; margin-bottom:5px;">${name}</p>
       <img src="${url}" alt="${name}">
-      <br>
       <button class="download-btn" onclick="downloadPDF('${url}', '${name}')">
-        Download ${name} PDF
+        Download PDF
       </button>
     </div>
   `;
@@ -139,11 +225,9 @@ function imgBox(url, name) {
 
 
 // ==========================
-// JPG DOWNLOAD
+// 📸 JPG DOWNLOAD
 // ==========================
 function downloadJPG(url, name) {
-  if (!url) return alert(name + " not available");
-
   const img = new Image();
   img.crossOrigin = "anonymous";
 
@@ -160,9 +244,7 @@ function downloadJPG(url, name) {
     link.download = name + ".jpg";
     link.href = canvas.toDataURL("image/jpeg");
 
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
   };
 
   img.src = url;
@@ -170,11 +252,9 @@ function downloadJPG(url, name) {
 
 
 // ==========================
-// PDF DOWNLOAD (jsPDF)
+// 📄 PDF DOWNLOAD
 // ==========================
 async function downloadPDF(url, name) {
-  if (!url) return alert(name + " not available");
-
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
@@ -188,32 +268,4 @@ async function downloadPDF(url, name) {
 
   pdf.addImage(img, "JPEG", 10, 10, 180, 250);
   pdf.save(name + ".pdf");
-}
-
-function copyText(el) {
-  const text = el.innerText;
-
-  navigator.clipboard.writeText(text).then(() => {
-
-    // small highlight
-    el.style.background = "#d4edda";
-    el.style.padding = "2px 5px";
-    el.style.borderRadius = "4px";
-
-    // toast message
-    showToast("Copied ✔");
-
-    setTimeout(() => {
-      el.style.background = "";
-    }, 800);
-  });
-}
-function showToast(msg) {
-  const toast = document.getElementById("toast");
-  toast.innerText = msg;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 1000);
 }
