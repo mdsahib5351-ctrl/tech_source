@@ -1,142 +1,158 @@
+// ===============================
+// MENU
+// ===============================
 function toggleMenu(){
-document.getElementById("navMenu").classList.toggle("active");
+  document.getElementById("navMenu").classList.toggle("active");
 }
 
 function toggleServices(){
-document.getElementById("servicesDropdown").classList.toggle("active");
+  document.getElementById("servicesDropdown").classList.toggle("active");
 }
 
 function toggleDark(){
-document.body.classList.toggle("dark");
+  document.body.classList.toggle("dark");
 }
 
-/* Card Animation */
 
-const cards=document.querySelectorAll(".card");
+// ===============================
+// CARD ANIMATION (SMOOTH + ONCE)
+// ===============================
+const cards = document.querySelectorAll(".card");
 
 function animateCards(){
-cards.forEach(c=>{
-if(c.getBoundingClientRect().top < window.innerHeight-100){
-c.classList.add("visible");
-}
-});
+  cards.forEach((card, index) => {
+
+    if(card.classList.contains("show")) return; // already animated
+
+    if(card.getBoundingClientRect().top < window.innerHeight - 80){
+
+      setTimeout(() => {
+        card.classList.add("show");
+      }, index * 120);
+
+    }
+
+  });
 }
 
-window.addEventListener("scroll",animateCards);
-animateCards();
+window.addEventListener("scroll", animateCards);
+window.addEventListener("load", animateCards);
 
+
+// ===============================
+// CONTACT FORM
+// ===============================
 const form = document.getElementById("contactForm");
 const status = document.getElementById("formStatus");
 const btn = document.getElementById("sendBtn");
 
+if(form){
 form.addEventListener("submit", async function(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-btn.innerText="Sending...";
-btn.disabled=true;
+  btn.innerText="Sending...";
+  btn.disabled=true;
 
-let data=new FormData(form);
+  let data = new FormData(form);
 
-try{
-
-let response=await fetch("https://formspree.io/f/xgonwgrr",{
-method:"POST",
-body:data,
-headers:{'Accept':'application/json'}
-});
-
-if(response.ok){
-
-status.innerHTML="✅ Message sent successfully!";
-status.style.color="green";
-form.reset();
-
-}else{
-
-status.innerHTML="❌ Something went wrong!";
-status.style.color="red";
-
-}
-
-}catch(error){
-
-status.innerHTML="❌ Network error!";
-status.style.color="red";
-
-}
-
-btn.innerText="Send Message";
-btn.disabled=false;
-
-});
-
-window.addEventListener("load",function(){
-
-document.getElementById("loader").style.display="none";
-
-});
-
-function openDownloadBill(){
-    document.querySelectorAll("section").forEach(sec=>{
-        sec.style.display="none";
+  try{
+    let response = await fetch("https://formspree.io/f/xgonwgrr",{
+      method:"POST",
+      body:data,
+      headers:{'Accept':'application/json'}
     });
-    document.getElementById("download-bill").style.display="block";
-}
-// Firebase collection: 'bills'
 
+    if(response.ok){
+      status.innerHTML="✅ Message sent successfully!";
+      status.style.color="green";
+      form.reset();
+    }else{
+      status.innerHTML="❌ Something went wrong!";
+      status.style.color="red";
+    }
+
+  }catch(error){
+    status.innerHTML="❌ Network error!";
+    status.style.color="red";
+  }
+
+  btn.innerText="Send Message";
+  btn.disabled=false;
+
+});
+}
+
+
+// ===============================
+// LOADER
+// ===============================
+window.addEventListener("load", function(){
+  const loader = document.getElementById("loader");
+  if(loader){
+    loader.style.opacity = "0";
+    setTimeout(()=> loader.style.display="none", 400);
+  }
+});
+
+
+// ===============================
+// DOWNLOAD BILL SECTION
+// ===============================
+function openDownloadBill(){
+  document.querySelectorAll("section").forEach(sec=>{
+    sec.style.display="none";
+  });
+
+  document.getElementById("download-bill").style.display="block";
+
+  // smooth scroll
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+
+// ===============================
+// DOWNLOAD BILL FUNCTION
+// ===============================
 function downloadBill(){
 
-    const billNo = document.getElementById("downloadBillNo").value.trim().toUpperCase();
+  const input = document.getElementById("downloadBillNo");
+  if(!input) return;
 
-    if(!billNo){
-        alert("कृपया बिल नंबर डालें");
-        return;
-    }
+  const billNo = input.value.trim().toUpperCase();
 
-    // billview page open
-    window.open(`billview.html?billNo=${billNo}`, "_blank");
+  if(!billNo){
+    alert("कृपया बिल नंबर डालें");
+    return;
+  }
+
+  window.open(`billview.html?billNo=${billNo}`, "_blank");
 }
-  const billInput = document.getElementById("downloadBillNo");
 
+
+// ===============================
+// BILL INPUT FORMAT
+// ===============================
+const billInput = document.getElementById("downloadBillNo");
+
+if(billInput){
 billInput.addEventListener("input", function(){
 
-    // TS/ hata ke sirf number lo
-    let value = billInput.value.replace(/^TS\//i, "").replace(/\D/g, "");
+  let value = billInput.value
+    .replace(/^TS\//i, "")
+    .replace(/\D/g, "")
+    .substring(0,8);
 
-    // max 8 digit
-    value = value.substring(0,8);
+  let formatted = "TS/";
 
-    let formatted = "TS/";
+  if(value.length > 0){
+    formatted += value.substring(0,4);
+  }
 
-    if(value.length > 0){
-        formatted += value.substring(0,4);
-    }
+  if(value.length > 4){
+    formatted += "/" + value.substring(4,8);
+  }
 
-    if(value.length > 4){
-        formatted += "/" + value.substring(4,8);
-    }
-
-    billInput.value = formatted;
+  billInput.value = formatted;
 });
-
-       const searchBtn = document.getElementById("search-btn");
-    const searchInput = document.getElementById("search");
-      function searchYouTube() {
-        const query = encodeURIComponent(searchInput.value);
-
-        if (!query) {
-            alert("कुछ लिखो पहले!");
-            return;
-        }
-
-        window.open(`https://www.youtube.com/results?search_query=${query}`, "_blank");
-    }
-
-    searchBtn.addEventListener("click", searchYouTube);
-
-    searchInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            searchYouTube();
-        }
-    });
+}
