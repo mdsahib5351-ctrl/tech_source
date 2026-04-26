@@ -21,28 +21,44 @@ function closeForm(){
   document.getElementById("formScreen").style.display="none";
 }
 
-/* IMGBB UPLOAD */
-async function uploadToImgBB(file){
+/* CLOUDINARY UPLOAD */
+async function uploadToCloudinary(file){
   if(!file) throw "File missing";
 
-  let apiKey = "fa4ad05090c8cc3f9ade673a64a52235";
+  const url = "https://api.cloudinary.com/v1_1/dsnuatuc8/image/upload";
 
   let fd = new FormData();
-  fd.append("image", file);
+  fd.append("file", file);
+  fd.append("upload_preset", "ml_default");
 
-  let res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`,{
-    method:"POST",
-    body:fd
-  });
+  // 🔥 optional optimization
+  fd.append("folder", "pan_applications");
 
-  let data = await res.json();
+  try {
+    let res = await fetch(url, {
+      method: "POST",
+      body: fd
+    });
 
-  if(data.success){
-    return data.data.url;
-  }else{
-    throw "Upload failed";
+    let data = await res.json();
+    console.log("Cloudinary FULL:", data);
+
+    if (!res.ok) {
+      throw data.error?.message || "Upload failed (Bad Request)";
+    }
+
+    if (data.secure_url) {
+      return data.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
+    } else {
+      throw "Upload failed";
+    }
+
+  } catch (err) {
+    console.error("Upload Error:", err);
+    throw err;
   }
 }
+
 
 /* SUBMIT */
 document.getElementById("newpanForm").addEventListener("submit", async function(e) {
@@ -92,12 +108,21 @@ try {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
 
     // 📤 UPLOAD
-    let photo = await uploadToImgBB(document.getElementById("photo").files[0]);
-    let signature = await uploadToImgBB(document.getElementById("signature").files[0]);
-    let aadhaarFront = await uploadToImgBB(document.getElementById("aadhaarFront").files[0]);
-    let aadhaarBack = await uploadToImgBB(document.getElementById("aadhaarBack").files[0]);
-    let dobProof = await uploadToImgBB(document.getElementById("dobProof").files[0]);
+    let files = [
+  document.getElementById("photo").files[0],
+  document.getElementById("signature").files[0],
+  document.getElementById("aadhaarFront").files[0],
+  document.getElementById("aadhaarBack").files[0],
+  document.getElementById("dobProof").files[0]
+  ];
 
+// check empty
+if(files.some(f => !f)){
+  throw "All files required";
+}
+
+let [photo, signature, aadhaarFront, aadhaarBack, dobProof] =
+  await Promise.all(files.map(uploadToCloudinary));
     // 👶 GUARDIAN
     let guardianName = "";
     let guardianFront = "";
@@ -122,8 +147,8 @@ try {
         }
 
         guardianName = gName;
-        guardianFront = await uploadToImgBB(gFrontFile);
-        guardianBack = await uploadToImgBB(gBackFile);
+        guardianFront = await uploadToCloudinary(gFrontFile);
+        guardianBack = await uploadToCloudinary(gBackFile);
     }
 
     let ackNo = generateAck();
@@ -156,7 +181,7 @@ try {
         district: document.getElementById("district").value,
         state: document.getElementById("state").value,
         pinCode: document.getElementById("pinCode").value,
-        dobdocType: document.getElementById("dobDocType").value,
+        dobdocType: document.getElementById("proof_dob").value,
 
         photo,
         signature,
