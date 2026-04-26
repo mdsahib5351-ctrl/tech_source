@@ -1,35 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" type="image/jpeg">
-<title>Pro Image Uploader v3</title>
-    <link rel="stylesheet" href="css/image.css">
-    <script src="script/image.js" defer></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Image Uploader</title>
+<link rel="stylesheet" href="css/image.css">
 </head>
+
 <body>
 
-<button onclick="toggleDark()">🌙 Dark Mode</button>
+<button class="dark-btn" onclick="toggleDark()">🌙</button>
 
 <div class="box">
 
-<div class="menu">
-<button onclick="showTab('upload')">Upload</button>
-<button onclick="showTab('history')">History</button>
+  <div class="menu">
+    <button onclick="showTab('upload')" class="active-btn">Upload</button>
+    <button onclick="showTab('history')">History</button>
+  </div>
+
+  <!-- Upload -->
+  <div id="upload" class="tab active">
+    <div id="drop" class="drop">
+      <p>📂 Drag & Drop Images</p>
+      <span>or click to upload</span>
+      <input type="file" id="file" multiple accept="image/*">
+    </div>
+
+    <div id="preview" class="preview"></div>
+  </div>
+
+  <!-- History -->
+  <div id="history" class="tab">
+    <h3>Upload History</h3>
+    <div id="historyBox"></div>
+    <button onclick="clearHistory()">Clear History</button>
+  </div>
+
 </div>
 
-<!-- Upload Tab -->
-<div id="upload" class="tab active">
-<div class="drop" id="drop">Drag & Drop Images<input type="file" id="file" multiple hidden></div>
-<div class="preview" id="preview"></div>
+<!-- Fullscreen Preview -->
+<div id="viewer" class="viewer" onclick="this.style.display='none'">
+  <img id="viewerImg">
 </div>
 
-<!-- History Tab -->
-<div id="history" class="tab">
-<h3>Upload History</h3>
-<div id="historyBox"></div>
-</div>
-
-</div>
-</body>\
+<script src="script/image.js"></script>
+</body>
 </html>
