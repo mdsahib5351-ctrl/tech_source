@@ -153,6 +153,25 @@ let [photo, signature, aadhaarFront, aadhaarBack, dobProof] =
 
     let ackNo = generateAck();
 
+let postOfficeEl = document.getElementById("postOffice");
+let manualEl = document.getElementById("manualPO");
+
+let postOfficeValue = "";
+
+// manual mode
+if(postOfficeEl.value === "manual"){
+  postOfficeValue = manualEl.value.trim();
+}
+// dropdown mode
+else{
+  postOfficeValue = postOfficeEl.value.trim();
+}
+
+// ❌ validation (IMPORTANT)
+if(!postOfficeValue){
+  throw "Post Office required";
+}
+
     formData = {
         ackNo,
 
@@ -176,7 +195,7 @@ let [photo, signature, aadhaarFront, aadhaarBack, dobProof] =
 
         flatNo: document.getElementById("flatNo").value,
         villageCity: document.getElementById("villageCity").value,
-        postOffice: document.getElementById("postOffice").value,
+        postOffice: postOfficeValue,
         subDivision: document.getElementById("subDivision").value,
         district: document.getElementById("district").value,
         state: document.getElementById("state").value,
@@ -572,3 +591,69 @@ function updateAadhaarName(){
 document.getElementById("firstName").addEventListener("input", updateAadhaarName);
 document.getElementById("middleName").addEventListener("input", updateAadhaarName);
 document.getElementById("lastName").addEventListener("input", updateAadhaarName);
+
+async function fetchAddress() {
+
+  const pin = document.getElementById("pinCode").value;
+  const select = document.getElementById("postOffice");
+
+  if(pin.length !== 6) return;
+
+  try {
+
+    // loading state
+    select.innerHTML = "<option>Loading...</option>";
+
+    const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+    const data = await res.json();
+
+    if(data[0].Status === "Success"){
+
+      const offices = data[0].PostOffice;
+
+      // reset dropdown
+      select.innerHTML = '<option value="">Select Post Office</option>';
+
+      // 🔥 sab post office add
+      offices.forEach((po, index) => {
+        let option = document.createElement("option");
+        option.value = po.Name;
+        option.text = `${po.Name} (${po.BranchType})`;
+        select.appendChild(option);
+
+        // auto fill district/state
+        if(index === 0){
+          document.getElementById("district").value = po.District;
+          document.getElementById("state").value = po.State;
+        }
+      });
+
+      // ✅ manual option add
+      let manualOption = document.createElement("option");
+      manualOption.value = "manual";
+      manualOption.text = "❗ Not in list? Enter manually";
+      select.appendChild(manualOption);
+
+    } else {
+      select.innerHTML = "<option>No Post Office Found</option>";
+      alert("Invalid PIN Code ❌");
+    }
+
+  } catch(err){
+    console.error(err);
+    select.innerHTML = "<option>Error loading</option>";
+    alert("Error fetching address");
+  }
+}
+document.getElementById("postOffice").addEventListener("change", function(){
+
+  const manualInput = document.getElementById("manualPO");
+
+  if(this.value === "manual"){
+    manualInput.style.display = "block";
+  } else {
+    manualInput.style.display = "none";
+    manualInput.value = "";
+  }
+
+});
