@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aadhaar Appointment View</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d9e2ef;
+      --primary: #0b5ed7;
+      --primary-dark: #0849a8;
+      --success: #0f8a4b;
+      --warn: #b96a00;
+      --danger: #b42318;
+      --soft-blue: #eaf2ff;
+      --soft-green: #eaf8f0;
+      --soft-orange: #fff4e5;
+      --soft-red: #fff0ee;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 18px 20px;
+      box-shadow: 0 6px 18px rgba(11, 94, 215, 0.18);
+    }
+
+    .header-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 2px;
+      font-size: clamp(21px, 3vw, 30px);
+      letter-spacing: 0;
+    }
+
+    .header-sub {
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 14px;
+    }
+
+    .brand-badge {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 24px auto 40px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      margin-bottom: 18px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.12);
+    }
+
+    button, .button-link {
+      min-height: 42px;
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    button:hover, .button-link:hover {
+      background: var(--primary-dark);
+    }
+
+    button.secondary, .button-link.secondary {
+      background: #eef2f7;
+      color: #1d2939;
+    }
+
+    button.secondary:hover, .button-link.secondary:hover {
+      background: #e3e8f0;
+    }
+
+    button:disabled {
+      opacity: 0.72;
+      cursor: wait;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid #e7edf5;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid #edf2f7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: #fbfdff;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--soft-blue);
+      color: var(--primary);
+    }
+
+    .status-pill.pending {
+      background: var(--soft-orange);
+      color: var(--warn);
+    }
+
+    .status-pill.rescheduled {
+      background: var(--soft-blue);
+      color: var(--primary);
+    }
+
+    .status-pill.completed, .status-pill.approved {
+      background: var(--soft-green);
+      color: var(--success);
+    }
+
+    .status-pill.cancelled, .status-pill.rejected {
+      background: var(--soft-red);
+      color: var(--danger);
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-item {
+      border: 1px solid #e6edf6;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfdff;
+      min-width: 0;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .summary-value {
+      font-size: 15px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .section h3 {
+      margin-bottom: 10px;
+      font-size: 17px;
+      color: #24324a;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      border: 1px solid #e6edf6;
+      border-bottom: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .detail-label, .detail-value {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e6edf6;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-label {
+      background: #f8fafd;
+      color: #344054;
+      font-weight: 700;
+    }
+
+    .detail-value {
+      background: #fff;
+      color: #172033;
+      white-space: pre-wrap;
+    }
+
+    .doc-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .message {
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid #e6edf6;
+      background: #fff;
+      color: #344054;
+      margin-bottom: 16px;
+    }
+
+    .message.warn {
+      border-color: #ffd79a;
+      background: var(--soft-orange);
+      color: var(--warn);
+    }
+
+    .message.error {
+      border-color: #ffc7c2;
+      background: var(--soft-red);
+      color: var(--danger);
+    }
+
+    .message.success {
+      border-color: #b7e7c9;
+      background: var(--soft-green);
+      color: var(--success);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      header, .toolbar, .no-print {
+        display: none !important;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+      }
+
+      .panel {
+        border: 0;
+        box-shadow: none;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-label {
+        padding-bottom: 4px;
+        border-bottom: 0;
+      }
+
+      .detail-value {
+        padding-top: 4px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .header-inner, .panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Aadhaar Appointment View</h1>
+        <div class="header-sub">Admin panel se selected appointment ki full details</div>
+      </div>
+      <span class="brand-badge">Tech Source</span>
+    </div>
+  </header>
+
+  <main>
+    <form class="toolbar no-print" id="searchForm">
+      <div class="field">
+        <label for="appointmentSearch">Appointment ID</label>
+        <input id="appointmentSearch" placeholder="Example: TS-123456" autocomplete="off">
+      </div>
+      <button id="searchBtn" type="submit">View Details</button>
+      <button class="secondary" type="button" onclick="window.print()">Print</button>
+    </form>
+
+    <div id="messageBox" class="message warn">Appointment ID ke saath page open karein ya upar ID enter karke details dekhein.</div>
+
+    <section id="detailsPanel" class="panel hidden" aria-live="polite">
+      <div class="panel-head">
+        <div>
+          <h2 id="titleId">Appointment</h2>
+          <div id="createdText" class="header-sub" style="color:#667085;"></div>
+        </div>
+        <span id="statusPill" class="status-pill">Pending</span>
+      </div>
+
+      <div class="content">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-label">Name</div>
+            <div id="summaryName" class="summary-value">-</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Service</div>
+            <div id="summaryService" class="summary-value">-</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Date</div>
+            <div id="summaryDate" class="summary-value">-</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Time</div>
+            <div id="summaryTime" class="summary-value">-</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Personal Details</h3>
+          <div id="personalDetails" class="details-grid"></div>
+        </div>
+
+        <div class="section">
+          <h3>Service Details</h3>
+          <div id="serviceDetails" class="details-grid"></div>
+        </div>
+
+        <div class="section">
+          <h3>Appointment Details</h3>
+          <div id="appointmentDetails" class="details-grid"></div>
+        </div>
+
+        <div id="documentSection" class="section hidden">
+          <h3>Document</h3>
+          <div id="documentDetails" class="details-grid"></div>
+          <div class="doc-actions no-print">
+            <a id="documentLink" class="button-link" href="#" target="_blank" rel="noopener">Open Document</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
+      authDomain: "tech-source-bill.firebaseapp.com",
+      databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
+      projectId: "tech-source-bill",
+      storageBucket: "tech-source-bill.firebasestorage.app",
+      messagingSenderId: "690209240188",
+      appId: "1:690209240188:web:6e54de365e7f839634c5f9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const $ = (id) => document.getElementById(id);
+    const params = new URLSearchParams(window.location.search);
+
+    const els = {
+      searchForm: $("searchForm"),
+      appointmentSearch: $("appointmentSearch"),
+      searchBtn: $("searchBtn"),
+      messageBox: $("messageBox"),
+      detailsPanel: $("detailsPanel"),
+      titleId: $("titleId"),
+      createdText: $("createdText"),
+      statusPill: $("statusPill"),
+      summaryName: $("summaryName"),
+      summaryService: $("summaryService"),
+      summaryDate: $("summaryDate"),
+      summaryTime: $("summaryTime"),
+      personalDetails: $("personalDetails"),
+      serviceDetails: $("serviceDetails"),
+      appointmentDetails: $("appointmentDetails"),
+      documentSection: $("documentSection"),
+      documentDetails: $("documentDetails"),
+      documentLink: $("documentLink")
+    };
+
+    function safe(value) {
+      return value === undefined || value === null || value === "" ? "-" : String(value);
+    }
+
+    function maskAadhaar(value) {
+      const aadhaar = safe(value).replace(/\D/g, "");
+      return aadhaar.length >= 4 ? "XXXX XXXX " + aadhaar.slice(-4) : safe(value);
+    }
+
+    function maskMobile(value) {
+      const mobile = safe(value).replace(/\D/g, "");
+      return mobile.length === 10 ? mobile.slice(0, 2) + "XXXXXX" + mobile.slice(-2) : safe(value);
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      if (typeof value.toDate === "function") {
+        return value.toDate().toLocaleString("en-IN");
+      }
+      return safe(value);
+    }
+
+    function showMessage(message, type) {
+      els.messageBox.textContent = message;
+      els.messageBox.className = "message " + (type || "warn");
+      els.messageBox.classList.remove("hidden");
+    }
+
+    function hideMessage() {
+      els.messageBox.classList.add("hidden");
+    }
+
+    function setLoading(isLoading) {
+      els.searchBtn.disabled = isLoading;
+      els.searchBtn.textContent = isLoading ? "Loading..." : "View Details";
+    }
+
+    function addRow(container, label, value) {
+      const labelDiv = document.createElement("div");
+      const valueDiv = document.createElement("div");
+      labelDiv.className = "detail-label";
+      valueDiv.className = "detail-value";
+      labelDiv.textContent = label;
+      valueDiv.textContent = safe(value);
+      container.append(labelDiv, valueDiv);
+    }
+
+    function resetGrid(container) {
+      container.innerHTML = "";
+    }
+
+    function setStatus(status) {
+      const normalized = safe(status).toLowerCase().replace(/\s+/g, "-");
+      els.statusPill.textContent = safe(status);
+      els.statusPill.className = "status-pill " + normalized;
+    }
+
+    function renderAppointment(data, firestoreDocId) {
+      const appointmentId = data.appointmentId || firestoreDocId;
+      els.titleId.textContent = "Appointment " + safe(appointmentId);
+      els.createdText.textContent = data.createdAt ? "Created: " + formatDate(data.createdAt) : "";
+      setStatus(data.status || "Pending");
+
+      els.summaryName.textContent = safe(data.name);
+      els.summaryService.textContent = safe(data.service);
+      els.summaryDate.textContent = safe(data.appointmentDate);
+      els.summaryTime.textContent = safe(data.appointmentTime);
+
+      resetGrid(els.personalDetails);
+      addRow(els.personalDetails, "Appointment ID", appointmentId);
+      addRow(els.personalDetails, "Full Name", data.name);
+      addRow(els.personalDetails, "Mobile Number", maskMobile(data.mobile));
+      addRow(els.personalDetails, "Aadhaar Number", data.aadhaarMasked || maskAadhaar(data.aadhaar));
+
+      resetGrid(els.serviceDetails);
+      addRow(els.serviceDetails, "Selected Service", data.service);
+      if (data.newAddress) addRow(els.serviceDetails, "New Address", data.newAddress);
+      if (data.note) addRow(els.serviceDetails, "Reason / Note", data.note);
+      if (data.relationType) addRow(els.serviceDetails, "Relation Type", data.relationType);
+      if (data.coName) addRow(els.serviceDetails, "C/O Name", data.coName);
+      if (data.coAddress) addRow(els.serviceDetails, "C/O Address", data.coAddress);
+      if (data.oldMobile) addRow(els.serviceDetails, "Old Mobile", maskMobile(data.oldMobile));
+      if (data.newMobile) addRow(els.serviceDetails, "New Mobile", maskMobile(data.newMobile));
+      if (data.docType) addRow(els.serviceDetails, "Document Type", data.docType);
+      if (data.fileName) addRow(els.serviceDetails, "Uploaded File", data.fileName);
+      if (data.docAddress) addRow(els.serviceDetails, "Document Address", data.docAddress);
+      if (!els.serviceDetails.children.length) addRow(els.serviceDetails, "Details", "No extra service details found");
+
+      resetGrid(els.appointmentDetails);
+      addRow(els.appointmentDetails, "Appointment Date", data.appointmentDate);
+      addRow(els.appointmentDetails, "Appointment Time", data.appointmentTime);
+      addRow(els.appointmentDetails, "Status", data.status || "Pending");
+      addRow(els.appointmentDetails, "Created At", formatDate(data.createdAt));
+      addRow(els.appointmentDetails, "Updated At", formatDate(data.updatedAt));
+
+      resetGrid(els.documentDetails);
+      if (data.documentUrl) {
+        els.documentSection.classList.remove("hidden");
+        addRow(els.documentDetails, "Document URL", data.documentUrl);
+        els.documentLink.href = data.documentUrl;
+      } else {
+        els.documentSection.classList.add("hidden");
+        els.documentLink.href = "#";
+      }
+
+      hideMessage();
+      els.detailsPanel.classList.remove("hidden");
+    }
+
+    async function fetchByAppointmentId(id) {
+      const snap = await db.collection("appointments").where("appointmentId", "==", id).limit(1).get();
+      if (snap.empty) return null;
+      const docSnap = snap.docs[0];
+      return { id: docSnap.id, data: docSnap.data() };
+    }
+
+    async function fetchByDocId(docId) {
+      const docSnap = await db.collection("appointments").doc(docId).get();
+      if (!docSnap.exists) return null;
+      return { id: docSnap.id, data: docSnap.data() };
+    }
+
+    async function loadAppointment(rawId, mode) {
+      const id = safe(rawId).trim().toUpperCase();
+      if (!id || id === "-") {
+        showMessage("Appointment ID enter karein.", "warn");
+        return;
+      }
+
+      setLoading(true);
+      showMessage("Appointment details load ho rahi hain...", "warn");
+
+      try {
+        const result = mode === "docId" ? await fetchByDocId(id) : await fetchByAppointmentId(id);
+        if (!result) {
+          els.detailsPanel.classList.add("hidden");
+          showMessage("Appointment nahi mila. ID check karke dobara try karein.", "error");
+          return;
+        }
+
+        renderAppointment(result.data, result.id);
+      } catch (error) {
+        els.detailsPanel.classList.add("hidden");
+        showMessage("Firebase Error: " + error.message, "error");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    els.searchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      loadAppointment(els.appointmentSearch.value, "appointmentId");
+    });
+
+    const urlAppointmentId = params.get("id") || params.get("appointmentId") || params.get("appointment");
+    const urlDocId = params.get("docId");
+
+    if (urlAppointmentId) {
+      els.appointmentSearch.value = urlAppointmentId.toUpperCase();
+      loadAppointment(urlAppointmentId, "appointmentId");
+    } else if (urlDocId) {
+      els.appointmentSearch.value = urlDocId;
+      loadAppointment(urlDocId, "docId");
+    }
+  </script>
+</body>
+</html>
