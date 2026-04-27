@@ -1,21 +1,237 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>About Us</title>
-<link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" type="image/jpeg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>About Us | Tech Source</title>
+
+<link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg">
+
+<style>
+
+/* ===== RESET ===== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+/* ===== BODY ===== */
+body{
+  background:#f4f6f9;
+  color:#222;
+  transition:.3s;
+}
+
+.dark{
+  background:#0d0d0d;
+  color:#fff;
+}
+
+/* ===== HEADER ===== */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 8%;
+  background:#fff;
+  box-shadow:0 5px 20px rgba(0,0,0,0.05);
+}
+
+.dark .header{
+  background:#111;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.toggle{
+  background:#00ff66;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* ===== HERO ===== */
+.hero{
+  text-align:center;
+  padding:70px 20px;
+  background:linear-gradient(135deg,#00ff66,#006633);
+  color:#000;
+}
+
+.hero h1{
+  font-size:36px;
+  margin-bottom:10px;
+}
+
+.hero p{
+  font-size:16px;
+  opacity:.9;
+}
+
+/* ===== CONTAINER ===== */
+.container{
+  max-width:1000px;
+  margin:40px auto;
+  padding:20px;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:#fff;
+  padding:25px;
+  border-radius:14px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.1);
+  margin-bottom:25px;
+  transition:.3s;
+}
+
+.dark .card{
+  background:#1a1a1a;
+}
+
+.card h2{
+  margin-bottom:10px;
+  color:#00cc66;
+}
+
+.card p{
+  line-height:1.7;
+  color:#555;
+}
+
+.dark .card p{
+  color:#ccc;
+}
+
+/* ===== FEATURES ===== */
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+.feature-box{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  transition:.3s;
+}
+
+.dark .feature-box{
+  background:#222;
+}
+
+.feature-box:hover{
+  transform:translateY(-5px);
+}
+
+.feature-box h3{
+  margin:10px 0;
+  color:#00cc66;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  margin-top:50px;
+  padding:30px;
+  text-align:center;
+  background:#000;
+  color:#aaa;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .hero h1{
+    font-size:28px;
+  }
+}
+
+</style>
 </head>
+
 <body>
 
-<h1>About Us</h1>
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">Tech Source</div>
+  <button class="toggle" onclick="toggleDark()">🌙</button>
+</div>
 
-<p>
-Ultimate Mini App ek digital service platform hai jaha se aap PAN card, Aadhaar services,
-QR generator aur billing services use kar sakte hain.
-</p>
+<!-- HERO -->
+<section class="hero">
+  <h1>About Us</h1>
+  <p>Your trusted digital service partner</p>
+</section>
 
-<p>
-Hamari priority hai fast, secure aur reliable service dena.
-</p>
+<!-- MAIN -->
+<div class="container">
+
+  <!-- ABOUT -->
+  <div class="card">
+    <h2>Who We Are</h2>
+    <p>
+      Ultimate Mini App ek digital service platform hai jaha se aap PAN card,
+      Aadhaar services, QR generator aur billing services use kar sakte hain.
+      Hum simple, fast aur user-friendly tools provide karte hain.
+    </p>
+  </div>
+
+  <!-- MISSION -->
+  <div class="card">
+    <h2>Our Mission</h2>
+    <p>
+      Hamari priority hai fast, secure aur reliable service dena.
+      Hum technology ko easy bana kar har user tak pahuchana chahte hain.
+    </p>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features">
+
+    <div class="feature-box">
+      <h3>⚡ Fast Service</h3>
+      <p>Instant processing & quick results</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>🔒 Secure</h3>
+      <p>Your data is fully protected</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>📱 Easy to Use</h3>
+      <p>Simple and user-friendly interface</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>🌐 Multi Services</h3>
+      <p>All tools in one platform</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  © 2026 Tech Source | All Rights Reserved
+</div>
+
+<!-- JS -->
+<script>
+function toggleDark(){
+  document.body.classList.toggle("dark")
+}
+</script>
 
 </body>
 </html>
