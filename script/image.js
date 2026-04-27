@@ -1,172 +1,216 @@
-const CLOUD_NAME = "dsnuatuc8"
-const UPLOAD_PRESET = "ml_default"
-const API = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`
+// ===== CONFIG =====
+const CLOUD_NAME = "dsnuatuc8";
+const UPLOAD_PRESET = "ml_default";
+const API = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
-const drop = document.getElementById("drop")
-const fileInput = document.getElementById("file")
-const preview = document.getElementById("preview")
-const viewer = document.getElementById("viewer")
-const viewerImg = document.getElementById("viewerImg")
-const historyBox = document.getElementById("historyBox")
+// ===== ELEMENTS =====
+const drop = document.getElementById("drop");
+const fileInput = document.getElementById("file");
+const preview = document.getElementById("preview");
+const viewer = document.getElementById("viewer");
+const viewerImg = document.getElementById("viewerImg");
+const historyBox = document.getElementById("historyBox");
 
-drop.onclick = () => fileInput.click()
+// ===== DROP EVENTS =====
+drop.addEventListener("click", () => fileInput.click());
 
-drop.ondragover = e => e.preventDefault()
-drop.ondragenter = () => drop.classList.add("hover")
-drop.ondragleave = () => drop.classList.remove("hover")
+["dragover", "dragenter"].forEach(evt => {
+  drop.addEventListener(evt, e => {
+    e.preventDefault();
+    drop.classList.add("hover");
+  });
+});
 
-drop.ondrop = e => {
-e.preventDefault()
-drop.classList.remove("hover")
-handleFiles(e.dataTransfer.files)
+["dragleave", "drop"].forEach(evt => {
+  drop.addEventListener(evt, () => {
+    drop.classList.remove("hover");
+  });
+});
+
+drop.addEventListener("drop", e => {
+  e.preventDefault();
+  handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener("change", e => handleFiles(e.target.files));
+
+// ===== HANDLE FILES =====
+function handleFiles(files) {
+  [...files].forEach(file => {
+
+    if (!file.type.startsWith("image/")) {
+      showToast("Only images allowed");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Max 5MB allowed");
+      return;
+    }
+
+    const ui = createPreview(file);
+    upload(file, ui);
+  });
 }
 
-fileInput.onchange = e => handleFiles(e.target.files)
+// ===== CREATE PREVIEW =====
+function createPreview(file) {
 
-function handleFiles(files){
-for(let file of files){
+  const card = document.createElement("div");
+  card.className = "preview-card";
 
-if(!file.type.startsWith("image/")){
-showToast("Only images allowed")
-continue
+  const img = document.createElement("img");
+  img.src = URL.createObjectURL(file);
+
+  img.addEventListener("click", () => {
+    viewer.style.display = "flex";
+    viewerImg.src = img.src;
+  });
+
+  const del = document.createElement("div");
+  del.className = "delete";
+  del.innerHTML = "×";
+  del.onclick = () => card.remove();
+
+  const progress = document.createElement("div");
+  progress.className = "progress";
+
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  progress.appendChild(bar);
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  const copy = document.createElement("button");
+  copy.textContent = "Copy";
+
+  const download = document.createElement("button");
+  download.textContent = "DL";
+
+  actions.append(copy, download);
+
+  card.append(img, del, progress, actions);
+  preview.appendChild(card);
+
+  return { bar, copy, download };
 }
 
-if(file.size > 5*1024*1024){
-showToast("Max 5MB")
-continue
+// ===== UPLOAD =====
+function upload(file, ui) {
+
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", UPLOAD_PRESET);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", API);
+
+  xhr.upload.onprogress = e => {
+    if (e.lengthComputable) {
+      ui.bar.style.width = (e.loaded / e.total * 100) + "%";
+    }
+  };
+
+  xhr.onload = () => {
+    try {
+      const res = JSON.parse(xhr.responseText);
+
+      if (res.secure_url) {
+
+        const url = res.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
+
+        ui.copy.onclick = () => {
+          navigator.clipboard.writeText(url);
+          showToast("Copied!");
+        };
+
+        ui.download.onclick = () => window.open(url);
+
+        saveHistory(url);
+
+      } else {
+        showToast(res.error?.message || "Upload failed");
+      }
+
+    } catch {
+      showToast("Upload error");
+    }
+  };
+
+  xhr.onerror = () => showToast("Network error");
+
+  xhr.send(form);
 }
 
-let ui = createPreview(file)
-upload(file, ui)
-}
-}
-
-function createPreview(file){
-let card = document.createElement("div")
-card.className = "card"
-
-let img = document.createElement("img")
-img.src = URL.createObjectURL(file)
-img.onclick = () => {
-viewer.style.display = "flex"
-viewerImg.src = img.src
+// ===== HISTORY =====
+function saveHistory(url) {
+  const hist = JSON.parse(localStorage.getItem("imgHistory") || "[]");
+  hist.push(url);
+  localStorage.setItem("imgHistory", JSON.stringify(hist));
+  loadHistory();
 }
 
-let del = document.createElement("div")
-del.className = "delete"
-del.innerHTML = "×"
-del.onclick = () => card.remove()
+function loadHistory() {
+  const hist = JSON.parse(localStorage.getItem("imgHistory") || "[]");
+  historyBox.innerHTML = "";
 
-let progress = document.createElement("div")
-progress.className = "progress"
+  [...hist].reverse().forEach(url => {
 
-let bar = document.createElement("div")
-bar.className = "bar"
-progress.appendChild(bar)
+    const card = document.createElement("div");
+    card.className = "preview-card";
 
-let actions = document.createElement("div")
-actions.className = "actions"
+    const img = document.createElement("img");
+    img.src = url;
 
-let copy = document.createElement("button")
-copy.textContent = "Copy"
+    img.onclick = () => {
+      viewer.style.display = "flex";
+      viewerImg.src = url;
+    };
 
-let download = document.createElement("button")
-download.textContent = "DL"
-
-actions.appendChild(copy)
-actions.appendChild(download)
-
-card.appendChild(img)
-card.appendChild(del)
-card.appendChild(progress)
-card.appendChild(actions)
-
-preview.appendChild(card)
-
-return {card, bar, copy, download}
+    card.appendChild(img);
+    historyBox.appendChild(card);
+  });
 }
 
-function upload(file, ui){
-let form = new FormData()
-form.append("file", file)
-form.append("upload_preset", UPLOAD_PRESET)
-
-let xhr = new XMLHttpRequest()
-xhr.open("POST", API)
-
-xhr.upload.onprogress = e=>{
-if(e.lengthComputable){
-ui.bar.style.width = (e.loaded/e.total*100)+"%"
-}
+function clearHistory() {
+  localStorage.removeItem("imgHistory");
+  loadHistory();
 }
 
-xhr.onload = ()=>{
-let res = JSON.parse(xhr.responseText)
-
-if(res.secure_url){
-let url = res.secure_url.replace("/upload/","/upload/f_auto,q_auto/")
-
-ui.copy.onclick = ()=>{
-navigator.clipboard.writeText(url)
-showToast("Copied")
+// ===== DARK MODE =====
+function toggleDark() {
+  document.body.classList.toggle("dark");
 }
 
-ui.download.onclick = ()=>{
-window.open(url)
+// ===== TAB SYSTEM (NEW) =====
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // active button
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // show tab
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// ===== VIEWER CLOSE =====
+viewer.addEventListener("click", () => {
+  viewer.style.display = "none";
+});
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
 }
 
-saveHistory(url)
-
-}else{
-showToast(res.error?.message || "Upload failed")
-}
-}
-
-xhr.send(form)
-}
-
-function saveHistory(url){
-let hist = JSON.parse(localStorage.getItem("imgHistory")||"[]")
-hist.push(url)
-localStorage.setItem("imgHistory",JSON.stringify(hist))
-loadHistory()
-}
-
-function loadHistory(){
-let hist = JSON.parse(localStorage.getItem("imgHistory")||"[]")
-historyBox.innerHTML = ""
-
-;[...hist].reverse().forEach(url=>{
-let div = document.createElement("div")
-let img = document.createElement("img")
-img.src = url
-img.style.height="50px"
-
-div.appendChild(img)
-historyBox.appendChild(div)
-})
-}
-
-function clearHistory(){
-localStorage.removeItem("imgHistory")
-loadHistory()
-}
-
-function toggleDark(){
-document.body.classList.toggle("dark")
-}
-
-function showTab(id){
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-document.getElementById(id).classList.add("active")
-}
-
-function showToast(msg){
-let t=document.createElement("div")
-t.className="toast"
-t.textContent=msg
-document.body.appendChild(t)
-setTimeout(()=>t.remove(),2000)
-}
-
-loadHistory()
+// ===== INIT =====
+loadHistory();
