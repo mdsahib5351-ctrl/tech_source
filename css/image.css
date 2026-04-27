@@ -1,75 +1,186 @@
-body {
-  font-family: Arial;
+/* ===== RESET ===== */
+* {
   margin: 0;
-  background: #f4f4f4;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== BODY ===== */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f9;
+  color: #222;
+  transition: 0.3s;
 }
 
 .dark {
-  background: #111;
-  color: white;
+  background: #0d0d0d;
+  color: #fff;
 }
 
-.box {
-  max-width: 900px;
+/* ===== HEADER ===== */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 8%;
+  background: #fff;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.dark .topbar {
+  background: #111;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.dark-btn {
+  border: none;
+  background: #00ff66;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+  max-width: 950px;
   margin: 40px auto;
   padding: 20px;
-  background: white;
-  border-radius: 12px;
 }
 
-.menu {
+/* ===== CARD ===== */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.dark .card {
+  background: #1a1a1a;
+}
+
+/* ===== TABS ===== */
+.tabs {
   display: flex;
   gap: 10px;
+  margin-bottom: 15px;
 }
 
-.menu button {
-  padding: 10px;
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #eee;
   cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
-.drop {
-  border: 2px dashed #aaa;
-  padding: 30px;
-  text-align: center;
-  margin-top: 20px;
-  cursor: pointer;
-}
-
-.drop.hover {
+.tab-btn:hover {
   background: #ddd;
 }
 
-.preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.tab-btn.active {
+  background: #00ff66;
+  color: #000;
+}
+
+/* ===== TAB CONTENT ===== */
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
+}
+
+/* ===== DROP AREA ===== */
+.drop {
+  border: 2px dashed #bbb;
+  padding: 40px;
+  text-align: center;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: 0.3s;
+}
+
+.drop:hover {
+  border-color: #00ff66;
+  background: rgba(0,255,100,0.05);
+}
+
+.drop input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.drop p {
+  font-size: 18px;
+}
+
+.drop span {
+  font-size: 13px;
+  color: #777;
+}
+
+/* ===== PREVIEW GRID ===== */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
   margin-top: 20px;
 }
 
-.card {
-  width: 150px;
+/* ===== IMAGE CARD ===== */
+.preview-card {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: 0.3s;
 }
 
-.card img {
+.dark .preview-card {
+  background: #222;
+}
+
+.preview-card:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+
+.preview-card img {
   width: 100%;
+  height: 120px;
+  object-fit: cover;
   cursor: pointer;
 }
 
+/* DELETE */
 .delete {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background: red;
+  top: 6px;
+  right: 6px;
+  background: rgba(255,0,0,0.9);
   color: white;
-  padding: 2px 6px;
+  padding: 4px 7px;
+  font-size: 12px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
+/* PROGRESS */
 .progress {
   height: 4px;
   background: #eee;
@@ -78,20 +189,40 @@ body {
 .bar {
   height: 100%;
   width: 0;
-  background: green;
+  background: #00ff66;
 }
 
+/* ACTION BUTTONS */
 .actions {
   display: flex;
-  gap: 5px;
-  padding: 5px;
+  gap: 6px;
+  padding: 8px;
 }
 
 .actions button {
   flex: 1;
-  font-size: 10px;
+  font-size: 11px;
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #f1f1f1;
 }
 
+.actions button:hover {
+  background: #00ff66;
+  color: #000;
+}
+
+/* ===== HISTORY GRID ===== */
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* ===== VIEWER ===== */
 .viewer {
   position: fixed;
   top: 0;
@@ -99,21 +230,144 @@ body {
   width: 100%;
   height: 100%;
   display: none;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .viewer img {
   max-width: 90%;
   max-height: 90%;
+  border-radius: 10px;
 }
 
+/* ===== TOAST ===== */
 .toast {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: black;
-  color: white;
+  background: #00ff66;
+  color: #000;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  font-size: 14px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  margin-top: 60px;
+  padding: 60px 8% 30px;
+  background: linear-gradient(135deg,#012401,#000);
+  color: #fff;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 40px;
+}
+
+.footer-box h2,
+.footer-box h3 {
+  color: #00ff66;
+  margin-bottom: 15px;
+}
+
+.footer-box p {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-box ul {
+  list-style: none;
+}
+
+.footer-box ul li {
+  margin: 8px 0;
+}
+
+.footer-box ul li a {
+  color: #ddd;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.footer-box ul li a:hover {
+  color: #00ff66;
+  padding-left: 5px;
+}
+
+/* SOCIAL */
+.social {
+  margin-top: 15px;
+}
+
+.social a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #00ff66;
+  border-radius: 50%;
+  color: #00ff66;
+  margin-right: 8px;
+  transition: 0.3s;
+}
+
+.social a:hover {
+  background: #00ff66;
+  color: #000;
+}
+
+/* NEWSLETTER */
+.newsletter {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.newsletter input {
+  flex: 1;
   padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.newsletter button {
+  width: 42px;
+  background: #00ff66;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* BOTTOM */
+.footer-bottom {
+  text-align: center;
+  margin-top: 30px;
+  border-top: 1px solid #333;
+  padding-top: 15px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width: 600px){
+  .topbar {
+    padding: 12px 5%;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .drop {
+    padding: 25px;
+  }
 }
