@@ -1,48 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Image Uploader</title>
-<link rel="stylesheet" href="css/image.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Image Uploader | Tech Source</title>
+  <meta name="description" content="Upload images and get instant links with history tracking">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/image.css">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
 
-<button class="dark-btn" onclick="toggleDark()">🌙</button>
+  <!-- ===== HEADER ===== -->
+  <header class="topbar">
+    <h1 class="logo">Image Uploader</h1>
+    <button class="dark-btn" onclick="toggleDark()">🌙</button>
+  </header>
 
-<div class="box">
+  <!-- ===== MAIN ===== -->
+  <main class="container">
 
-  <div class="menu">
-    <button onclick="showTab('upload')" class="active-btn">Upload</button>
-    <button onclick="showTab('history')">History</button>
+    <section class="card">
+
+      <!-- Tabs -->
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="upload">
+          <i class="fa-solid fa-upload"></i> Upload
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <i class="fa-solid fa-clock"></i> History
+        </button>
+      </nav>
+
+      <!-- ===== Upload Tab ===== -->
+      <section id="upload" class="tab active">
+
+        <!-- Drop Area -->
+        <div id="drop" class="drop">
+          <div class="drop-content">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>Drag & Drop Images</p>
+            <span>or click to upload</span>
+          </div>
+          <input type="file" id="file" multiple accept="image/*">
+        </div>
+
+        <!-- Preview -->
+        <div id="preview" class="preview-grid"></div>
+
+      </section>
+
+      <!-- ===== History Tab ===== -->
+      <section id="history" class="tab">
+
+        <div class="history-head">
+          <h3>Upload History</h3>
+          <button class="clear-btn" onclick="clearHistory()">Clear</button>
+        </div>
+
+        <div id="historyBox" class="history-grid"></div>
+
+      </section>
+
+    </section>
+
+  </main>
+
+  <!-- ===== IMAGE VIEWER ===== -->
+  <div id="viewer" class="viewer" onclick="this.style.display='none'">
+    <img id="viewerImg" alt="Preview">
   </div>
 
-  <!-- Upload -->
-  <div id="upload" class="tab active">
-    <div id="drop" class="drop">
-      <p>📂 Drag & Drop Images</p>
-      <span>or click to upload</span>
-      <input type="file" id="file" multiple accept="image/*">
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+
+    <div class="footer-container">
+
+      <!-- Brand -->
+      <div class="footer-box">
+        <h2>Tech Source</h2>
+        <p>
+          Fast & easy digital services provider. Upload images,
+          generate links and manage your files instantly.
+        </p>
+
+        <div class="social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+          <a href="#"><i class="fab fa-whatsapp"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="footer-box">
+        <h3>Features</h3>
+        <ul>
+          <li>Image Upload</li>
+          <li>Instant Link</li>
+          <li>History Save</li>
+          <li>Fast Download</li>
+        </ul>
+      </div>
+
+      <!-- Links -->
+      <div class="footer-box">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Uploader</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="footer-box">
+        <h3>Newsletter</h3>
+        <p>Get updates and new features.</p>
+
+        <form class="newsletter">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+
     </div>
 
-    <div id="preview" class="preview"></div>
-  </div>
+    <div class="footer-bottom">
+      © 2026 Tech Source | All Rights Reserved
+    </div>
 
-  <!-- History -->
-  <div id="history" class="tab">
-    <h3>Upload History</h3>
-    <div id="historyBox"></div>
-    <button onclick="clearHistory()">Clear History</button>
-  </div>
+  </footer>
 
-</div>
+  <!-- JS -->
+  <script src="script/image.js"></script>
 
-<!-- Fullscreen Preview -->
-<div id="viewer" class="viewer" onclick="this.style.display='none'">
-  <img id="viewerImg">
-</div>
-
-<script src="script/image.js"></script>
 </body>
 </html>
