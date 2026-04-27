@@ -2,103 +2,241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" type="image/jpeg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ration Card Service</title>
+
+<title>Ration Card Service | Tech Source</title>
+
+<link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg">
 
 <style>
-body{
-  font-family: Arial, sans-serif;
-  background:#f5f5f5;
+
+/* ===== RESET ===== */
+*{
   margin:0;
   padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
 }
 
-header{
-  background:#4CAF50;
-  color:white;
-  padding:20px;
+/* ===== BODY ===== */
+body{
+  background:#f5f5f5;
+  color:#222;
+}
+
+/* ===== HEADER ===== */
+.header{
+  background:#fff;
+  padding:15px 8%;
+  border-bottom:1px solid #ddd;
   text-align:center;
 }
 
+.header h1{
+  font-size:22px;
+}
+
+/* ===== CONTAINER ===== */
 .container{
   max-width:900px;
   margin:40px auto;
-  background:white;
-  padding:30px;
-  border-radius:15px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.1);
-}
-
-h2{
-  color:#4CAF50;
-  margin-top:30px;
-}
-
-ul{
-  line-height:2;
-}
-
-.price-box{
-  background:#fff3e0;
   padding:20px;
-  border-radius:10px;
-  margin-top:20px;
 }
 
-.btn{
-  display:inline-block;
-  margin-top:25px;
-  padding:12px 25px;
-  background:#4CAF50;
-  color:white;
-  text-decoration:none;
+/* ===== CARD ===== */
+.card{
+  background:#fff;
+  padding:25px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-bottom:20px;
+}
+
+/* ===== SECTION TITLE ===== */
+.card h2{
+  font-size:18px;
+  margin-bottom:10px;
+  border-left:4px solid #000;
+  padding-left:8px;
+}
+
+/* ===== PRICE BOX ===== */
+.price-box{
+  background:#fafafa;
+  border:1px solid #eee;
+  padding:15px;
   border-radius:8px;
 }
 
-.btn:hover{
-  background:#4CAF50;
+.price-box p{
+  margin:8px 0;
+  font-size:15px;
 }
+
+/* ===== LIST ===== */
+ul{
+  line-height:2;
+  padding-left:15px;
+}
+
+/* ===== CONTACT ===== */
+.contact p{
+  margin:6px 0;
+}
+
+/* ===== BUTTON ===== */
+.btn{
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 20px;
+  background:#000;
+  color:#fff;
+  text-decoration:none;
+  border-radius:6px;
+  font-size:14px;
+}
+
+.btn:hover{
+  background:#333;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  margin-top:50px;
+  padding:40px 8% 20px;
+  background:#fff;
+  border-top:1px solid #ddd;
+}
+
+.footer-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:30px;
+}
+
+.footer-box h3,
+.footer-box h4{
+  margin-bottom:10px;
+}
+
+.footer-box p,
+.footer-box a{
+  font-size:14px;
+  color:#555;
+  text-decoration:none;
+}
+
+.footer-box ul{
+  list-style:none;
+}
+
+.footer-box ul li{
+  margin:6px 0;
+}
+
+.footer-bottom{
+  text-align:center;
+  margin-top:20px;
+  padding-top:10px;
+  border-top:1px solid #eee;
+  font-size:13px;
+  color:#777;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .container{
+    padding:10px;
+  }
+}
+
 </style>
 </head>
+
 <body>
 
-<header>
-<h1>Ration Card Service</h1>
-</header>
-
-<div class="container">
-
-<h2>Available Services</h2>
-
-<div class="price-box">
-<p><strong>New Ration Card Apply:</strong> ₹1500</p>
-<p><strong>TATKAL New Ration Card Apply:</strong> ₹2500</p>
-<p><strong>Member Add:</strong> ₹200</p>
-<p><strong>TATKAL Member Add:</strong> ₹1000</p>
-<p><strong>Member Remove:</strong> ₹149</p>
-<p><strong>TATKAL Member Remove:</strong> ₹1000</p>  
-<p><strong>Correction Service:</strong> ₹500</p>
+<!-- HEADER -->
+<div class="header">
+  <h1>Ration Card Service</h1>
 </div>
 
-<h2>Required Documents</h2>
-<ul>
-<li>✔ Aadhaar Card (All Members)</li>
-<li>✔ Passport Size Family Photo</li>
-<li>✔ Residendial Certificate </li>
-<li>✔ Income Certificate </li>
-<li>✔ Caste Certificate (if requird)</li>
-<li>✔ Mobile Number</li>
-</ul>
+<!-- MAIN -->
+<div class="container">
 
-<h2>Processing Time</h2>
-<p>⏳ 10–60 Working Days</p>
+  <!-- SERVICES -->
+  <div class="card">
+    <h2>Available Services</h2>
 
-<h2>Contact For Apply</h2>
-<p>📞 Mobile: 9661905351</p>
-<p>@ E-mail: mdsahib5351@gmail.com</p>
+    <div class="price-box">
+      <p><strong>New Ration Card Apply:</strong> ₹1500</p>
+      <p><strong>Tatkal New Apply:</strong> ₹2500</p>
+      <p><strong>Member Add:</strong> ₹200</p>
+      <p><strong>Tatkal Member Add:</strong> ₹1000</p>
+      <p><strong>Member Remove:</strong> ₹149</p>
+      <p><strong>Tatkal Remove:</strong> ₹1000</p>  
+      <p><strong>Correction Service:</strong> ₹500</p>
+    </div>
+  </div>
 
-<a href="index.html" class="btn">⬅ Back to Home</a>
+  <!-- DOCUMENTS -->
+  <div class="card">
+    <h2>Required Documents</h2>
+    <ul>
+      <li>Aadhaar Card (All Members)</li>
+      <li>Passport Size Family Photo</li>
+      <li>Residential Certificate</li>
+      <li>Income Certificate</li>
+      <li>Caste Certificate (if required)</li>
+      <li>Mobile Number</li>
+    </ul>
+  </div>
+
+  <!-- TIME -->
+  <div class="card">
+    <h2>Processing Time</h2>
+    <p>10–60 Working Days</p>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="card contact">
+    <h2>Contact For Apply</h2>
+    <p>📞 Mobile: 9661905351</p>
+    <p>📧 Email: mdsahib5351@gmail.com</p>
+  </div>
+
+  <a href="index.html" class="btn">⬅ Back to Home</a>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+
+  <div class="footer-container">
+
+    <div class="footer-box">
+      <h3>Tech Source</h3>
+      <p>Fast & secure digital services platform.</p>
+    </div>
+
+    <div class="footer-box">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-box">
+      <h4>Contact</h4>
+      <p>Email: mdsahib5351@gmail.com</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 Tech Source | All Rights Reserved
+  </div>
 
 </div>
 
