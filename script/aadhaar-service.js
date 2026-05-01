@@ -16,6 +16,7 @@ const CLOUD_NAME = "dsnuatuc8";
 const UPLOAD_PRESET = "ml_default";
 const CLOUDINARY_API = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_RESCHEDULE_COUNT = 2;
 
 const $ = (id) => document.getElementById(id);
 const digitsOnly = (value) => value.replace(/\D/g, "");
@@ -44,8 +45,18 @@ const state = {
   userProfile: {},
   selectedService: "",
   appointmentData: {},
-  submitting: false
+  rescheduleAppointments: [],
+  submitting: false,
+  draftLoaded: false
 };
+
+let draftSaveTimer = null;
+
+const draftFieldIds = [
+  "name", "mobile", "aadhaar", "newAddress", "withoutDocNote", "relationType",
+  "coName", "coAddress", "oldMobile", "newMobile", "docType", "docAddress",
+  "appointmentDate", "appointmentTime"
+];
 
 const els = {
   authPage: $("authPage"),
@@ -70,6 +81,8 @@ const els = {
   homePage: $("homePage"),
   bookPage: $("bookPage"),
   trackPage: $("trackPage"),
+  historyPage: $("historyPage"),
+  historyList: $("historyList"),
   reschedulePage: $("reschedulePage"),
   step1: $("step1"),
   step2: $("step2"),
@@ -111,7 +124,11 @@ const els = {
   resDate: $("resDate"),
   resTime: $("resTime"),
   resTimeSlots: $("resTimeSlots"),
-  resResult: $("resResult")
+  resReason: $("resReason"),
+  resResult: $("resResult"),
+  resSelectedPreview: $("resSelectedPreview"),
+  rescheduleConfirmPopup: $("rescheduleConfirmPopup"),
+  resConfirmDetails: $("resConfirmDetails")
 };
 
 const slotList = [
@@ -130,12 +147,109 @@ els.resDate.max = maxAppointmentISO();
   });
 });
 
+document.querySelectorAll("#bookPage input, #bookPage select, #bookPage textarea").forEach(field => {
+  if(field.type === "file"){
+    field.addEventListener("change", () => showToast("Document selected. Files are not saved in draft."));
+    return;
+  }
+
+  field.addEventListener("input", scheduleDraftSave);
+  field.addEventListener("change", scheduleDraftSave);
+});
+
 function showMessage(target, message, type = "warn"){
   target.innerHTML = "";
   const div = document.createElement("div");
   div.className = `status ${type}`;
   div.textContent = message;
   target.appendChild(div);
+}
+
+function showToast(message, type = "success"){
+  let stack = $("toastStack");
+
+  if(!stack){
+    stack = document.createElement("div");
+    stack.id = "toastStack";
+    stack.className = "toast-stack";
+    document.body.appendChild(stack);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  stack.appendChild(toast);
+
+  setTimeout(() => toast.classList.add("is-visible"), 20);
+  setTimeout(() => {
+    toast.classList.remove("is-visible");
+    setTimeout(() => toast.remove(), 220);
+  }, 2600);
+}
+
+function getDraftKey(){
+  const owner = state.currentUser?.uid || state.currentUser?.email || "guest";
+  return `aadhaarAppointmentDraft:${owner}`;
+}
+
+function collectDraftData(){
+  const values = {};
+  draftFieldIds.forEach(id => {
+    const field = $(id);
+    if(field) values[id] = field.value;
+  });
+
+  return {
+    values,
+    selectedService: state.selectedService,
+    savedAt: Date.now()
+  };
+}
+
+function saveDraft(silent = true){
+  if(!state.currentUser) return;
+  localStorage.setItem(getDraftKey(), JSON.stringify(collectDraftData()));
+  if(!silent) showToast("Draft saved");
+}
+
+function scheduleDraftSave(){
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(() => saveDraft(true), 500);
+}
+
+function clearDraft(){
+  if(!state.currentUser) return;
+  localStorage.removeItem(getDraftKey());
+  state.draftLoaded = false;
+}
+
+function loadDraft(){
+  if(!state.currentUser || state.draftLoaded) return false;
+  const raw = localStorage.getItem(getDraftKey());
+  if(!raw) return false;
+
+  try{
+    const draft = JSON.parse(raw);
+    Object.entries(draft.values || {}).forEach(([id, value]) => {
+      const field = $(id);
+      if(field && field.type !== "file") field.value = value || "";
+    });
+
+    state.selectedService = draft.selectedService || "";
+    if(state.selectedService){
+      const option = Array.from(document.querySelectorAll(".opt"))
+        .find(opt => opt.textContent.trim() === state.selectedService);
+      if(option) option.classList.add("active");
+      showServices();
+    }
+
+    state.draftLoaded = true;
+    showToast("Saved draft restored");
+    return true;
+  }catch(error){
+    localStorage.removeItem(getDraftKey());
+    return false;
+  }
 }
 
 function addReviewRow(container, label, value){
@@ -145,6 +259,13 @@ function addReviewRow(container, label, value){
   p.appendChild(b);
   p.appendChild(document.createTextNode(value || "-"));
   container.appendChild(p);
+}
+
+function copyAppointmentId(id){
+  if(!id) return;
+  navigator.clipboard.writeText(id)
+    .then(() => showToast("Appointment ID copied"))
+    .catch(() => prompt("Copy Appointment ID:", id));
 }
 
 function generateAppointmentId(){
@@ -340,6 +461,108 @@ function renderReview(rows){
   rows.forEach(([label,value]) => addReviewRow(els.reviewBox, label, value));
 }
 
+function getAppointmentTimeline(data){
+  const status = String(data.status || "Pending").toLowerCase();
+  const submitted = true;
+  const rescheduled = status === "rescheduled";
+  const completed = status === "completed" || status === "approved";
+  const rejected = status === "rejected" || status === "cancelled";
+
+  return [
+    { label:"Submitted", state:submitted ? "done" : "pending" },
+    { label:rescheduled ? "Rescheduled" : "Scheduled", state:rescheduled || submitted ? "done" : "pending" },
+    { label:"Under Review", state:completed || rejected ? "done" : "active" },
+    {
+      label:rejected ? "Rejected" : completed ? "Completed" : "Final Status",
+      state:rejected ? "rejected" : completed ? "done" : "pending"
+    }
+  ];
+}
+
+function renderAppointmentCard(data, options = {}){
+  const box = document.createElement("div");
+  box.className = "appointment-card";
+  const timeline = getAppointmentTimeline(data).map(step => `
+    <div class="timeline-step ${step.state}">
+      <span></span>
+      <strong>${step.label}</strong>
+    </div>
+  `).join("");
+
+  box.innerHTML = `
+    <div class="appointment-card-head">
+      <div>
+        <span class="mini-label">Appointment ID</span>
+        <h3>${data.appointmentId || "-"}</h3>
+        <p>${data.service || "Aadhaar Service"}</p>
+      </div>
+      <span class="status-pill">${data.status || "Pending"}</span>
+    </div>
+    <div class="appointment-timeline">${timeline}</div>
+    <div class="appointment-details">
+      <div><small>Name</small><strong>${data.name || "-"}</strong></div>
+      <div><small>Date</small><strong>${data.appointmentDate || "-"}</strong></div>
+      <div><small>Time</small><strong>${data.appointmentTime || "-"}</strong></div>
+      <div><small>Aadhaar</small><strong>${data.aadhaarMasked || maskAadhaar(data.aadhaar || "")}</strong></div>
+      <div><small>Reschedules</small><strong>${data.rescheduleCount || 0}/${MAX_RESCHEDULE_COUNT}</strong></div>
+    </div>
+  `;
+
+  if(data.rescheduleReason){
+    const reason = document.createElement("div");
+    reason.className = "reason-note";
+    const label = document.createElement("small");
+    const value = document.createElement("strong");
+    label.textContent = "Reschedule Reason";
+    value.textContent = data.rescheduleReason;
+    reason.append(label, value);
+    box.appendChild(reason);
+  }
+
+  const actionRow = document.createElement("div");
+  actionRow.className = "inline-actions card-actions";
+
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.className = "secondary mini-action";
+  copyBtn.textContent = "Copy ID";
+  copyBtn.onclick = () => copyAppointmentId(data.appointmentId || "");
+
+  const receiptBtn = document.createElement("button");
+  receiptBtn.type = "button";
+  receiptBtn.className = "mini-action";
+  receiptBtn.textContent = "Receipt";
+  receiptBtn.onclick = () => downloadAppointmentReceipt(data);
+
+  actionRow.append(copyBtn, receiptBtn);
+
+  if(options.showReschedule){
+    const rescheduleBtn = document.createElement("button");
+    rescheduleBtn.type = "button";
+    rescheduleBtn.className = "mini-action";
+    rescheduleBtn.textContent = "Reschedule";
+    rescheduleBtn.onclick = () => openReschedule(data.appointmentId || "");
+    actionRow.appendChild(rescheduleBtn);
+  }
+
+  box.appendChild(actionRow);
+
+  if(data.documentUrl){
+    const actions = document.createElement("div");
+    actions.className = "inline-actions";
+    const link = document.createElement("a");
+    link.className = "doc-link";
+    link.href = data.documentUrl;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "Open Document";
+    actions.appendChild(link);
+    box.appendChild(actions);
+  }
+
+  return box;
+}
+
 async function getAvailabilityRule(selectedDate){
   if(!selectedDate) return {};
   try{
@@ -414,6 +637,8 @@ function isSlotPassed(slot, now){
 }
 
 function resetBookingForm(){
+  if(state.draftLoaded) return;
+
   state.selectedService = "";
   state.appointmentData = {};
   [
@@ -451,6 +676,7 @@ window.hideAll = function(){
   els.profilePage.classList.add("hidden");
   els.bookPage.classList.add("hidden");
   els.trackPage.classList.add("hidden");
+  els.historyPage.classList.add("hidden");
   els.reschedulePage.classList.add("hidden");
 };
 
@@ -465,6 +691,7 @@ window.openBook = function(){
   hideAll();
   resetBookingForm();
   els.bookPage.classList.remove("hidden");
+  loadDraft();
   showOnlyStep(1);
 };
 
@@ -475,16 +702,26 @@ window.openTrack = function(){
   els.trackPage.classList.remove("hidden");
 };
 
-window.openReschedule = function(){
+window.openHistory = function(){
+  if(!requireLogin()) return;
+  hideAll();
+  els.historyPage.classList.remove("hidden");
+  loadAppointmentHistory();
+};
+
+window.openReschedule = function(appointmentId = ""){
   if(!requireLogin()) return;
   hideAll();
   els.resResult.innerHTML = "";
   els.resId.value = "";
   els.resDate.value = "";
   els.resTime.value = "";
+  els.resReason.value = "";
+  els.resSelectedPreview.innerHTML = "";
+  els.resSelectedPreview.classList.add("hidden");
   renderSlots(els.resTimeSlots, els.resTime, els.resDate.value);
   els.reschedulePage.classList.remove("hidden");
-  loadUserAppointmentsForReschedule();
+  loadUserAppointmentsForReschedule(appointmentId);
 };
 
 window.showOnlyStep = function(n){
@@ -512,6 +749,7 @@ window.selectService = function(el, service){
   document.querySelectorAll(".opt").forEach(o => o.classList.remove("active"));
   el.classList.add("active");
   state.selectedService = service;
+  scheduleDraftSave();
 };
 
 window.goStep2 = function(){
@@ -519,10 +757,10 @@ window.goStep2 = function(){
   const mobile = els.mobileInput.value.trim();
   const aadhaar = els.aadhaarInput.value.trim();
 
-  if(name.length < 3) return alert("Valid full name enter karo");
-  if(!isTenDigitMobile(mobile)) return alert("Valid 10 digit Indian mobile number enter karo");
-  if(!isAadhaar(aadhaar)) return alert("Valid 12 digit Aadhaar number enter karo");
-  if(!state.selectedService) return alert("Service select karo");
+  if(name.length < 3) return showToast("Valid full name enter karo", "error");
+  if(!isTenDigitMobile(mobile)) return showToast("Valid 10 digit Indian mobile number enter karo", "error");
+  if(!isAadhaar(aadhaar)) return showToast("Valid 12 digit Aadhaar number enter karo", "error");
+  if(!state.selectedService) return showToast("Service select karo", "error");
 
   els.selectedServiceText.textContent = state.selectedService;
   [els.withoutDocSection, els.coSection, els.mobileUpdateSection, els.docSection].forEach(section => section.classList.add("hidden"));
@@ -533,19 +771,20 @@ window.goStep2 = function(){
   else els.docSection.classList.remove("hidden");
 
   showOnlyStep(2);
+  saveDraft(true);
 };
 
 window.backStep1 = function(){ showOnlyStep(1); };
 window.backStep2 = function(){ showOnlyStep(2); };
 
 window.goReview = function(){
-  if(!els.appointmentDate.value) return alert("Appointment date select karo");
-  if(els.appointmentDate.value < todayISO()) return alert("Past date allowed nahi hai");
-  if(els.appointmentDate.value > maxAppointmentISO()) return alert("Appointment maximum 15 din ke andar book ho sakta hai");
-  if(!els.appointmentTime.value) return alert("Appointment time select karo");
+  if(!els.appointmentDate.value) return showToast("Appointment date select karo", "error");
+  if(els.appointmentDate.value < todayISO()) return showToast("Past date allowed nahi hai", "error");
+  if(els.appointmentDate.value > maxAppointmentISO()) return showToast("Appointment maximum 15 din ke andar book ho sakta hai", "error");
+  if(!els.appointmentTime.value) return showToast("Appointment time select karo", "error");
 
   const extra = getServiceExtraData();
-  if(extra.error) return alert(extra.error);
+  if(extra.error) return showToast(extra.error, "error");
 
   state.appointmentData = {
     appointmentId: generateAppointmentId(),
@@ -575,6 +814,7 @@ window.goReview = function(){
   ]);
 
   showOnlyStep(3);
+  saveDraft(true);
 };
 
 window.submitAppointment = async function(){
@@ -597,10 +837,12 @@ window.submitAppointment = async function(){
     });
 
     downloadPDF();
+    clearDraft();
+    showToast("Appointment submitted");
     els.finalId.textContent = state.appointmentData.appointmentId;
     showOnlyStep(4);
   }catch(error){
-    alert("Error: " + error.message);
+    showToast("Error: " + error.message, "error");
     console.error(error);
   }finally{
     state.submitting = false;
@@ -611,55 +853,117 @@ window.submitAppointment = async function(){
 
 window.downloadPDF = function(){
   if(!state.appointmentData.appointmentId){
-    alert("PDF ke liye appointment data available nahi hai");
+    showToast("PDF ke liye appointment data available nahi hai", "error");
     return;
   }
 
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
-  let y = 20;
+  const data = state.appointmentData;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const margin = 16;
+  const contentWidth = pageWidth - margin * 2;
+  const primary = [11, 94, 215];
+  const dark = [23, 32, 51];
+  const muted = [102, 112, 133];
+  const line = [216, 226, 242];
 
-  const addLine = (label, value) => {
-    const text = `${label}: ${value || "-"}`;
-    const lines = pdf.splitTextToSize(text, 170);
-    pdf.text(lines, 20, y);
-    y += lines.length * 7 + 2;
-    if(y > 275){ pdf.addPage(); y = 20; }
-  };
+  function infoRow(label, value, x, y, width){
+    pdf.setTextColor(muted[0], muted[1], muted[2]);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    pdf.text(label.toUpperCase(), x, y);
+    pdf.setTextColor(23, 32, 51);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.text(pdf.splitTextToSize(String(value || "-"), width), x, y + 6);
+  }
 
+  function sectionTitle(title, y){
+    pdf.setTextColor(dark[0], dark[1], dark[2]);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(12);
+    pdf.text(title, margin, y);
+    pdf.setDrawColor(line[0], line[1], line[2]);
+    pdf.line(margin, y + 4, pageWidth - margin, y + 4);
+  }
+
+  pdf.setFillColor(247, 249, 252);
+  pdf.rect(0, 0, pageWidth, 297, "F");
+
+  pdf.setFillColor(primary[0], primary[1], primary[2]);
+  pdf.roundedRect(margin, 14, contentWidth, 38, 4, 4, "F");
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(19);
+  pdf.text("TECH SOURCE", margin + 12, 29);
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("Aadhaar Appointment Receipt", margin + 12, 39);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  pdf.text("SERVICE FEE", pageWidth - margin - 44, 28);
   pdf.setFontSize(16);
-  pdf.text("Aadhaar Service Appointment", 20, y);
-  y += 12;
+  pdf.text("Rs. 150", pageWidth - margin - 44, 40);
 
-  pdf.setFontSize(11);
-  addLine("Appointment ID", state.appointmentData.appointmentId);
-  addLine("Name", state.appointmentData.name);
-  addLine("Mobile", maskMobile(state.appointmentData.mobile));
-  addLine("Aadhaar", maskAadhaar(state.appointmentData.aadhaar));
-  addLine("Service", state.appointmentData.service);
-  addLine("Date", state.appointmentData.appointmentDate);
-  addLine("Time", state.appointmentData.appointmentTime);
-  addLine("Status", state.appointmentData.status);
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(margin, 60, contentWidth, 35, 4, 4, "F");
+  pdf.setDrawColor(line[0], line[1], line[2]);
+  pdf.roundedRect(margin, 60, contentWidth, 35, 4, 4, "S");
+  infoRow("Appointment ID", data.appointmentId, margin + 10, 73, 58);
+  infoRow("Service", data.service, margin + 78, 73, 62);
+  infoRow("Status", data.status, margin + 150, 73, 30);
 
-  if(state.appointmentData.newAddress) addLine("New Address", state.appointmentData.newAddress);
-  if(state.appointmentData.note) addLine("Note", state.appointmentData.note);
-  if(state.appointmentData.oldMobile){
-    addLine("Old Mobile", maskMobile(state.appointmentData.oldMobile));
-    addLine("New Mobile", maskMobile(state.appointmentData.newMobile));
-  }
-  if(state.appointmentData.coName){
-    addLine("Relation", state.appointmentData.relationType);
-    addLine("C/O Name", state.appointmentData.coName);
-    addLine("Address", state.appointmentData.coAddress);
-  }
-  if(state.appointmentData.docType){
-    addLine("Document Type", state.appointmentData.docType);
-    addLine("Document File", state.appointmentData.fileName);
-  }
-  if(state.appointmentData.documentUrl) addLine("Document Link", "Saved in Firebase");
+  sectionTitle("Applicant Details", 112);
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(margin, 122, contentWidth, 52, 4, 4, "F");
+  pdf.setDrawColor(line[0], line[1], line[2]);
+  pdf.roundedRect(margin, 122, contentWidth, 52, 4, 4, "S");
+  infoRow("Name", data.name, margin + 10, 136, 72);
+  infoRow("Mobile", maskMobile(data.mobile), margin + 98, 136, 38);
+  infoRow("Aadhaar", data.aadhaarMasked || maskAadhaar(data.aadhaar || ""), margin + 148, 136, 36);
+  infoRow("Date", data.appointmentDate, margin + 10, 158, 45);
+  infoRow("Time", data.appointmentTime, margin + 72, 158, 45);
+  infoRow("Created", new Date().toLocaleDateString("en-IN"), margin + 132, 158, 45);
+
+  sectionTitle("Service Details", 190);
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(margin, 200, contentWidth, 48, 4, 4, "F");
+  pdf.setDrawColor(line[0], line[1], line[2]);
+  pdf.roundedRect(margin, 200, contentWidth, 48, 4, 4, "S");
+  infoRow("Service", data.service, margin + 10, 214, 70);
+  infoRow("Document", data.docType || data.fileName || "Not required", margin + 96, 214, 78);
+
+  const detailText = data.rescheduleReason || data.newAddress || data.docAddress || data.coAddress || data.note || data.coName || data.newMobile || "No additional note";
+  infoRow("Update Detail", detailText, margin + 10, 236, 160);
+
+  pdf.setFillColor(227, 242, 253);
+  pdf.roundedRect(margin, 260, contentWidth, 16, 4, 4, "F");
+  pdf.setTextColor(primary[0], primary[1], primary[2]);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.text("Please carry original documents and this receipt at the appointment time.", margin + 10, 270);
+
+  pdf.setTextColor(muted[0], muted[1], muted[2]);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.text("Generated by Tech Source Aadhaar Service Portal", margin, 286);
 
   pdf.save(`${state.appointmentData.appointmentId}.pdf`);
+  showToast("PDF downloaded");
 };
+
+function downloadAppointmentReceipt(data){
+  if(!data?.appointmentId){
+    showToast("Receipt data not available", "error");
+    return;
+  }
+
+  const previousData = state.appointmentData;
+  state.appointmentData = { ...data };
+  downloadPDF();
+  state.appointmentData = previousData;
+}
 
 window.trackAppointment = async function(){
   try{
@@ -682,47 +986,91 @@ window.trackAppointment = async function(){
     els.trackResult.innerHTML = "";
     snap.forEach(docSnap => {
       const data = docSnap.data();
-      const box = document.createElement("div");
-      box.className = "review-box";
-      [
-        ["ID", data.appointmentId],
-        ["Name", data.name],
-        ["Service", data.service],
-        ["Date", data.appointmentDate],
-        ["Time", data.appointmentTime],
-        ["Status", data.status]
-      ].forEach(row => addReviewRow(box, row[0], row[1]));
-
-      if(data.documentUrl){
-        const p = document.createElement("p");
-        const b = document.createElement("b");
-        const a = document.createElement("a");
-        b.textContent = "Document: ";
-        a.href = data.documentUrl;
-        a.target = "_blank";
-        a.rel = "noopener";
-        a.textContent = "Open Document";
-        p.append(b, a);
-        box.appendChild(p);
-      }
-
-      els.trackResult.appendChild(box);
+      els.trackResult.appendChild(renderAppointmentCard(data));
     });
   }catch(error){
     showMessage(els.trackResult, `Firebase Error: ${error.message}`, "error");
   }
 };
 
+window.loadAppointmentHistory = async function(){
+  if(!requireLogin()) return;
+  els.historyList.innerHTML = `<div class="status warn">Loading history...</div>`;
+
+  try{
+    const snap = await db.collection("appointments")
+      .where("userId", "==", state.currentUser.uid)
+      .get();
+
+    if(snap.empty){
+      els.historyList.innerHTML = `
+        <div class="empty-state">
+          <h3>No appointment history</h3>
+          <p>Abhi tak is account se koi Aadhaar appointment book nahi hua.</p>
+          <button type="button" onclick="openBook()">Book Appointment</button>
+        </div>
+      `;
+      return;
+    }
+
+    const appointments = snap.docs
+      .map(docSnap => docSnap.data())
+      .sort((a, b) => String(b.appointmentDate || "").localeCompare(String(a.appointmentDate || "")));
+
+    els.historyList.innerHTML = "";
+    appointments.forEach(app => els.historyList.appendChild(renderAppointmentCard(app, { showReschedule:true })));
+  }catch(error){
+    showMessage(els.historyList, `Firebase Error: ${error.message}`, "error");
+  }
+};
+
 window.rescheduleAppointment = async function(){
+  if(!requireLogin()) return;
+
+  const id = els.resId.value.trim().toUpperCase();
+  const reason = els.resReason.value.trim();
+
+  if(!id) return showToast("Apna appointment select karo", "error");
+  if(!els.resDate.value) return showToast("New date select karo", "error");
+  if(els.resDate.value < todayISO()) return showToast("Past date allowed nahi hai", "error");
+  if(els.resDate.value > maxAppointmentISO()) return showToast("Appointment maximum 15 din ke andar reschedule ho sakta hai", "error");
+  if(!els.resTime.value) return showToast("New time select karo", "error");
+  if(reason.length < 3) return showToast("Reschedule reason enter karo", "error");
+
+  const selected = state.rescheduleAppointments.find(app => app.appointmentId === id);
+  if((selected?.rescheduleCount || 0) >= MAX_RESCHEDULE_COUNT){
+    return showToast(`Is appointment ko maximum ${MAX_RESCHEDULE_COUNT} baar reschedule kiya ja chuka hai`, "error");
+  }
+
+  els.resConfirmDetails.innerHTML = "";
+
+  [
+    ["Appointment ID", id],
+    ["Service", selected?.service || "-"],
+    ["Current Date", selected?.appointmentDate || "-"],
+    ["Current Time", selected?.appointmentTime || "-"],
+    ["New Date", els.resDate.value],
+    ["New Time", els.resTime.value],
+    ["Reschedule Used", `${selected?.rescheduleCount || 0}/${MAX_RESCHEDULE_COUNT}`],
+    ["Reason", reason]
+  ].forEach(([label, value]) => addReviewRow(els.resConfirmDetails, label, value));
+
+  els.rescheduleConfirmPopup.classList.remove("hidden");
+  els.rescheduleConfirmPopup.setAttribute("aria-hidden", "false");
+};
+
+window.closeRescheduleConfirm = function(){
+  els.rescheduleConfirmPopup.classList.add("hidden");
+  els.rescheduleConfirmPopup.setAttribute("aria-hidden", "true");
+};
+
+window.confirmRescheduleAppointment = async function(){
   try{
     if(!requireLogin()) return;
     const id = els.resId.value.trim().toUpperCase();
-    if(!id) return alert("Apna appointment select karo");
-    if(!els.resDate.value) return alert("New date select karo");
-    if(els.resDate.value < todayISO()) return alert("Past date allowed nahi hai");
-    if(els.resDate.value > maxAppointmentISO()) return alert("Appointment maximum 15 din ke andar reschedule ho sakta hai");
-    if(!els.resTime.value) return alert("New time select karo");
+    const reason = els.resReason.value.trim();
 
+    closeRescheduleConfirm();
     showMessage(els.resResult, "Loading...", "warn");
 
     const snap = await db.collection("appointments")
@@ -737,15 +1085,24 @@ window.rescheduleAppointment = async function(){
 
     const docSnap = snap.docs[0];
     const data = docSnap.data();
+    const currentCount = data.rescheduleCount || 0;
 
     if(data.userId !== state.currentUser.uid){
       showMessage(els.resResult, "Permission denied. Ye appointment aapke login account ka nahi hai.", "error");
       return;
     }
 
+    if(currentCount >= MAX_RESCHEDULE_COUNT){
+      showMessage(els.resResult, `Is appointment ko maximum ${MAX_RESCHEDULE_COUNT} baar reschedule kiya ja chuka hai.`, "error");
+      return;
+    }
+
     await db.collection("appointments").doc(docSnap.id).update({
       appointmentDate: els.resDate.value,
       appointmentTime: els.resTime.value,
+      rescheduleReason: reason,
+      rescheduleCount: currentCount + 1,
+      lastRescheduledAt: firebase.firestore.FieldValue.serverTimestamp(),
       status: "Rescheduled",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -756,7 +1113,11 @@ window.rescheduleAppointment = async function(){
     addReviewRow(box, "Appointment Rescheduled", id);
     addReviewRow(box, "New Date", els.resDate.value);
     addReviewRow(box, "New Time", els.resTime.value);
+    addReviewRow(box, "Reschedule Count", `${currentCount + 1}/${MAX_RESCHEDULE_COUNT}`);
+    addReviewRow(box, "Reason", reason);
     els.resResult.appendChild(box);
+    showToast("Appointment rescheduled");
+    loadUserAppointmentsForReschedule();
   }catch(error){
     showMessage(els.resResult, `Firebase Error: ${error.message}`, "error");
   }
@@ -764,13 +1125,14 @@ window.rescheduleAppointment = async function(){
 
 window.renderTimeSlots = function(){
   renderSlots(els.timeSlots, els.appointmentTime, els.appointmentDate.value);
+  scheduleDraftSave();
 };
 
 window.renderRescheduleSlots = function(){
   renderSlots(els.resTimeSlots, els.resTime, els.resDate.value);
 };
 
-window.loadUserAppointmentsForReschedule = async function(){
+window.loadUserAppointmentsForReschedule = async function(preselectId = ""){
   if(!requireLogin()) return;
 
   els.resOwnAppointments.innerHTML = `<option value="">Loading your appointments...</option>`;
@@ -781,6 +1143,7 @@ window.loadUserAppointmentsForReschedule = async function(){
       .get();
 
     if(snap.empty){
+      state.rescheduleAppointments = [];
       els.resOwnAppointments.innerHTML = `<option value="">No appointment found in your account</option>`;
       return;
     }
@@ -789,6 +1152,7 @@ window.loadUserAppointmentsForReschedule = async function(){
       .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
       .sort((a, b) => String(b.appointmentDate || "").localeCompare(String(a.appointmentDate || "")));
 
+    state.rescheduleAppointments = appointments;
     els.resOwnAppointments.innerHTML = `<option value="">Select your appointment</option>`;
     appointments.forEach(app => {
       const option = document.createElement("option");
@@ -796,6 +1160,11 @@ window.loadUserAppointmentsForReschedule = async function(){
       option.textContent = `${app.appointmentId || "No ID"} - ${app.service || "Service"} - ${app.appointmentDate || "No date"} ${app.appointmentTime || ""}`;
       els.resOwnAppointments.appendChild(option);
     });
+
+    if(preselectId){
+      els.resOwnAppointments.value = preselectId;
+      selectRescheduleAppointment();
+    }
   }catch(error){
     els.resOwnAppointments.innerHTML = `<option value="">Unable to load appointments</option>`;
     showMessage(els.resResult, `Firebase Error: ${error.message}`, "error");
@@ -803,6 +1172,15 @@ window.loadUserAppointmentsForReschedule = async function(){
 };
 
 window.selectRescheduleAppointment = function(){
-  els.resId.value = els.resOwnAppointments.value || "";
+  const id = els.resOwnAppointments.value || "";
+  els.resId.value = id;
   els.resResult.innerHTML = "";
+  els.resSelectedPreview.innerHTML = "";
+  els.resSelectedPreview.classList.add("hidden");
+
+  const selected = state.rescheduleAppointments.find(app => app.appointmentId === id);
+  if(selected){
+    els.resSelectedPreview.classList.remove("hidden");
+    els.resSelectedPreview.appendChild(renderAppointmentCard(selected));
+  }
 };
