@@ -12,6 +12,7 @@
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -19,7 +20,9 @@
   <!-- ===== HEADER ===== -->
   <header class="topbar">
     <h1 class="logo">Image Uploader</h1>
-    <button class="dark-btn" onclick="toggleDark()">🌙</button>
+    <button class="dark-btn" type="button" onclick="toggleDark()" aria-label="Toggle dark mode">
+      <i class="fa-solid fa-moon"></i>
+    </button>
   </header>
 
   <!-- ===== MAIN ===== -->
@@ -60,7 +63,7 @@
 
         <div class="history-head">
           <h3>Upload History</h3>
-          <button class="clear-btn" onclick="clearHistory()">Clear</button>
+        <button class="clear-btn" type="button" onclick="clearHistory()">Clear</button>
         </div>
 
         <div id="historyBox" class="history-grid"></div>
@@ -72,8 +75,30 @@
   </main>
 
   <!-- ===== IMAGE VIEWER ===== -->
-  <div id="viewer" class="viewer" onclick="this.style.display='none'">
-    <img id="viewerImg" alt="Preview">
+  <div id="viewer" class="viewer" aria-hidden="true">
+    <div class="viewer-panel">
+      <button class="viewer-close" type="button" onclick="closeViewer()" aria-label="Close preview">&times;</button>
+      <img id="viewerImg" alt="Preview">
+      <div class="viewer-meta">
+        <input id="viewerUrl" readonly aria-label="Image URL">
+        <div class="viewer-actions">
+          <button type="button" onclick="copyViewerUrl()">Copy URL</button>
+          <button type="button" onclick="openViewerUrl()">Open</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ocrPopup" class="tool-popup hidden" aria-hidden="true">
+    <div class="tool-box">
+      <button class="viewer-close" type="button" onclick="closeOcrPopup()" aria-label="Close OCR">&times;</button>
+      <h3>Extracted Text</h3>
+      <textarea id="ocrText" readonly rows="8"></textarea>
+      <div class="viewer-actions">
+        <button type="button" onclick="copyOcrText()">Copy Text</button>
+        <button type="button" onclick="closeOcrPopup()">Close</button>
+      </div>
+    </div>
   </div>
 
   <!-- ===== FOOTER ===== -->
@@ -90,10 +115,10 @@
         </p>
 
         <div class="social">
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-youtube"></i></a>
-          <a href="#"><i class="fab fa-whatsapp"></i></a>
-          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
         </div>
       </div>
 
@@ -112,10 +137,10 @@
       <div class="footer-box">
         <h3>Quick Links</h3>
         <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Uploader</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Contact</a></li>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="image.html">Uploader</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
         </ul>
       </div>
 
