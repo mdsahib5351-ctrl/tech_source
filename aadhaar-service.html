@@ -92,6 +92,9 @@
         <div class="card home-card" role="button" tabindex="0" onclick="openReschedule()" onkeydown="handleCardKey(event, openReschedule)">
           <h2>Change</h2><h3>Reschedule Appointment</h3><p>Change appointment date/time</p>
         </div>
+        <div class="card home-card" role="button" tabindex="0" onclick="openHistory()" onkeydown="handleCardKey(event, openHistory)">
+          <h2>History</h2><h3>Appointment History</h3><p>View all Aadhaar appointments</p>
+        </div>
       </div>
 
       <section class="info-section">
@@ -104,26 +107,21 @@
         <div class="steps-grid">
           <div class="step-card">
             <span>1</span>
-            <h3>Login / Register</h3>
-            <p>Apne email aur mobile number se secure account banayein.</p>
-          </div>
-          <div class="step-card">
-            <span>2</span>
             <h3>Select Service</h3>
             <p>Aadhaar number enter karke required update service choose karein.</p>
           </div>
           <div class="step-card">
-            <span>3</span>
+            <span>2</span>
             <h3>Fill Details</h3>
             <p>Address, C/O, mobile update ya document details complete karein.</p>
           </div>
           <div class="step-card">
-            <span>4</span>
+            <span>3</span>
             <h3>Choose Slot</h3>
             <p>Available date aur time slot select karke appointment review karein.</p>
           </div>
           <div class="step-card">
-            <span>5</span>
+            <span>4</span>
             <h3>Submit & PDF</h3>
             <p>Appointment submit karein aur receipt PDF download karein.</p>
           </div>
@@ -320,6 +318,23 @@
       </section>
     </div>
 
+    <div id="historyPage" class="container hidden">
+      <section class="card">
+        <div class="page-title-row">
+          <div>
+            <span class="badge">History</span>
+            <h3>Appointment History</h3>
+            <p class="hint">Is account se book kiye gaye sabhi Aadhaar appointments.</p>
+          </div>
+          <button class="secondary" type="button" onclick="loadAppointmentHistory()">Refresh</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <div class="status warn">Loading history...</div>
+        </div>
+        <button class="secondary full" type="button" onclick="goHome()">Back Home</button>
+      </section>
+    </div>
+
     <div id="reschedulePage" class="container hidden">
       <section class="card">
         <h3>Reschedule Appointment</h3>
@@ -333,6 +348,8 @@
         <input id="resId" placeholder="Select your appointment above" readonly>
         <p class="hint">Security: sirf logged-in account ke appointments reschedule ho sakte hain.</p>
 
+        <div id="resSelectedPreview" class="res-preview hidden"></div>
+
         <label for="resDate">New Date</label>
         <input type="date" id="resDate" onchange="renderRescheduleSlots()">
 
@@ -342,6 +359,9 @@
           <p style="grid-column:1/-1;color:#777;">Please select date first</p>
         </div>
 
+        <label for="resReason">Reschedule Reason</label>
+        <textarea id="resReason" rows="3" placeholder="Reason / note for reschedule"></textarea>
+
         <button class="full" type="button" onclick="rescheduleAppointment()">Reschedule</button>
         <button class="secondary full" type="button" onclick="goHome()">Back Home</button>
         <div id="resResult" style="margin-top:20px;"></div>
@@ -349,6 +369,17 @@
     </div>
   </div>
 </main>
+
+<div id="rescheduleConfirmPopup" class="modal hidden" aria-hidden="true">
+  <div class="modal-box">
+    <h3>Confirm Reschedule</h3>
+    <div id="resConfirmDetails" class="confirm-details"></div>
+    <div class="modal-actions">
+      <button class="secondary" type="button" onclick="closeRescheduleConfirm()">Cancel</button>
+      <button type="button" onclick="confirmRescheduleAppointment()">Confirm Reschedule</button>
+    </div>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="footer-grid">
