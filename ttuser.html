@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Gaming Tournament</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23facc15%27/%3E%3Ctext x=%2732%27 y=%2742%27 font-size=%2730%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-weight=%27700%27 fill=%27%230f172a%27%3EG%3C/text%3E%3C/svg%3E">
+
+    <!-- Icons and Fonts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* --- CSS Styles (No changes needed here) --- */
+        :root {
+            --primary-bg: #0F172A; /* Dark blue-gray */
+            --secondary-bg: #1E293B; /* Slightly lighter blue-gray */
+            --card-bg: #1E293B;
+            --text-primary: #E2E8F0; /* Light gray for primary text */
+            --text-secondary: #94A3B8; /* Muted gray for secondary text */
+            --accent-color: #FACC15; /* Yellow accent */
+            --accent-gradient: linear-gradient(to right, #FACC15, #FBBF24);
+            --primary-button-bg: #3B82F6; /* Blue for primary actions */
+            --border-color: #334155; /* Border color */
+            --bottom-nav-bg: #1E293B;
+            --success-color: #10B981; /* Green for success */
+            --danger-color: #EF4444; /* Red for danger/errors */
+            --warning-color: #F59E0B; /* Orange for warnings */
+            --info-color: #3B82F6; /* Blue for info */
+        }
+        /* ... (Rest of the CSS styles remain exactly the same) ... */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; min-height: 100%; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--primary-bg); color: var(--text-primary); padding-top: 70px; padding-bottom: 80px; min-height: 100vh; overscroll-behavior-y: auto; }
+        a { color: var(--accent-color); text-decoration: none; } a:hover { color: #FBBF24; }
+        .main-content { padding: 15px; min-height: calc(100vh - 145px); }
+        .section { display: none; animation: fadeIn 0.3s ease-in-out; } .section.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; color: var(--text-primary); } .custom-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); border: 1px solid var(--border-color); } .btn-custom { border-radius: 6px; font-size: 0.9rem; font-weight: 500; padding: 8px 15px; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: background-color 0.2s ease, filter 0.2s ease; } .btn-custom-primary { background-color: var(--primary-button-bg); color: var(--text-primary); } .btn-custom-primary:hover { background-color: #2563EB; } .btn-custom-secondary { background-color: var(--secondary-bg); color: var(--text-primary); border: 1px solid var(--border-color); } .btn-custom-secondary:hover { background-color: #334155; } .btn-custom-accent { background: var(--accent-gradient); color: var(--primary-bg); font-weight: 600; } .btn-custom-accent:hover { filter: brightness(1.1); } .btn-custom-link { background: none; border: none; color: var(--primary-button-bg); font-size: 0.9rem; font-weight: 500; padding: 0; cursor: pointer; } .text-accent { color: var(--accent-color); } .text-success { color: var(--success-color); } .text-danger { color: var(--danger-color); } .text-warning { color: var(--warning-color); } .form-control { background-color: var(--primary-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; } .form-control:focus { background-color: var(--primary-bg); border-color: var(--accent-color); color: var(--text-primary); box-shadow: 0 0 0 0.2rem rgba(250, 204, 21, 0.25); } .form-control::placeholder { color: var(--text-secondary); opacity: 0.7; } .form-label { color: var(--text-secondary); font-size: 0.9rem; } .alert { border-radius: 6px; font-size: 0.9rem; } .list-group-item { background-color: var(--card-bg); color: var(--text-primary); border: none; border-bottom: 1px solid var(--border-color); padding: 15px; font-size: 0.95rem; transition: background-color 0.2s ease; } .list-group-item:hover { background-color: rgba(255, 255, 255, 0.05); } .list-group-item:last-child { border-bottom: none; } .list-group-item i:first-child { color: var(--accent-color); margin-right: 15px; font-size: 1.1rem; width: 20px; text-align: center; } .list-group-item .bi-chevron-right { color: var(--text-secondary); font-size: 0.9rem; } #globalLoaderEl { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; display: none; } .spinner-border { color: var(--accent-color); width: 3rem; height: 3rem; } .placeholder-glow .placeholder { background-color: rgba(51, 65, 85, 0.5); animation: placeholder-glow 2s ease-in-out infinite; } .placeholder { background-color: rgba(51, 65, 85, 0.5); border-radius: 4px; } @keyframes placeholder-glow { 0% { background-color: rgba(51, 65, 85, 0.5); } 50% { background-color: rgba(51, 65, 85, 0.7); } 100% { background-color: rgba(51, 65, 85, 0.5); } } .interactive-list-item { cursor: pointer; } .referral-code { font-family: monospace; letter-spacing: 1px; user-select: all; } .app-header { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background-color: var(--secondary-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 1000; border-bottom: 1px solid var(--border-color); } .header-left { display: flex; align-items: center; gap: 10px; } .header-logo { width: 40px; height: 40px; border-radius: 50%; background-color: #fff; object-fit: cover; border: 1px solid var(--accent-color); } .header-title { font-size: 0.9rem; font-weight: 500; line-height: 1.2; } .header-title span { font-size: 0.75rem; color: var(--text-secondary); display: block; } .header-back-button { background: none; border: none; color: var(--text-primary); font-size: 1.4rem; margin-right: 5px; display: none; padding: 5px; } .header-right { display: flex; align-items: center; gap: 15px; } .notification-icon { font-size: 1.3rem; color: var(--text-primary); position: relative; background: none; border: none; padding: 0; } .notification-badge { position: absolute; top: -3px; right: -5px; background-color: var(--danger-color); color: white; font-size: 0.6rem; width: 15px; height: 15px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; } .wallet-chip { background: var(--accent-gradient); color: var(--primary-bg); padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; font-size: 0.85rem; font-weight: 700; border: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); cursor: pointer; } .wallet-chip i { margin-right: 5px; font-size: 0.9rem; } .header-game-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-left: 10px; display: none; } .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background-color: var(--bottom-nav-bg); display: flex; justify-content: space-around; align-items: stretch; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); z-index: 1000; border-top: 1px solid var(--border-color); } .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; flex-grow: 1; padding: 8px 0; transition: color 0.2s ease, background-color 0.2s ease; border: none; background: none; cursor: pointer; font-size: 0.7rem; } .nav-item i { font-size: 1.4rem; margin-bottom: 4px; line-height: 1; } .nav-item span { font-size: 0.7rem; font-weight: 500; line-height: 1; } .nav-item.active { color: var(--accent-color); background-color: rgba(250, 204, 21, 0.1); } .swiper-container#promotionSliderEl { width: 100%; height: 200px; border-radius: 10px; margin-bottom: 25px; --swiper-pagination-color: var(--accent-color); --swiper-pagination-bullet-inactive-color: var(--text-secondary); --swiper-pagination-bullet-size: 8px; } .swiper-slide { background-color: var(--secondary-bg); border-radius: 10px; } .swiper-slide img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 10px; } .swiper-slide a { display: block; width: 100%; height: 100%; } .game-card { text-align: center; background-color: var(--card-bg); border-radius: 8px; overflow: hidden; padding: 0; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s ease; } .game-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); } .game-card img { width: 100%; height: 130px; object-fit: cover; display: block; } .game-card span { display: block; padding: 10px 5px; font-weight: 500; font-size: 0.9rem; color: var(--text-primary); } .tournament-tabs { display: flex; justify-content: space-around; background-color: var(--secondary-bg); padding: 5px; border-radius: 8px; margin-bottom: 15px; } .tab-item { color: var(--text-secondary); background: none; border: none; padding: 8px 10px; font-size: 0.85rem; font-weight: 600; border-radius: 6px; flex-grow: 1; text-align: center; cursor: pointer; transition: background-color 0.2s, color 0.2s; } .tab-item.active { background-color: var(--primary-button-bg); color: var(--text-primary); } .tab-item i { margin-right: 5px; } .tournament-card { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 15px; padding: 15px; border: 1px solid var(--border-color); } .tournament-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 5px; } .tournament-card-tags span { background-color: var(--primary-bg); color: var(--text-secondary); font-size: 0.7rem; font-weight: 500; padding: 3px 8px; border-radius: 4px; display: inline-block; border: 1px solid var(--border-color); margin-right: 4px; margin-bottom: 4px; } .tournament-card-timer { background-color: rgba(255, 255, 255, 0.1); color: var(--text-primary); font-size: 0.75rem; font-weight: 600; padding: 3px 8px; border-radius: 4px; } .tournament-card-title { font-size: 1rem; font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; color: var(--text-primary); } .tournament-card-title i { color: var(--accent-color); } .tournament-card-info { display: flex; justify-content: space-between; align-items: stretch; border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color); padding: 10px 0; margin: 10px 0; font-size: 0.8rem; } .info-item { text-align: center; flex: 1; padding: 0 5px; } .info-item span { display: block; color: var(--text-secondary); font-size: 0.7rem; margin-bottom: 2px; } .info-item strong { color: var(--text-primary); font-weight: 600; font-size: 0.9rem; } .info-item .prize-icon { color: var(--accent-color); font-size: 1.2rem; } .tournament-card-spots { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; } .tournament-card-spots span { font-weight: 600; } .progress { height: 6px; background-color: var(--primary-bg); border-radius: 3px; overflow: hidden; } .progress-bar { background-color: var(--warning-color); transition: width 0.3s ease; } .tournament-card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; } .tournament-card-actions .btn-sm { padding: 8px 10px; font-size: 0.85rem; width: 100%; } .tournament-card-actions .btn-join { background: var(--accent-gradient); color: var(--primary-bg); font-weight: 600; grid-column: 2 / 3; } .tournament-card-actions .btn-details { background-color: var(--secondary-bg); border: 1px solid var(--border-color); grid-column: 1 / 2; } .tournament-card-actions .btn-joined { background-color: var(--success-color); color: var(--text-primary); opacity: 0.8; grid-column: 2 / 3; } .tournament-card-actions .btn-disabled { background-color: var(--secondary-bg); opacity: 0.6; cursor: not-allowed; grid-column: 2 / 3; } .btn-idpass { background: var(--accent-gradient); color: var(--primary-bg); border: none; font-weight: 600; } .wallet-card { background: linear-gradient(145deg, var(--secondary-bg), var(--primary-bg)); border-radius: 10px; padding: 20px; border: 1px solid var(--border-color); } .wallet-card h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; } .balance-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color); } .balance-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; } .balance-item-label { font-size: 0.95rem; color: var(--text-secondary); } .balance-item-value { font-size: 1.1rem; font-weight: 600; } .balance-item-action { min-width: 100px; text-align: right; } .balance-item-action .btn-custom-link { font-size: 0.85rem; color: var(--accent-color); padding: 5px; } .balance-item-action .btn-withdraw { background-color: var(--primary-button-bg); color: #fff; font-size: 0.8rem; padding: 5px 12px; border-radius: 5px; border: none; } #recentTransactionsListEl .custom-card { background-color: var(--secondary-bg); } #earnings-section .custom-card { text-align: center; } #earnings-section .display-4 { font-size: 3rem; } #earnings-section p strong { color: var(--text-primary); } .profile-header-card { background: linear-gradient(145deg, var(--secondary-bg), var(--primary-bg)); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px; border: 1px solid var(--border-color); } .profile-avatar { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 10px; border: 2px solid var(--accent-color); object-fit: cover; background-color: var(--primary-bg); } .profile-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 2px; } .profile-email { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; word-break: break-all; } .profile-stats { display: flex; justify-content: space-around; width: 100%; border-top: 1px solid var(--border-color); padding-top: 15px; } .stat-item { text-align: center; flex: 1; } .stat-item strong { display: block; font-size: 1rem; font-weight: 600; } .stat-item span { font-size: 0.75rem; color: var(--text-secondary); } .profile-links .list-group { border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); } .profile-links .form-switch .form-check-input { background-color: var(--secondary-bg); border-color: var(--border-color); background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 0.25%29'/%3e%3c/svg%3e"); } .profile-links .form-switch .form-check-input:checked { background-color: var(--accent-color); border-color: var(--accent-color); background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e"); } #login-section { margin-top: 5vh; } #login-section .card { background-color: var(--card-bg); border: 1px solid var(--border-color); } #login-section .btn-primary { background-color: var(--primary-button-bg); border: none; } #login-section .btn-link { background: none; border: none; color: var(--accent-color); text-decoration: none; font-size: 0.9em; padding: 5px 0; } #login-section .btn-link:hover { text-decoration: underline; } #login-section .btn-success { background-color: var(--success-color); border: none; } #login-section .btn-danger { background-color: var(--danger-color); border: none; } #login-section .form-divider { text-align: center; margin: 20px 0; position: relative; color: var(--text-secondary); } #login-section .form-divider::before, #login-section .form-divider::after { content: ""; position: absolute; top: 50%; width: 40%; height: 1px; background-color: var(--border-color); } #login-section .form-divider::before { left: 0; } #login-section .form-divider::after { right: 0; } #login-section .form-divider span { background-color: var(--card-bg); padding: 0 10px; position: relative; z-index: 1; font-size: 0.8rem; font-weight: 500; } #login-section .card-title { color: var(--text-primary); } .modal-content { background-color: var(--secondary-bg); color: var(--text-primary); border: 1px solid var(--border-color); } .modal-header { border-bottom-color: var(--border-color); } .modal-footer { border-top-color: var(--border-color); } .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); } .modal-body .phonepe-number { color: var(--warning-color); font-weight: bold; user-select: text; } #matchDetailsModalBodyEl pre { background-color: var(--primary-bg); padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.85rem; white-space: pre-wrap; word-wrap: break-word; } #policyModalBodyEl { line-height: 1.6; font-size: 0.95rem; white-space: pre-wrap; } #idPasswordModalEl .copy-btn { padding: 2px 6px; font-size: 0.8rem; margin-left: 8px; vertical-align: middle; } #policyModalBodyEl .copy-btn, #policyModalBodyEl #shareReferralBtn { padding: 4px 10px; font-size: 0.9rem; } #policyModalBodyEl #shareReferralBtn i, #policyModalBodyEl .copy-btn i { margin-right: 5px; }
+
+        .money-modal-panel{background:linear-gradient(180deg,rgba(30,41,59,.98),rgba(15,23,42,.98));border:1px solid rgba(148,163,184,.22)}.amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.amount-chip{border:1px solid var(--border-color);background:var(--primary-bg);color:var(--text-primary);border-radius:8px;padding:9px 6px;font-weight:700}.amount-chip.active,.amount-chip:hover{border-color:var(--accent-color);color:var(--accent-color)}.payment-qr-card,.withdraw-panel{background:var(--primary-bg);border:1px solid var(--border-color);border-radius:12px;padding:14px}.payment-qr-card{border-style:dashed;border-color:rgba(250,204,21,.55)}.payment-qr-frame{width:210px;height:210px;margin:0 auto;background:#fff;border-radius:12px;padding:10px;display:grid;place-items:center}.payment-qr-frame img{width:190px;height:190px;object-fit:contain}.upi-copy-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(15,23,42,.7);border:1px solid var(--border-color);border-radius:8px;padding:8px 10px}.withdraw-balance-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,rgba(250,204,21,.16),rgba(59,130,246,.14));border:1px solid rgba(250,204,21,.25);border-radius:12px;padding:14px;margin-bottom:14px}.withdraw-method-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.withdraw-method-tab{border:1px solid var(--border-color);background:var(--primary-bg);color:var(--text-primary);border-radius:8px;padding:10px;font-weight:700}.withdraw-method-tab.active{background:var(--primary-button-bg);border-color:var(--primary-button-bg)}.withdraw-summary,.bank-lookup-box{background:rgba(15,23,42,.7);border:1px solid var(--border-color);border-radius:10px;padding:10px;font-size:.86rem;color:var(--text-secondary)}.history-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.history-stat{background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;padding:10px}.history-stat span{color:var(--text-secondary);font-size:.72rem;display:block}.history-filters{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}.history-filter{border:1px solid var(--border-color);background:var(--primary-bg);color:var(--text-secondary);border-radius:8px;padding:8px 4px;font-size:.78rem;font-weight:700}.history-filter.active{background:var(--accent-color);color:var(--primary-bg);border-color:var(--accent-color)}.history-item,.notification-card{background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;padding:12px;margin-bottom:10px}.history-item{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center}.history-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:rgba(59,130,246,.12)}.notification-list{max-height:60vh;overflow-y:auto}.notification-card.unread{border-color:rgba(250,204,21,.65);box-shadow:inset 3px 0 0 var(--accent-color)}.notification-read-badge{font-size:.7rem;padding:2px 7px;border-radius:999px;background:rgba(16,185,129,.15);color:var(--success-color)}
+        .update-modal-panel{overflow:hidden;background:radial-gradient(circle at top left,rgba(250,204,21,.22),transparent 34%),linear-gradient(180deg,rgba(30,41,59,.99),rgba(15,23,42,.99));border:1px solid rgba(250,204,21,.22)}.update-hero{background:linear-gradient(135deg,rgba(250,204,21,.16),rgba(59,130,246,.13));border:1px solid rgba(250,204,21,.24);border-radius:12px;padding:16px;margin-bottom:14px}.update-icon-wrap{width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:rgba(250,204,21,.16);border:1px solid rgba(250,204,21,.38);box-shadow:0 12px 28px rgba(0,0,0,.25)}.update-icon-wrap i{font-size:2.15rem;color:var(--accent-color)}.update-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.14);color:var(--success-color);border:1px solid rgba(16,185,129,.24);border-radius:999px;padding:4px 10px;font-size:.72rem;font-weight:800;margin-bottom:10px}.update-copy{color:var(--text-secondary);font-size:.92rem;line-height:1.55}.update-points{display:grid;gap:8px;text-align:left;margin:0}.update-point{display:flex;align-items:flex-start;gap:9px;background:rgba(15,23,42,.66);border:1px solid var(--border-color);border-radius:10px;padding:10px;color:var(--text-secondary);font-size:.84rem}.update-point i{color:var(--accent-color);font-size:1rem;line-height:1.25}.modal[data-update-mode="force"] .update-chip{background:rgba(239,68,68,.14);color:#fecaca;border-color:rgba(239,68,68,.28)}.modal[data-update-mode="force"] .update-icon-wrap{background:rgba(239,68,68,.13);border-color:rgba(239,68,68,.32)}.modal[data-update-mode="force"] .update-icon-wrap i{color:#fca5a5}
+        .home-notice-card{display:none;background:linear-gradient(135deg,rgba(250,204,21,.13),rgba(59,130,246,.11));border:1px solid rgba(250,204,21,.28);border-radius:10px;padding:12px;margin-bottom:14px}.home-notice-card strong{display:flex;align-items:center;gap:6px;margin-bottom:4px}.home-notice-card p{margin:0;color:var(--text-secondary);font-size:.86rem;line-height:1.5}.download-app-card{display:none;align-items:center;justify-content:space-between;gap:12px;background:rgba(15,23,42,.72);border:1px solid var(--border-color);border-radius:10px;padding:12px;margin-bottom:16px}.download-app-card span{display:block;color:var(--text-secondary);font-size:.78rem}.maintenance-body{min-height:100vh;background:radial-gradient(circle at top,rgba(250,204,21,.18),transparent 38%),var(--primary-bg);display:grid;place-items:center;padding:22px}.maintenance-panel{width:min(440px,100%);background:linear-gradient(180deg,rgba(30,41,59,.98),rgba(15,23,42,.98));border:1px solid rgba(250,204,21,.24);border-radius:14px;padding:22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.34)}.maintenance-panel i{font-size:3rem;color:var(--accent-color);display:block;margin-bottom:12px}.maintenance-panel p{color:var(--text-secondary);line-height:1.55}
+        .profile-action-note{display:block;font-size:.72rem;color:var(--text-secondary);margin-top:2px}.mini-status-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.status-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:700}.status-pending{background:rgba(245,158,11,.16);color:var(--warning-color)}.status-approved,.status-completed{background:rgba(16,185,129,.16);color:var(--success-color)}.status-rejected,.status-failed{background:rgba(239,68,68,.16);color:var(--danger-color)}.game-id-card,.support-type-card,.result-breakdown-card{background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;padding:12px;margin-bottom:10px}.support-type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.support-type-card{cursor:pointer;text-align:center;color:var(--text-secondary)}.support-type-card.active{border-color:var(--accent-color);color:var(--accent-color)}.join-confirm-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--border-color);padding:8px 0}.join-confirm-row:last-child{border-bottom:0}.result-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.result-kpi{background:rgba(15,23,42,.65);border:1px solid var(--border-color);border-radius:8px;padding:8px;text-align:center}.result-kpi span{display:block;color:var(--text-secondary);font-size:.72rem}.result-kpi strong{font-size:.95rem}
+        .tournament-result-ribbon{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.14);color:var(--success-color);border:1px solid rgba(16,185,129,.28);border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:700;margin-left:auto}
+        .result-breakdown-card h5{font-size:.92rem;margin-bottom:10px;display:flex;align-items:center;gap:4px}        @media (max-width: 420px){body{padding-top:64px;padding-bottom:72px}.main-content{padding:12px 10px}.app-header{height:60px;padding:0 10px}.header-logo{width:34px;height:34px}.header-title{font-size:.82rem;max-width:145px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.header-title span{font-size:.68rem}.header-right{gap:8px}.wallet-chip{padding:5px 8px;font-size:.78rem}.notification-icon{font-size:1.15rem}.bottom-nav{height:62px}.nav-item i{font-size:1.18rem}.nav-item span{font-size:.64rem}.swiper-container#promotionSliderEl{height:150px}.game-card img{height:105px}.game-card span{font-size:.78rem;padding:8px 4px}.tournament-card{padding:12px;border-radius:10px}.tournament-card-title{font-size:.92rem;line-height:1.35}.tournament-card-info{gap:4px}.info-item{padding:0 2px}.info-item span{font-size:.62rem}.info-item strong{font-size:.78rem}.tournament-card-actions{grid-template-columns:1fr;gap:8px}.tournament-card-actions .btn-join,.tournament-card-actions .btn-joined,.tournament-card-actions .btn-disabled,.tournament-card-actions .btn-details{grid-column:auto}.result-kpi-grid,.history-stats{grid-template-columns:1fr}.history-filters{grid-template-columns:repeat(2,1fr)}.history-item{grid-template-columns:32px 1fr}.history-item>div:last-child{grid-column:2;text-align:left!important}.amount-grid{grid-template-columns:repeat(3,1fr)}.support-type-grid,.mini-status-grid{grid-template-columns:1fr}.modal-dialog{margin:.75rem}.modal-body{padding:1rem}.payment-qr-frame{width:190px;height:190px}.payment-qr-frame img{width:170px;height:170px}.profile-stats{gap:8px}.stat-item span{font-size:.66rem}}
+        .leaderboard-list{display:grid;gap:12px}.leaderboard-card{width:100%;text-align:left;background:linear-gradient(145deg,rgba(30,41,59,.98),rgba(15,23,42,.98));border:1px solid var(--border-color);border-radius:10px;padding:14px;color:var(--text-primary);box-shadow:0 1px 3px rgba(0,0,0,.14)}.leaderboard-card:active,.leaderboard-card:hover{border-color:rgba(250,204,21,.55)}.leaderboard-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.leaderboard-card-title{font-weight:800;line-height:1.35}.leaderboard-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.leaderboard-meta span{background:var(--primary-bg);border:1px solid var(--border-color);border-radius:999px;padding:3px 8px;color:var(--text-secondary);font-size:.72rem}.leaderboard-status{background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.28);color:var(--success-color);border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:800;white-space:nowrap}.leaderboard-detail{display:none;margin-top:16px}.leaderboard-detail.active{display:block}.leaderboard-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}.leaderboard-table-wrap{border:1px solid var(--border-color);border-radius:10px;overflow:hidden;background:var(--card-bg)}.leaderboard-row{display:grid;grid-template-columns:48px 1fr 70px 92px;gap:8px;align-items:center;padding:11px 10px;border-bottom:1px solid var(--border-color)}.leaderboard-row:last-child{border-bottom:0}.leaderboard-row.header{background:var(--primary-bg);color:var(--text-secondary);font-size:.72rem;font-weight:800;text-transform:uppercase}.leaderboard-rank{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(250,204,21,.14);color:var(--accent-color);font-weight:900}.leaderboard-rank.top{background:var(--accent-gradient);color:var(--primary-bg)}.leaderboard-player strong,.leaderboard-player small{display:block}.leaderboard-player small{color:var(--text-secondary);font-size:.72rem;word-break:break-word}.leaderboard-empty{background:var(--card-bg);border:1px dashed var(--border-color);border-radius:10px;padding:18px;text-align:center;color:var(--text-secondary)}@media(max-width:420px){.leaderboard-row{grid-template-columns:42px 1fr 52px 76px;padding:10px 8px;font-size:.86rem}.leaderboard-row.header{font-size:.64rem}.leaderboard-player small{font-size:.66rem}}
+#globalLoaderEl{inset:0;height:100vh;max-height:100vh;overflow:hidden;pointer-events:none;visibility:hidden}
+html, body{min-height:100%;max-width:100%;overflow-x:hidden;overflow-y:auto}
+body{min-height:100vh;-webkit-overflow-scrolling:touch}
+.main-content{min-height:calc(100vh - 145px)}
+#gamesListEl.placeholder-glow,#myContestsListEl.placeholder-glow,#tournamentsListContainerEl.placeholder-glow,#leaderboardListEl.placeholder-glow{height:92px;max-height:92px;overflow:hidden;contain:layout paint}
+#gamesListEl.placeholder-glow .game-card{height:82px}
+#gamesListEl.placeholder-glow .game-card .placeholder:first-child{height:52px!important}
+#myContestsListEl.placeholder-glow .tournament-card,#tournamentsListContainerEl.placeholder-glow .tournament-card{height:84px;overflow:hidden;margin-bottom:0!important;padding:10px}
+#leaderboardListEl.placeholder-glow .leaderboard-card{height:76px;overflow:hidden}
+#recentTransactionsListEl.placeholder-glow{height:58px;max-height:58px;overflow:hidden;contain:layout paint}
+.swiper-container#promotionSliderEl:has(.swiper-wrapper.placeholder-glow){height:118px;margin-bottom:16px}
+.swiper-wrapper.placeholder-glow{height:118px;max-height:118px;overflow:hidden}
+        #promotionSliderEl{position:relative;max-width:100%;overflow:hidden;contain:layout paint}
+        #promotionSliderEl .swiper-wrapper{display:flex;width:100%;max-width:100%}
+        #promotionSliderEl .swiper-slide{flex:0 0 100%;width:100%!important;max-width:100%;min-width:0;overflow:hidden}
+        #promotionSliderEl > .swiper-pagination,#promotionSliderEl.swiper-horizontal > .swiper-pagination-bullets{position:absolute!important;left:0!important;right:0!important;top:auto!important;bottom:24px!important;width:100%!important;z-index:10!important}
+        .support-history-list{display:grid;gap:10px;max-height:260px;overflow-y:auto}.support-history-card{background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;padding:11px}.support-history-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.support-history-card p{white-space:pre-wrap;color:var(--text-secondary);font-size:.84rem;margin:.45rem 0 0}.support-reply-box{margin-top:9px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.22);border-radius:8px;padding:9px}.support-reply-box strong{color:var(--success-color);display:block;margin-bottom:3px}
+        .saved-payout-card{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(59,130,246,.11));border:1px solid rgba(16,185,129,.28);border-radius:12px;padding:12px;color:var(--text-primary)}
+        .saved-payout-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+        .saved-payout-title{display:flex;align-items:center;gap:8px;font-weight:800}
+        .saved-payout-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.18);color:var(--success-color);border:1px solid rgba(16,185,129,.3);border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:800}
+        .saved-payout-lines{display:grid;gap:7px;color:var(--text-secondary);font-size:.85rem}
+        .saved-payout-line{display:flex;justify-content:space-between;gap:12px;border-top:1px dashed rgba(148,163,184,.2);padding-top:7px}
+        .saved-payout-line strong{color:var(--text-primary);text-align:right;word-break:break-word}
+        .saved-payout-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+        .saved-payout-actions .btn-custom{width:100%;padding:8px 10px;font-size:.82rem}
+        .withdraw-details-form.is-collapsed{display:none}
+    </style>
+</head>
+
+<body>
+<!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <button class="header-back-button" id="headerBackBtnEl"><i class="bi bi-arrow-left"></i></button>
+            <img src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 80 80%27%3E%3Crect width=%2780%27 height=%2780%27 rx=%2740%27 fill=%27%23facc15%27/%3E%3Ctext x=%2740%27 y=%2751%27 font-size=%2732%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-weight=%27700%27 fill=%27%230f172a%27%3EG%3C/text%3E%3C/svg%3E" alt="Logo" class="header-logo" id="appLogoEl">
+            <div class="header-title" id="headerTitleContainerEl"> Welcome <span id="headerUserGreetingEl">Guest</span> </div>
+            <div class="header-game-title" id="headerGameTitleEl">Game Title</div>
+        </div>
+        <div class="header-right">
+            <button class="notification-icon" id="notificationBtnEl"> <i class="bi bi-bell-fill"></i> <span class="notification-badge" style="display: none;"></span> </button>
+            <button class="wallet-chip" id="headerWalletChipEl" style="display: none;"> <i class="bi bi-wallet-fill"></i> ₹<span id="headerChipBalanceEl">0</span> </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div id="globalLoaderEl"> <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div> </div>
+
+        <!-- Login Section -->
+        <section id="login-section" class="section">
+             <div class="container" style="max-width: 450px;">
+                <div class="card shadow-sm custom-card">
+                    <div class="card-body p-4">
+                        <!-- Login Form -->
+                        <form id="emailLoginForm">
+                            <h2 class="card-title text-center mb-4">Login</h2>
+                            <div class="mb-3"> <label for="loginEmailInputEl" class="form-label">Email</label> <input type="email" class="form-control" id="loginEmailInputEl" placeholder="name@example.com" required> </div>
+                            <div class="mb-3"> <label for="loginPasswordInputEl" class="form-label">Password</label> <input type="password" class="form-control" id="loginPasswordInputEl" placeholder="Password" required> </div>
+                            <div id="loginStatusMessageEl" class="alert mt-3" style="display: none;"></div>
+                            <div class="d-grid gap-2 mb-3"> <button type="button" class="btn btn-custom btn-custom-primary" id="loginEmailBtnEl">Login</button> <button type="button" class="btn-custom-link btn-sm p-0 text-center d-block" id="showSignupToggleBtnEl">Need an account? Sign Up</button> <a href="#" id="forgotPasswordLinkEl" class="text-center small mt-2 d-block" style="color: var(--text-secondary);">Forgot Password?</a> </div>
+                        </form>
+
+                        <!-- Signup Form (Initially Hidden) -->
+                        <form id="emailSignupForm" style="display: none;">
+                            <h2 class="card-title text-center mb-4">Sign Up</h2>
+                            <div class="mb-3"> <label for="signupEmailInputEl" class="form-label">Email</label> <input type="email" class="form-control" id="signupEmailInputEl" placeholder="name@example.com" required> </div>
+                            <div class="mb-3"> <label for="signupPasswordInputEl" class="form-label">Password (min 6 chars)</label> <input type="password" class="form-control" id="signupPasswordInputEl" placeholder="Password" required minlength="6"> </div>
+                            <div class="mb-3"> <label for="signupConfirmPasswordInputEl" class="form-label">Confirm Password</label> <input type="password" class="form-control" id="signupConfirmPasswordInputEl" placeholder="Confirm Password" required> </div>
+                            <!-- *** REFERRAL CODE INPUT ADDED *** -->
+                            <div class="mb-3"> <label for="signupReferralCodeInputEl" class="form-label">Referral Code (Optional)</label> <input type="text" class="form-control" id="signupReferralCodeInputEl" placeholder="Enter referral code"> </div>
+                            <div id="signupStatusMessageEl" class="alert mt-3" style="display: none;"></div>
+                            <div class="d-grid gap-2 mb-3"> <button type="button" class="btn btn-custom btn-custom-accent" id="signupEmailBtnEl">Sign Up</button> <button type="button" class="btn-custom-link btn-sm p-0 text-center d-block" id="showLoginToggleBtnEl">Already have account? Login</button> </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Home Section -->
+        <section id="home-section" class="section">
+            <div class="home-notice-card" id="homeNoticeCardEl"><strong><i class="bi bi-megaphone-fill text-accent"></i><span id="homeNoticeTitleEl">Notice</span></strong><p id="homeNoticeMessageEl"></p></div>
+            <div class="download-app-card" id="downloadAppCardEl"><div><strong><i class="bi bi-download me-1 text-accent"></i>Download Latest App</strong><span id="downloadAppTextEl">Get the latest version for the best experience.</span></div><a class="btn btn-sm btn-custom btn-custom-accent" id="downloadAppBtnEl" href="#" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i> Download</a></div>
+            <!-- Promotion Slider -->
+            <div class="swiper-container" id="promotionSliderEl">
+                <div class="swiper-wrapper placeholder-glow">
+                    <div class="swiper-slide"><span class="placeholder" style="display: block; width: 100%; height: 100%; border-radius: 10px;"></span></div>
+                 </div>
+                 <div class="swiper-pagination"></div>
+            </div>
+
+            <!-- Esport Games -->
+            <h2 class="section-title">Esport Games</h2>
+            <div class="row g-3 mb-4 placeholder-glow" id="gamesListEl">
+                <!-- Placeholder Game Cards -->
+<div class="col-6"> <div class="game-card custom-card"><span class="placeholder d-block" style="height: 52px; border-top-left-radius: 8px; border-top-right-radius: 8px;"></span><span class="placeholder d-block mt-2 col-8 mx-auto" style="height: 14px;"></span></div> </div> <div class="col-6"> <div class="game-card custom-card"><span class="placeholder d-block" style="height: 52px; border-top-left-radius: 8px; border-top-right-radius: 8px;"></span><span class="placeholder d-block mt-2 col-8 mx-auto" style="height: 14px;"></span></div> </div>
+            </div>
+
+            <!-- My Contests -->
+            <h2 class="section-title">My Contests</h2>
+            <div id="myContestsListEl" class="placeholder-glow">
+                 <!-- Placeholder Contest Card -->
+                <div class="tournament-card placeholder-glow mb-3"> <span class="placeholder col-6" style="height: 18px;"></span> <span class="placeholder col-12 mt-2" style="height: 24px;"></span> <span class="placeholder col-10 mt-2" style="height: 16px;"></span> <div class="d-flex justify-content-between mt-3"> <span class="placeholder col-4" style="height: 30px; border-radius: 6px;"></span> <span class="placeholder col-4" style="height: 30px; border-radius: 6px;"></span> </div> </div>
+                <p id="noContestsMessageEl" class="text-secondary text-center" style="display: none;">You haven't joined any contests yet.</p>
+            </div>
+        </section>
+
+        <!-- Tournaments Section -->
+        <section id="tournaments-section" class="section">
+            <div class="tournament-tabs"> <button class="tab-item active" data-status="upcoming"><i class="bi bi-calendar-event-fill"></i> Upcoming</button> <button class="tab-item" data-status="ongoing"><i class="bi bi-play-circle-fill"></i> Ongoing</button> <button class="tab-item" data-status="completed"><i class="bi bi-trophy-fill"></i> Results</button> </div>
+            <div id="tournamentsListContainerEl" class="mt-3 placeholder-glow"> <div class="tournament-card placeholder-glow mb-3"> <span class="placeholder col-6" style="height: 18px;"></span> <span class="placeholder col-12 mt-2" style="height: 24px;"></span> <span class="placeholder col-10 mt-2" style="height: 16px;"></span> <div class="d-flex justify-content-between mt-3"> <span class="placeholder col-4" style="height: 30px; border-radius: 6px;"></span> <span class="placeholder col-4" style="height: 30px; border-radius: 6px;"></span> </div> </div> </div>
+            <p id="noTournamentsMessageEl" class="text-secondary text-center mt-4" style="display: none;">No tournaments found.</p>
+        </section>
+
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard-section" class="section">
+            <h2 class="section-title">Leader Board</h2>
+            <div class="custom-card mb-3">
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                    <div>
+                        <strong><i class="bi bi-trophy-fill text-accent me-1"></i> Completed Tournaments</strong>
+                        <p class="small text-secondary mb-0">Tournament select karo aur full leaderboard dekho.</p>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-custom btn-custom-secondary" id="refreshLeaderboardBtnEl"><i class="bi bi-arrow-clockwise"></i></button>
+                </div>
+            </div>
+            <div id="leaderboardListEl" class="leaderboard-list placeholder-glow">
+                <div class="leaderboard-card"><span class="placeholder col-7" style="height:18px;"></span><span class="placeholder col-12 mt-3" style="height:34px;"></span></div>
+            </div>
+            <div id="leaderboardDetailEl" class="leaderboard-detail"></div>
+        </section>
+        <!-- Wallet Section -->
+        <section id="wallet-section" class="section">
+            <div class="wallet-card custom-card">
+                <h2 class="section-title mb-4">Wallet</h2>
+                <div class="balance-item placeholder-glow"> <span class="balance-item-label">Total Balance</span> <span class="balance-item-value" id="walletTotalBalanceEl"><span class="placeholder col-3"></span></span> <div class="balance-item-action"> <button class="btn-custom-link" id="allTransactionsBtnEl">History <i class="bi bi-chevron-right"></i></button> </div> </div>
+                <div class="balance-item placeholder-glow"> <span class="balance-item-label">Winning Cash</span> <span class="balance-item-value" id="walletWinningCashEl"><span class="placeholder col-3"></span></span> <div class="balance-item-action"> <button class="btn-withdraw" id="withdrawBtnEl">Withdraw</button> </div> </div>
+                <div class="balance-item placeholder-glow"> <span class="balance-item-label">Bonus Cash</span> <span class="balance-item-value" id="walletBonusCashEl"><span class="placeholder col-3"></span></span> <div class="balance-item-action" style="min-width: 100px;"></div> </div>
+                <button class="btn btn-custom btn-custom-secondary w-100 mt-4" id="addAmountWalletBtnEl"> <i class="bi bi-plus-circle-fill me-2"></i>Add Amount </button>
+            </div>
+            <h3 class="section-title mt-4">Recent Transactions</h3>
+            <div id="recentTransactionsListEl" class="placeholder-glow"> <div class="custom-card p-2 mb-2 placeholder-glow"> <div class="d-flex justify-content-between"> <span class="placeholder col-5" style="height: 16px;"></span> <span class="placeholder col-3" style="height: 16px;"></span> </div> <div class="small text-secondary mt-1"><span class="placeholder col-6" style="height: 14px;"></span></div> </div> <p class="text-secondary text-center mt-3" id="noTransactionsMessageEl" style="display: none;">Loading transactions...</p> </div>
+        </section>
+
+        <!-- Earnings Section -->
+        <section id="earnings-section" class="section">
+            <h2 class="section-title">Earnings</h2>
+            <div class="custom-card text-center">
+                <i class="bi bi-coin display-4 text-accent mb-3"></i>
+                <p class="text-secondary mb-4">Track your earnings from tournaments and referrals here.</p>
+                <div class="placeholder-glow"> <p>Total Earned: <strong id="earningsTotalEl"><span class="placeholder col-3"></span></strong></p> <p>From Referrals: <strong id="earningsReferralEl"><span class="placeholder col-3"></span></strong></p> </div>
+                <button class="btn btn-custom btn-custom-link mt-3" id="viewEarningsHistoryBtn">View History</button>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile-section" class="section">
+            <div class="profile-header-card placeholder-glow"> <img src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 80 80%27%3E%3Crect width=%2780%27 height=%2780%27 rx=%2740%27 fill=%27%231e293b%27/%3E%3Ccircle cx=%2740%27 cy=%2732%27 r=%2714%27 fill=%27%23facc15%27/%3E%3Cpath d=%27M16 72c4-18 16-28 24-28s20 10 24 28%27 fill=%27%23facc15%27/%3E%3C/svg%3E" alt="Avatar" class="profile-avatar" id="profileAvatarEl"> <h3 class="profile-name mt-2" id="profileNameEl"><span class="placeholder col-6"></span></h3> <p class="profile-email" id="profileEmailEl"><span class="placeholder col-8"></span></p> <div class="profile-stats w-100"> <div class="stat-item"><strong id="profileTotalMatchesEl"><span class="placeholder col-4"></span></strong><span>Matches Played</span></div> <div class="stat-item"><strong id="profileWonMatchesEl"><span class="placeholder col-4"></span></strong><span>Matches Won</span></div> <div class="stat-item"><strong id="profileTotalEarningsEl"><span class="placeholder col-4"></span></strong><span>Total Winnings</span></div> </div> </div>
+            <div class="profile-links">
+                <div class="list-group custom-card">
+<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" data-policy="refer"> <span><i class="bi bi-person-plus-fill"></i> Refer & Earn</span> <i class="bi bi-chevron-right"></i> </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" data-policy="privacy"> <span><i class="bi bi-shield-lock-fill"></i> Privacy Policy</span><i class="bi bi-chevron-right"></i> </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" data-policy="terms"> <span><i class="bi bi-file-text-fill"></i> Terms and Conditions</span><i class="bi bi-chevron-right"></i> </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" data-policy="refund"> <span><i class="bi bi-arrow-repeat"></i> Refund and Cancellation</span><i class="bi bi-chevron-right"></i> </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" data-policy="fairPlay"> <span><i class="bi bi-patch-check-fill"></i> Fair Play Policy</span><i class="bi bi-chevron-right"></i> </a>
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" id="manageGameIdsBtnEl"> <span><i class="bi bi-controller"></i> My Game IDs <span class="profile-action-note">Free Fire/BGMI profile manage</span></span><i class="bi bi-chevron-right"></i> </button>
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center interactive-list-item" id="supportTicketBtnEl"> <span><i class="bi bi-headset"></i> Support Ticket <span class="profile-action-note">Payment, withdraw, tournament help</span></span><i class="bi bi-chevron-right"></i> </button>                    <button class="list-group-item list-group-item-action text-danger d-flex justify-content-between align-items-center interactive-list-item" id="logoutProfileBtnEl"> <span><i class="bi bi-box-arrow-right"></i> Logout</span><span></span> </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modals -->
+    <div class="modal fade" id="policyModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-scrollable modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="policyModalTitleEl">Details</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="policyModalBodyEl" style="min-height: 300px;"></div></div></div></div>
+    <div class="modal fade" id="appUpdateModalEl" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"><div class="modal-dialog modal-dialog-centered"><div class="modal-content update-modal-panel"><div class="modal-header"><h5 class="modal-title" id="appUpdateModalTitleEl"><i class="bi bi-cloud-arrow-down-fill me-2"></i>New Update Available</h5><button type="button" class="btn-close btn-close-white" id="appUpdateCloseXEl" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><div class="update-hero"><span class="update-chip" id="appUpdateChipEl"><i class="bi bi-stars"></i> Better experience ready</span><div class="update-icon-wrap"><i class="bi bi-arrow-up-circle-fill"></i></div><h4 class="mb-2" id="appUpdateHeadlineEl">Fresh version is available</h4><p class="update-copy mb-0" id="appUpdateModalMessageEl">New features, smoother gameplay flow, and important improvements are ready for you.</p></div><div class="update-points"><div class="update-point"><i class="bi bi-lightning-charge-fill"></i><span>Faster loading and cleaner tournament experience.</span></div><div class="update-point"><i class="bi bi-shield-check"></i><span>Important fixes keep your account flow more reliable.</span></div><div class="update-point"><i class="bi bi-download"></i><span>Tap the update button to download the latest app.</span></div></div></div><div class="modal-footer"><button type="button" class="btn btn-custom btn-custom-secondary" id="appUpdateCloseBtnEl" data-bs-dismiss="modal">Close</button><a class="btn btn-custom btn-custom-accent" id="appUpdateActionBtnEl" href="#" target="_blank" rel="noopener"><i class="bi bi-download"></i> Update Now</a></div></div></div></div>
+    <div class="modal fade" id="joinConfirmModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content money-modal-panel"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-check2-circle me-2"></i>Confirm Join</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div id="joinConfirmBodyEl"></div><div id="joinConfirmStatusEl" class="alert mt-3" style="display:none;"></div></div><div class="modal-footer"><button type="button" class="btn btn-custom btn-custom-secondary" id="cancelJoinConfirmBtnEl">Cancel</button><button type="button" class="btn btn-custom btn-custom-accent" id="confirmJoinBtnEl"><i class="bi bi-trophy-fill"></i> Join Now</button></div></div></div></div>
+    <div class="modal fade" id="gameIdsManageModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-controller me-2"></i>My Game IDs</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div id="gameIdsManageListEl"></div><div id="gameIdsManageStatusEl" class="alert mt-3" style="display:none;"></div></div><div class="modal-footer"><button type="button" class="btn btn-custom btn-custom-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-custom btn-custom-primary" id="saveGameIdsBtnEl"><i class="bi bi-save-fill"></i> Save</button></div></div></div></div>
+    <div class="modal fade" id="supportTicketModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-headset me-2"></i>Support Ticket</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="support-type-grid mb-3" id="supportTypeGridEl"><button type="button" class="support-type-card active" data-type="payment"><i class="bi bi-wallet2 d-block fs-4"></i>Payment</button><button type="button" class="support-type-card" data-type="withdraw"><i class="bi bi-bank d-block fs-4"></i>Withdraw</button><button type="button" class="support-type-card" data-type="tournament"><i class="bi bi-trophy d-block fs-4"></i>Tournament</button><button type="button" class="support-type-card" data-type="other"><i class="bi bi-three-dots d-block fs-4"></i>Other</button></div><label class="form-label" for="supportSubjectInputEl">Subject</label><input type="text" class="form-control mb-3" id="supportSubjectInputEl" placeholder="Short subject"><label class="form-label" for="supportMessageInputEl">Message</label><textarea class="form-control" id="supportMessageInputEl" rows="4" placeholder="Issue detail likhiye"></textarea><div id="supportTicketStatusEl" class="alert mt-3" style="display:none;"></div><hr><div class="d-flex justify-content-between align-items-center mb-2"><strong><i class="bi bi-clock-history text-accent me-1"></i>My Tickets</strong><button type="button" class="btn btn-sm btn-custom btn-custom-secondary" id="refreshSupportHistoryBtnEl"><i class="bi bi-arrow-clockwise"></i></button></div><div id="supportHistoryListEl" class="support-history-list"><p class="text-secondary text-center my-3">Loading tickets...</p></div></div><div class="modal-footer"><button type="button" class="btn btn-custom btn-custom-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-custom btn-custom-primary" id="submitSupportTicketBtnEl"><i class="bi bi-send-fill"></i> Submit</button></div></div></div></div>    <div class="modal fade" id="notificationModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-bell-fill me-2"></i>Notifications <span class="badge text-bg-warning ms-2" id="notificationCountEl">0</span></h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-flex justify-content-between align-items-center mb-3"><span class="small text-secondary">Latest updates</span><button type="button" class="btn btn-sm btn-custom btn-custom-secondary" id="markAllNotificationsReadBtnEl"><i class="bi bi-check2-all"></i> Mark read</button></div><div class="notification-list" id="notificationListEl"><p class="text-secondary text-center my-4">No notifications.</p></div></div></div></div></div>
+    <div class="modal fade" id="transactionHistoryModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>Wallet History</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="history-stats"><div class="history-stat"><span>Credit</span><strong class="text-success" id="historyCreditTotalEl">₹0</strong></div><div class="history-stat"><span>Debit</span><strong class="text-danger" id="historyDebitTotalEl">₹0</strong></div><div class="history-stat"><span>Pending</span><strong class="text-warning" id="historyPendingCountEl">0</strong></div></div><div class="history-filters" id="historyFilterTabsEl"><button class="history-filter active" data-filter="all">All</button><button class="history-filter" data-filter="credit">Credit</button><button class="history-filter" data-filter="debit">Debit</button><button class="history-filter" data-filter="pending">Pending</button></div><div class="d-flex justify-content-between align-items-center mb-2"><span class="small text-secondary" id="historyCountEl">0 records</span><button type="button" class="btn btn-sm btn-custom btn-custom-secondary" id="historyRefreshBtnEl"><i class="bi bi-arrow-clockwise"></i></button></div><div id="transactionHistoryListEl"><p class="text-secondary text-center my-4">No transactions.</p></div></div></div></div></div>    <div class="modal fade" id="gameProfileModalEl" tabindex="-1" data-bs-backdrop="static"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-controller me-2"></i>Game Profile</h5></div><div class="modal-body"><p class="small text-secondary">Ye details ek baar save hongi. Next tournament join me auto use hongi.</p><div class="mb-3"><label for="joinGameNameInputEl" class="form-label">Game name</label><input type="text" class="form-control" id="joinGameNameInputEl" readonly></div><div class="mb-3"><label for="joinPlayerNameInputEl" class="form-label">In-game name</label><input type="text" class="form-control" id="joinPlayerNameInputEl" placeholder="Enter your game name"></div><div class="mb-3"><label for="joinPlayerGameIdInputEl" class="form-label">Game ID / UID</label><input type="text" class="form-control" id="joinPlayerGameIdInputEl" placeholder="Enter your game ID"></div><div id="joinGameProfileStatusEl" class="alert mt-3" style="display: none;"></div></div><div class="modal-footer"><button type="button" class="btn btn-custom btn-custom-secondary" id="cancelGameProfileBtnEl">Cancel</button><button type="button" class="btn btn-custom btn-custom-primary" id="saveGameProfileBtnEl"><i class="bi bi-save-fill me-1"></i>Save & Join</button></div></div></div></div>    <div class="modal fade" id="addAmountModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content money-modal-panel"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-qr-code-scan me-2"></i>Add Amount</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="withdraw-balance-card"><div><div class="small text-secondary">Manual UPI Deposit</div><strong>Scan QR or open UPI app</strong></div><i class="bi bi-shield-check text-accent fs-3"></i></div><label for="addAmountInput" class="form-label">Amount</label><input type="number" id="addAmountInput" class="form-control" placeholder="Enter amount" min="10"><div class="amount-grid mt-2" id="quickAmountButtons"><button type="button" class="amount-chip" data-amount="50">₹50</button><button type="button" class="amount-chip" data-amount="100">₹100</button><button type="button" class="amount-chip" data-amount="200">₹200</button></div><button class="btn btn-custom btn-custom-accent w-100 mt-3" id="payNowBtn"><i class="bi bi-qr-code"></i> Generate QR</button><div id="qrSection" class="payment-qr-card mt-3" style="display:none;"><div class="payment-qr-frame"><img id="qrImage" src="" alt="Payment QR"></div><div class="upi-copy-row mt-3"><span class="small" id="addUpiText">UPI</span><button type="button" class="btn btn-sm btn-custom btn-custom-secondary" id="copyAddUpiBtn"><i class="bi bi-clipboard"></i></button></div><a class="btn btn-custom btn-custom-secondary w-100 mt-2" id="openAddUpiAppBtn" href="#"><i class="bi bi-phone"></i> Open UPI App</a><label for="paymentReferenceInput" class="form-label mt-3">UTR / Reference (optional)</label><input type="text" id="paymentReferenceInput" class="form-control" placeholder="Payment reference"><button class="btn btn-custom btn-custom-primary w-100 mt-3" id="paidBtn"><i class="bi bi-check2-circle"></i> Payment Done</button></div><div id="addAmountStatusMessage" class="alert mt-3" style="display:none;"></div></div></div></div></div>    <div class="modal fade" id="withdrawModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content money-modal-panel"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-cash-coin me-2"></i>Withdraw Funds</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="withdraw-balance-card"><div><div class="small text-secondary">Withdrawable balance</div><strong id="withdrawModalBalanceEl">₹0.00</strong></div><i class="bi bi-wallet2 fs-3 text-accent"></i></div><div class="withdraw-panel"><label for="withdrawAmountInputEl" class="form-label">Amount (Min ₹<span id="minWithdrawAmountEl">50</span>)</label><input type="number" class="form-control" id="withdrawAmountInputEl" placeholder="Enter amount"><div class="amount-grid mt-2" id="withdrawQuickAmountButtons"><button type="button" class="amount-chip" data-amount="50">₹50</button><button type="button" class="amount-chip" data-amount="100">₹100</button><button type="button" class="amount-chip" data-amount="200">₹200</button></div><div id="savedPayoutCardEl" class="saved-payout-card mt-3" style="display:none;"></div><div id="withdrawDetailsFormEl" class="withdraw-details-form"><input type="hidden" id="withdrawMethodTypeEl" value="upi"><div class="withdraw-method-tabs" id="withdrawMethodTabs"><button type="button" class="withdraw-method-tab active" data-method="upi"><i class="bi bi-phone"></i> UPI</button><button type="button" class="withdraw-method-tab" data-method="bank"><i class="bi bi-bank"></i> Bank</button></div><label for="withdrawAccountNameEl" class="form-label">Holder name</label><input type="text" class="form-control mb-3" id="withdrawAccountNameEl" placeholder="Account holder name"><div id="withdrawUpiGroup"><label for="withdrawMethodInputEl" class="form-label">UPI ID</label><input type="text" class="form-control" id="withdrawMethodInputEl" placeholder="name@upi"><label for="withdrawUpiNameEl" class="form-label mt-3">UPI name (manual)</label><input type="text" class="form-control" id="withdrawUpiNameEl" placeholder="Name shown in UPI app"><p class="small text-secondary mt-2 mb-0">UPI name auto lookup free web API se reliable nahi hota, isliye manually verify ke liye save hoga.</p></div><div id="withdrawBankGroup" style="display:none;"><label for="withdrawAccountNumberEl" class="form-label">Account number</label><input type="text" class="form-control mb-3" id="withdrawAccountNumberEl" placeholder="Bank account number"><label for="withdrawIfscCodeEl" class="form-label">IFSC code</label><input type="text" class="form-control text-uppercase" id="withdrawIfscCodeEl" placeholder="SBIN0000001"><div class="bank-lookup-box mt-3" id="bankLookupBoxEl" style="display:none;"></div><input type="hidden" id="withdrawBankNameEl"><input type="hidden" id="withdrawBranchNameEl"><input type="hidden" id="withdrawBankAddressEl"></div></div><div class="withdraw-summary mt-3" id="withdrawSummaryEl">Enter amount and payment details.</div><div id="withdrawStatusMessageEl" class="alert mt-3" style="display:none;"></div></div></div><div class="modal-footer"><button type="button" class="btn btn-custom btn-custom-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-custom btn-custom-primary" id="submitWithdrawRequestBtnEl"><i class="bi bi-send-fill"></i> Submit Request</button></div></div></div></div>    <div class="modal fade" id="matchDetailsModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="matchDetailsModalTitleEl">Match Details</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="matchDetailsModalBodyEl"></div></div></div></div>
+    <div class="modal fade" id="idPasswordModalEl" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Room ID & Password</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><p class="small text-secondary">ID/Pass shown shortly before match start.</p><div class="my-3 p-3" style="background: var(--primary-bg); border-radius: 8px;"><p class="mb-1">Room ID:</p><h4 id="roomIdDisplayEl" class="text-accent referral-code placeholder-glow d-inline-block"><span class="placeholder col-6"></span></h4><button class="btn btn-sm btn-outline-warning ms-2 copy-btn" data-target="#roomIdDisplayEl" title="Copy Room ID"><i class="bi bi-clipboard"></i></button></div><div class="my-3 p-3" style="background: var(--primary-bg); border-radius: 8px;"><p class="mb-1">Password:</p><h4 id="roomPasswordDisplayEl" class="text-accent referral-code placeholder-glow d-inline-block"><span class="placeholder col-6"></span></h4><button class="btn btn-sm btn-outline-warning ms-2 copy-btn" data-target="#roomPasswordDisplayEl" title="Copy Password"><i class="bi bi-clipboard"></i></button></div><p class="small text-warning"><i class="bi bi-exclamation-triangle"></i> Don't share ID/Password.</p></div></div></div></div>
+
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-section="home-section"><i class="bi bi-house-door-fill"></i><span>Home</span></button>
+        <button class="nav-item" data-section="wallet-section"><i class="bi bi-wallet-fill"></i><span>Wallet</span></button>
+        <button class="nav-item" data-section="leaderboard-section"><i class="bi bi-trophy-fill"></i><span>Leaders</span></button>
+        <button class="nav-item" data-section="earnings-section"><i class="bi bi-coin"></i><span>Earnings</span></button>
+        <button class="nav-item" data-section="profile-section"><i class="bi bi-person-fill"></i><span>Profile</span></button>
+    </nav>
+
+    <!-- JS Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Firebase SDK & App Logic -->
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update, push, query, orderByChild, equalTo, onValue, runTransaction, off, limitToLast, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"; // Added serverTimestamp
+        import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        // ===============================================================
+        // ================= !!! IMPORTANT !!! ===========================
+        // Replace the placeholder values below with your actual Firebase project configuration.
+        // You can find these details in your Firebase project settings:
+        // Project settings > General > Your apps > Web app > SDK setup and configuration > Config
+        // ===============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDAxQr0uXCzkZt5TZeiXqvUDobq2irCkU8",
+  authDomain: "ts-gaming73.firebaseapp.com",
+  databaseURL: "https://ts-gaming73-default-rtdb.firebaseio.com",
+  projectId: "ts-gaming73",
+  storageBucket: "ts-gaming73.firebasestorage.app",
+  messagingSenderId: "504166431496",
+  appId: "1:504166431496:web:b8c9da7f3c6cacf05ecabd",
+  measurementId: "G-M33PBBFV6G"
+};
+        const APP_VERSION = "1.0.3";
+
+        // Initialize Firebase
+        let app, db, auth;
+        try {
+            // Check if placeholder values are still present
+            if (firebaseConfig.apiKey === "YOUR_API_KEY" || firebaseConfig.projectId === "YOUR_PROJECT_ID") {
+                console.warn("Firebase config using placeholder values. Replace them with your actual project details.");
+                // Optionally prevent initialization or show a UI warning here
+                // For this example, we'll allow initialization but log the warning.
+            }
+            app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            auth = getAuth(app);
+} catch (error) {
+            console.error("Firebase initialization failed:", error);
+            document.body.innerHTML = `<div class="alert alert-danger m-5 position-fixed top-0 start-0 end-0" style="z-index: 10000;">Critical Error: Could not connect. Check Firebase config & console. Error: ${error.message}</div>`;
+        }
+
+        // --- DOM Elements Cache ---
+         const getElement = (id) => document.getElementById(id);
+         const querySel = (selector) => document.querySelector(selector);
+         const querySelAll = (selector) => document.querySelectorAll(selector);
+         const elements = {
+             sections: querySelAll('.section'), bottomNavItems: querySelAll('.bottom-nav .nav-item'), globalLoader: getElement('globalLoaderEl'),
+             headerBackBtn: getElement('headerBackBtnEl'), headerTitleContainer: getElement('headerTitleContainerEl'), headerGameTitle: getElement('headerGameTitleEl'), headerWalletChip: getElement('headerWalletChipEl'), headerChipBalance: getElement('headerChipBalanceEl'), headerUserGreeting: getElement('headerUserGreetingEl'), appLogo: getElement('appLogoEl'), notificationBtn: getElement('notificationBtnEl'), notificationBadge: querySel('.notification-badge'),
+             // Login Form Elements
+             emailLoginForm: getElement('emailLoginForm'),
+             loginEmailInput: getElement('loginEmailInputEl'),
+             loginPasswordInput: getElement('loginPasswordInputEl'),
+             loginEmailBtn: getElement('loginEmailBtnEl'),
+             showSignupToggleBtn: getElement('showSignupToggleBtnEl'),
+             loginStatusMessage: getElement('loginStatusMessageEl'),
+             forgotPasswordLink: getElement('forgotPasswordLinkEl'),
+             // Signup Form Elements
+             emailSignupForm: getElement('emailSignupForm'),
+             signupEmailInput: getElement('signupEmailInputEl'),
+             signupPasswordInput: getElement('signupPasswordInputEl'),
+             signupConfirmPasswordInput: getElement('signupConfirmPasswordInputEl'),
+             signupReferralCodeInput: getElement('signupReferralCodeInputEl'), // <<< Added Referral Code Input Element
+             signupEmailBtn: getElement('signupEmailBtnEl'),
+             showLoginToggleBtn: getElement('showLoginToggleBtnEl'),
+             signupStatusMessage: getElement('signupStatusMessageEl'),
+             promotionSlider: getElement('promotionSliderEl'), gamesList: getElement('gamesListEl'), myContestsList: getElement('myContestsListEl'), noContestsMessage: getElement('noContestsMessageEl'),
+             homeNoticeCard: getElement('homeNoticeCardEl'), homeNoticeTitle: getElement('homeNoticeTitleEl'), homeNoticeMessage: getElement('homeNoticeMessageEl'), downloadAppCard: getElement('downloadAppCardEl'), downloadAppText: getElement('downloadAppTextEl'), downloadAppBtn: getElement('downloadAppBtnEl'),
+             tournamentsSection: getElement('tournaments-section'), tournamentsListContainer: getElement('tournamentsListContainerEl'), noTournamentsMessage: getElement('noTournamentsMessageEl'), tournamentTabs: querySelAll('.tournament-tabs .tab-item'),
+             leaderboardList: getElement('leaderboardListEl'), leaderboardDetail: getElement('leaderboardDetailEl'), refreshLeaderboardBtn: getElement('refreshLeaderboardBtnEl'),
+             walletTotalBalance: getElement('walletTotalBalanceEl'), walletWinningCash: getElement('walletWinningCashEl'), walletBonusCash: getElement('walletBonusCashEl'), allTransactionsBtn: getElement('allTransactionsBtnEl'), withdrawBtn: getElement('withdrawBtnEl'), addAmountWalletBtn: getElement('addAmountWalletBtnEl'), recentTransactionsList: getElement('recentTransactionsListEl'), noTransactionsMessage: getElement('noTransactionsMessageEl'),
+             earningsTotal: getElement('earningsTotalEl'), earningsReferral: getElement('earningsReferralEl'), viewEarningsHistoryBtn: getElement('viewEarningsHistoryBtn'),
+             profileAvatar: getElement('profileAvatarEl'), profileName: getElement('profileNameEl'), profileEmail: getElement('profileEmailEl'), profileTotalMatches: getElement('profileTotalMatchesEl'), profileWonMatches: getElement('profileWonMatchesEl'), profileTotalEarnings: getElement('profileTotalEarningsEl'), logoutProfileBtn: getElement('logoutProfileBtnEl'), policyLinks: querySelAll('.profile-links a[data-policy], .profile-links button[data-policy]'),
+             policyModalInstance: getElement('policyModalEl') ? new bootstrap.Modal(getElement('policyModalEl')) : null, policyModalTitle: getElement('policyModalTitleEl'), policyModalBody: getElement('policyModalBodyEl'),
+             appUpdateModalInstance: getElement('appUpdateModalEl') ? new bootstrap.Modal(getElement('appUpdateModalEl'), { backdrop: 'static', keyboard: false }) : null, appUpdateModalEl: getElement('appUpdateModalEl'), appUpdateCloseX: getElement('appUpdateCloseXEl'), appUpdateCloseBtn: getElement('appUpdateCloseBtnEl'), appUpdateChip: getElement('appUpdateChipEl'), appUpdateHeadline: getElement('appUpdateHeadlineEl'), appUpdateModalTitle: getElement('appUpdateModalTitleEl'), appUpdateModalMessage: getElement('appUpdateModalMessageEl'), appUpdateActionBtn: getElement('appUpdateActionBtnEl'),
+             addAmountModalInstance: getElement('addAmountModalEl') ? new bootstrap.Modal(getElement('addAmountModalEl')) : null, modalUserEmail: getElement('modalUserEmailEl'),
+             withdrawModalInstance: getElement('withdrawModalEl') ? new bootstrap.Modal(getElement('withdrawModalEl')) : null, withdrawModalBalance: getElement('withdrawModalBalanceEl'), withdrawAmountInput: getElement('withdrawAmountInputEl'), withdrawMethodInput: getElement('withdrawMethodInputEl'), minWithdrawAmount: getElement('minWithdrawAmountEl'), withdrawStatusMessage: getElement('withdrawStatusMessageEl'), submitWithdrawRequestBtn: getElement('submitWithdrawRequestBtnEl'),
+             matchDetailsModalInstance: getElement('matchDetailsModalEl') ? new bootstrap.Modal(getElement('matchDetailsModalEl')) : null, matchDetailsModalTitle: getElement('matchDetailsModalTitleEl'), matchDetailsModalBody: getElement('matchDetailsModalBodyEl'),
+             idPasswordModalInstance: getElement('idPasswordModalEl') ? new bootstrap.Modal(getElement('idPasswordModalEl')) : null, roomIdDisplay: getElement('roomIdDisplayEl'), roomPasswordDisplay: getElement('roomPasswordDisplayEl')
+         };
+
+        // --- App State ---
+        let currentUser = null; let userProfile = {}; let currentSectionId = 'login-section'; let dbListeners = {}; let settingsListenerUnsubscribe = null;
+        let swiperInstance; let currentTournamentGameId = null; let appSettings = {};
+        let validReferrerUid = null; // <<< To store referrer UID temporarily
+
+        // --- Utility Functions ---
+        const showLoader = (show) => {
+    if (!elements.globalLoader) return;
+    elements.globalLoader.style.display = show ? 'flex' : 'none';
+    elements.globalLoader.style.pointerEvents = show ? 'auto' : 'none';
+    elements.globalLoader.style.visibility = show ? 'visible' : 'hidden';
+};
+        function showStatusMessage(element, message, type = 'danger', autohide = true) { if (!element) return; element.textContent = message; element.className = `alert alert-${type} mt-3`; element.style.display = 'block'; element.setAttribute('role', 'alert'); if (autohide) { setTimeout(() => { if (element.textContent === message) element.style.display = 'none'; }, 5000); } }
+        function clearStatusMessage(element) { if (!element) return; element.style.display = 'none'; element.innerHTML = ''; element.removeAttribute('role'); }
+        function copyToClipboard(targetSelector) { // <<< Modified to accept selector
+             if (!targetSelector) { alert('Copy target not defined.'); return; }
+             const targetElement = querySel(targetSelector);
+             if (!targetElement) { alert('Element to copy from not found.'); return; }
+             const textToCopy = targetElement.textContent;
+             if (!textToCopy || textToCopy === 'N/A' || textToCopy.includes('placeholder')) { alert('Nothing to copy.'); return; }
+             navigator.clipboard.writeText(textToCopy).then(() => alert('Copied!')).catch(err => { console.error('Failed to copy:', err); alert('Failed to copy.'); });
+        }
+        function shareReferral(code) { if (!navigator.share) { alert('Web Share not supported. Copy the code manually.'); return; } if (!code || code === 'N/A') { alert('Referral code not available.'); return; } navigator.share({ title: 'Join Me on Gaming Tournament!', text: `Join using my referral code: ${code} & get rewards! App: ${window.location.origin}`, url: window.location.origin }).catch(() => {}); }
+        function generateReferralCode(length = 8) { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let result = ''; for (let i = 0; i < length; i++) result += chars.charAt(Math.floor(Math.random() * chars.length)); return result; }
+function getTimeRemaining(startTime) { if (!startTime) return 'TBA'; const now = Date.now(); const diff = startTime - now; if (diff <= 0) return 'Starting Soon'; const days = Math.floor(diff / 86400000); const hours = Math.floor((diff % 86400000) / 3600000); const minutes = Math.floor((diff % 3600000) / 60000); let o = ''; if (days > 0) o += `${days}d `; if (hours > 0 || days > 0) o += `${hours}h `; o += `${minutes}m`; return o.trim() || 'Now'; }
+function canShowRoomIdPass(t) { if (!t) return false; if (t.showIdPass) return true; if (t.autoReleaseRoom === false) return false; const start = Number(t.startTime || 0); if (!start) return false; const minutes = Number(t.roomReleaseMinutes ?? 15); return Date.now() >= start - Math.max(0, minutes) * 60000; }
+        const removePlaceholders = (parentElement) => { if (!parentElement) return; parentElement.classList.remove('placeholder-glow'); parentElement.querySelectorAll('.placeholder').forEach(el => el.remove()); };
+        function blurFocusedModalElement(modal) {
+            if (modal && document.activeElement && modal.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
+        }
+function unlockPageScrollIfNoModal(){
+    if (document.querySelector('.modal.show')) return;
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    document.documentElement.style.overflowY = 'auto';
+    document.body.style.overflowY = 'auto';
+}
+
+        // --- UI Functions ---
+         function showSection(sectionId) {
+             if (!auth || !sectionId || !elements.sections) { console.error("Cannot show section", sectionId); return; }
+             const targetSection = getElement(sectionId); if (!targetSection) { console.error(`Section element "${sectionId}" not found.`); showSection(currentUser ? 'home-section' : 'login-section'); return; }
+             const protectedSections = ['home-section', 'wallet-section', 'earnings-section', 'profile-section', 'tournaments-section', 'leaderboard-section'];
+             const isLoggedIn = !!currentUser;
+             if (protectedSections.includes(sectionId) && !isLoggedIn) { showSection('login-section'); return; }
+             if (sectionId === 'login-section' && isLoggedIn) { showSection('home-section'); return; }
+             elements.sections.forEach(sec => sec.classList.remove('active')); targetSection.classList.add('active'); currentSectionId = sectionId;
+             updateHeaderForSection(sectionId);
+             elements.bottomNavItems.forEach(item => item.classList.toggle('active', item.dataset.section === sectionId));
+             // Load data *after* section is made active
+// <<< Added Log
+             switch (sectionId) {
+                 case 'home-section': loadHomePageData(); break;
+                 case 'wallet-section': loadWalletData(); break;
+                 case 'profile-section': loadProfileData(); break;
+                 case 'earnings-section': loadEarningsData(); break;
+                 case 'leaderboard-section': loadLeaderboards(); break;
+                 case 'tournaments-section':
+                    // Tournament data loaded when clicking a game or tab
+                    // Ensure the initial view is populated if landing here directly
+                    if(currentTournamentGameId) {
+                         const activeTab = querySel('.tournament-tabs .tab-item.active')?.dataset.status || 'upcoming';
+                         filterTournaments(currentTournamentGameId, activeTab);
+                    } else {
+                         // Maybe show a message or default to first game?
+                         elements.tournamentsListContainer.innerHTML = '<p class="text-secondary text-center mt-4">Select a game from Home page first.</p>';
+                    }
+                    break;
+             }
+             // Ensure login/signup form state is correct when showing login section
+             if (sectionId === 'login-section') { toggleLoginForm(true); } // Default to showing login form
+             unlockPageScrollIfNoModal();
+             window.scrollTo(0, 0);
+         }
+         function updateHeaderForSection(sectionId) {
+             const showBackButton = (sectionId === 'tournaments-section'); const defaultTitleVisible = !showBackButton; const gameTitleVisible = showBackButton;
+             if (elements.headerBackBtn) elements.headerBackBtn.style.display = showBackButton ? 'inline-block' : 'none';
+             if (elements.headerTitleContainer) elements.headerTitleContainer.style.display = defaultTitleVisible ? 'flex' : 'none';
+             if (elements.headerGameTitle) elements.headerGameTitle.style.display = gameTitleVisible ? 'block' : 'none';
+             if (gameTitleVisible && currentTournamentGameId && elements.headerGameTitle) {
+                 const gameName = appSettings?.games?.[currentTournamentGameId]?.name || `Game`;
+                 elements.headerGameTitle.textContent = gameName;
+              }
+             else if (defaultTitleVisible && elements.headerUserGreeting) { const nameToShow = userProfile?.displayName?.split(' ')[0] || (currentUser ? currentUser.email?.split('@')[0] : 'Guest') || 'Guest'; elements.headerUserGreeting.textContent = nameToShow; }
+         }
+         function updateGlobalUI(isLoggedIn) {
+             if (elements.headerWalletChip) { elements.headerWalletChip.style.display = isLoggedIn ? 'flex' : 'none'; if (isLoggedIn) elements.headerWalletChip.onclick = () => showSection('wallet-section'); else elements.headerWalletChip.onclick = null; }
+             if (!isLoggedIn && elements.headerUserGreeting) elements.headerUserGreeting.textContent = 'Guest';
+             if (!isLoggedIn && elements.headerChipBalance) elements.headerChipBalance.textContent = '0';
+             elements.bottomNavItems.forEach(item => { const section = item.dataset.section; item.style.display = (section === 'home-section' || isLoggedIn) ? 'flex' : 'none'; });
+         }
+         function populateUserInfo(user, profile) {
+             if (!user || !profile) return;
+             const displayName = profile.displayName || user.displayName || user.email?.split('@')[0] || 'User';
+             const photoURL = profile.photoURL || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0F172A&color=E2E8F0&bold=true&size=70`;
+             const balance = (profile.balance || 0); const winningCash = (profile.winningCash || 0); const bonusCash = (profile.bonusCash || 0);
+             const totalEarnings = (profile.totalEarnings || 0); const referralEarnings = (profile.referralEarnings || 0);
+             const totalMatches = profile.totalMatches || 0; const wonMatches = profile.wonMatches || 0;
+             const formatCurrency = (amount) => `₹${amount.toFixed(2)}`;
+             if (elements.headerUserGreeting) elements.headerUserGreeting.textContent = displayName.split(' ')[0];
+             if (elements.headerChipBalance) elements.headerChipBalance.textContent = Math.floor(balance);
+             if (elements.walletTotalBalance) { elements.walletTotalBalance.textContent = formatCurrency(balance); removePlaceholders(elements.walletTotalBalance.closest('.placeholder-glow')); }
+             if (elements.walletWinningCash) { elements.walletWinningCash.textContent = formatCurrency(winningCash); removePlaceholders(elements.walletWinningCash.closest('.placeholder-glow')); }
+             if (elements.walletBonusCash) { elements.walletBonusCash.textContent = formatCurrency(bonusCash); removePlaceholders(elements.walletBonusCash.closest('.placeholder-glow')); }
+             if (elements.withdrawModalBalance) elements.withdrawModalBalance.textContent = formatCurrency(winningCash);
+             if (elements.profileAvatar) elements.profileAvatar.src = photoURL;
+             if (elements.profileName) { elements.profileName.textContent = displayName; removePlaceholders(elements.profileName.closest('.placeholder-glow')); }
+             if (elements.profileEmail) { elements.profileEmail.textContent = user.email || 'N/A'; removePlaceholders(elements.profileEmail.closest('.placeholder-glow')); }
+             if (elements.profileTotalMatches) { elements.profileTotalMatches.textContent = totalMatches; removePlaceholders(elements.profileTotalMatches.closest('.placeholder-glow')); }
+             if (elements.profileWonMatches) { elements.profileWonMatches.textContent = wonMatches; removePlaceholders(elements.profileWonMatches.closest('.placeholder-glow')); }
+             if (elements.profileTotalEarnings) { elements.profileTotalEarnings.textContent = formatCurrency(totalEarnings); removePlaceholders(elements.profileTotalEarnings.closest('.placeholder-glow')); }
+              if (elements.earningsTotal) { elements.earningsTotal.textContent = formatCurrency(totalEarnings); removePlaceholders(elements.earningsTotal.closest('.placeholder-glow')); }
+              if (elements.earningsReferral) { elements.earningsReferral.textContent = formatCurrency(referralEarnings); removePlaceholders(elements.earningsReferral.closest('.placeholder-glow')); }
+              if (elements.modalUserEmail) elements.modalUserEmail.textContent = user.email || 'N/A';
+              applyPaymentSettingsToUi();
+          }
+        function toggleLoginForm(showLogin) {
+            if (!elements.emailLoginForm || !elements.emailSignupForm) return;
+            clearStatusMessage(elements.loginStatusMessage);
+            clearStatusMessage(elements.signupStatusMessage);
+            elements.emailLoginForm.style.display = showLogin ? 'block' : 'none';
+            elements.emailSignupForm.style.display = showLogin ? 'none' : 'block';
+            // Reset forms when toggling
+            elements.emailLoginForm.reset();
+            elements.emailSignupForm.reset();
+        }
+
+        // --- Firebase Auth Functions ---
+         async function signUpWithEmail() {
+             if (!auth) return;
+             const em = elements.signupEmailInput.value.trim();
+             const pw = elements.signupPasswordInput.value;
+             const cpw = elements.signupConfirmPasswordInput.value;
+             const refCode = elements.signupReferralCodeInput.value.trim(); // <<< Get Referral Code
+
+             if (!em || !pw || !cpw) { showStatusMessage(elements.signupStatusMessage, 'Fill required fields.', 'warning'); return; }
+             if (pw !== cpw) { showStatusMessage(elements.signupStatusMessage, 'Passwords don\'t match.', 'warning'); return; }
+             if (pw.length < 6) { showStatusMessage(elements.signupStatusMessage, 'Password min 6 chars.', 'warning'); return; }
+
+             showLoader(true); clearStatusMessage(elements.signupStatusMessage);
+             validReferrerUid = null; // Reset potential referrer
+
+             try {
+                 // --- Validate Referral Code (if provided) BEFORE creating user ---
+                 if (refCode) {
+const usersRef = ref(db, 'users');
+                     // IMPORTANT: Requires index on "referralCode" in Firebase Rules for /users
+                     // Ensure Firebase rules allow reading users node for this query (e.g., allow read if auth != null)
+                     const q = query(usersRef, orderByChild('referralCode'), equalTo(refCode));
+                     const snapshot = await get(q);
+                     if (snapshot.exists()) {
+                         // Assuming only one user can have a specific referral code
+                         const referrerData = snapshot.val();
+                         const referrerId = Object.keys(referrerData)[0]; // Get the UID
+                         const referrerProfile = referrerData[referrerId];
+
+                         // Check if the referrer is not the user themselves (though unlikely at signup)
+                         // and ensure the referrer profile exists properly
+                         if (referrerId && referrerProfile.email) { // Basic check
+                             validReferrerUid = referrerId;
+} else {
+                             console.warn("Referral code found, but referrer data invalid:", referrerData);
+                             // Optionally inform the user the code was invalid
+                             // showStatusMessage(elements.signupStatusMessage, 'Invalid referral code.', 'warning');
+                         }
+                     } else {
+// Optionally inform the user the code was invalid
+                         // showStatusMessage(elements.signupStatusMessage, 'Referral code not found.', 'warning');
+                     }
+                 }
+
+                 // --- Create the user ---
+                 await createUserWithEmailAndPassword(auth, em, pw);
+                 // Success: onAuthStateChanged will handle profile creation now, using validReferrerUid if set.
+
+             } catch (e) {
+                 console.error("Signup Error:", e); let m = `Signup failed.`; switch (e.code) { case 'auth/email-already-in-use': m = 'Email already registered.'; break; case 'auth/weak-password': m = 'Password too weak.'; break; case 'auth/invalid-email': m = 'Invalid email.'; break; case 'auth/network-request-failed': m = 'Network error.'; break; default: m = `Error: ${e.message}`; } showStatusMessage(elements.signupStatusMessage, m, 'danger');
+             } finally {
+                 showLoader(false);
+             }
+         }
+         async function loginWithEmail() {
+             if (!auth) return;
+             const em = elements.loginEmailInput.value.trim();
+             const pw = elements.loginPasswordInput.value;
+             if (!em || !pw) { showStatusMessage(elements.loginStatusMessage, 'Enter email & password.', 'warning'); return; }
+             showLoader(true); clearStatusMessage(elements.loginStatusMessage);
+             try { await signInWithEmailAndPassword(auth, em, pw); }
+             catch (e) { console.error("Login Error:", e); let m = `Login failed.`; switch (e.code) { case 'auth/user-not-found': case 'auth/wrong-password': case 'auth/invalid-credential': m = 'Invalid email or password.'; break; case 'auth/invalid-email': m = 'Invalid email format.'; break; case 'auth/too-many-requests': m = 'Too many attempts. Reset pass or wait.'; break; case 'auth/network-request-failed': m = 'Network error.'; break; case 'auth/user-disabled': m = 'Account disabled.'; break; default: m = `Error: ${e.message}`; } showStatusMessage(elements.loginStatusMessage, m, 'danger'); }
+             finally { showLoader(false); }
+         }
+         async function resetPassword() {
+             if (!auth) return;
+             const em = elements.loginEmailInput.value.trim();
+             if (!em) { showStatusMessage(elements.loginStatusMessage, 'Enter email for password reset.', 'warning'); return; }
+             showLoader(true); clearStatusMessage(elements.loginStatusMessage);
+             try { await sendPasswordResetEmail(auth, em); showStatusMessage(elements.loginStatusMessage, 'Password reset email sent! Check inbox/spam.', 'success', false); }
+             catch (e) { console.error("Reset Pass Error:", e); let m = `Failed to send email.`; switch (e.code) { case 'auth/user-not-found': case 'auth/invalid-email': m = 'Email not found.'; break; case 'auth/network-request-failed': m = 'Network error.'; break; default: m = `Error: ${e.message}`; } showStatusMessage(elements.loginStatusMessage, m, 'danger'); }
+             finally { showLoader(false); }
+         }
+         async function logoutUser() { if (!auth) return; try { showLoader(true); await signOut(auth); } catch (e) { console.error("Sign Out Error:", e); alert(`Logout failed: ${e.message}`); showLoader(false); } }
+
+        // --- Auth State Change Handler --- [UPDATED FOR REFERRAL]
+         async function handleAuthStateChange(user) {
+             if (!auth || !db) { console.error("Firebase not ready in auth change"); showLoader(false); return; }
+             showLoader(true); detachAllDbListeners(); currentUser = user;
+             const localReferrerUid = validReferrerUid; // Capture the value before resetting
+             validReferrerUid = null; // Reset for next signup attempt
+
+             if (user) { // Logged In
+const userRef = ref(db, 'users/' + user.uid);
+                 try {
+                     const snapshot = await get(userRef);
+                     if (snapshot.exists()) { // Existing user
+                         userProfile = snapshot.val(); const updates = {};
+                         if (user.displayName && (!userProfile.displayName || userProfile.displayName !== user.displayName)) updates.displayName = user.displayName;
+                         if (user.email && !userProfile.email) updates.email = user.email;
+                         if (Object.keys(updates).length > 0) { await update(userRef, updates); userProfile = { ...userProfile, ...updates }; }
+                     } else { // New user
+const newUserProfile = {
+                             uid: user.uid, displayName: user.displayName || user.email?.split('@')[0] || 'User', email: user.email || null, photoURL: user.photoURL || null,
+                             balance: appSettings.newUserBalance || 0, winningCash: 0, bonusCash: appSettings.newUserBonus || 0,
+                             totalMatches: 0, wonMatches: 0, totalEarnings: 0, referralEarnings: 0, createdAt: Date.now(),
+                             referralCode: generateReferralCode(), joinedTournaments: {}, isAdmin: false,
+                             // <<< Add referredBy field if valid referrer was found during signup >>>
+                             ...(localReferrerUid && { referredBy: localReferrerUid })
+                         };
+                         await set(userRef, newUserProfile);
+                         userProfile = newUserProfile;
+
+                         // Award signup bonus to new user (if any)
+                         if (newUserProfile.bonusCash > 0) {
+                             await recordTransaction(user.uid, 'signup_bonus', newUserProfile.bonusCash, `Welcome Bonus`);
+                         }
+
+                         // --- Award bonus to referrer (if any) ---
+                         if (localReferrerUid && appSettings.referralBonus > 0) {
+const referrerRef = ref(db, `users/${localReferrerUid}`);
+                             try {
+                                 const referrerUpdateResult = await runTransaction(referrerRef, (referrerData) => {
+                                     if (referrerData) {
+                                         referrerData.balance = (referrerData.balance || 0) + appSettings.referralBonus;
+                                         referrerData.bonusCash = (referrerData.bonusCash || 0) + appSettings.referralBonus; // Or winningCash depending on rules
+                                         referrerData.referralEarnings = (referrerData.referralEarnings || 0) + appSettings.referralBonus;
+                                     }
+                                     return referrerData;
+                                 });
+
+                                 if (referrerUpdateResult.committed) {
+                                     await recordTransaction(localReferrerUid, 'referral_bonus', appSettings.referralBonus, `Referral Bonus from ${newUserProfile.displayName || newUserProfile.email}`);
+} else {
+                                     console.error("Referrer bonus transaction aborted.");
+                                 }
+                             } catch (referrerError) {
+                                 console.error("Error awarding referrer bonus:", referrerError);
+                             }
+                         }
+                         // --- End Referrer Bonus Award ---
+                     }
+                     populateUserInfo(user, userProfile); setupRealtimeListeners(user.uid); setupNotificationListeners(user.uid); setupMoneyRequestListeners(user.uid); updateGlobalUI(true);
+                     const targetSection = (currentSectionId === 'login-section' || !getElement(currentSectionId)) ? 'home-section' : currentSectionId;
+                     showSection(targetSection);
+                 } catch (error) { console.error("Profile handling error:", error); alert("Error loading profile. Logging out. " + error.message); try { await logoutUser(); } catch (logoutErr) {} }
+             } else { // Logged Out
+currentUser = null; userProfile = {}; updateGlobalUI(false); showSection('login-section');
+             }
+             showLoader(false);
+}
+
+// --- Database Interaction Functions ---
+function applyUpdatePopupSettings() {
+    if (!elements.appUpdateModalInstance || !elements.appUpdateModalEl) return;
+    const requiredVersion = String(appSettings.requiredAppVersion || '').trim();
+    const versionMismatch = !!requiredVersion && requiredVersion !== APP_VERSION;
+    const forceActive = !!appSettings.forceUpdateActive || versionMismatch;
+    const normalActive = !!appSettings.normalUpdateActive && !versionMismatch;
+    const shouldShow = forceActive || normalActive;
+    if (!shouldShow) {
+        elements.appUpdateModalInstance.hide();
+        setTimeout(unlockPageScrollIfNoModal, 50);
+        return;
+    }
+    const title = appSettings.updateTitle || (forceActive ? 'Update Required' : 'New Update Available');
+    const versionLine = versionMismatch ? `\n\nYour version: ${APP_VERSION}\nRequired version: ${requiredVersion}` : '';
+    const message = appSettings.updateMessage || (forceActive ? `Is version me important security aur gameplay fixes hain. Continue karne ke liye latest app download karna zaroori hai.${versionLine}` : 'Latest version ready hai. New features, smoother match flow aur better wallet experience ke liye update download karein.');
+    const buttonText = appSettings.updateButtonText || (forceActive ? 'Update Now' : 'Download Update');
+    const updateLink = String(appSettings.updateLink || '').trim();
+    elements.appUpdateModalTitle.innerHTML = `<i class="bi ${forceActive ? 'bi-exclamation-triangle-fill' : 'bi-cloud-arrow-down-fill'} me-2"></i>${escapeHtml(title)}`;
+    if (elements.appUpdateChip) elements.appUpdateChip.innerHTML = forceActive ? '<i class="bi bi-lock-fill"></i> Required update' : '<i class="bi bi-stars"></i> Better experience ready';
+    if (elements.appUpdateHeadline) elements.appUpdateHeadline.textContent = forceActive ? 'Update first, then continue' : 'Fresh version is available';
+    elements.appUpdateModalMessage.innerHTML = escapeHtml(message).replace(/\n/g, '<br>');
+    elements.appUpdateActionBtn.innerHTML = `<i class="bi bi-download"></i> ${escapeHtml(buttonText)}`;
+    elements.appUpdateActionBtn.href = updateLink || '#';
+    elements.appUpdateActionBtn.classList.toggle('disabled', !updateLink);
+    elements.appUpdateActionBtn.setAttribute('aria-disabled', updateLink ? 'false' : 'true');
+    elements.appUpdateCloseBtn.style.display = forceActive ? 'none' : 'inline-flex';
+    elements.appUpdateCloseX.style.display = forceActive ? 'none' : 'block';
+    elements.appUpdateModalEl.setAttribute('data-update-mode', forceActive ? 'force' : 'normal');
+    elements.appUpdateModalInstance.show();
+}
+
+function setupSettingsListener() {
+    if (!db || settingsListenerUnsubscribe) return;
+    settingsListenerUnsubscribe = onValue(ref(db, 'settings'), (snapshot) => {
+        appSettings = snapshot.exists() ? (snapshot.val() || {}) : {};
+        if (appSettings.logoUrl && elements.appLogo) elements.appLogo.src = appSettings.logoUrl;
+        if (appSettings.minWithdraw && elements.minWithdrawAmount) elements.minWithdrawAmount.textContent = appSettings.minWithdraw;
+        if (applyMaintenanceMode()) return;
+        applyHomeControls();
+        applyPaymentSettingsToUi();
+        applyUpdatePopupSettings();
+    }, (error) => console.error('Settings realtime listener failed:', error));
+}
+
+function applyHomeControls() {
+    const noticeActive = !!appSettings.homeNoticeActive;
+    if (elements.homeNoticeCard) elements.homeNoticeCard.style.display = noticeActive ? 'block' : 'none';
+    if (noticeActive) {
+        if (elements.homeNoticeTitle) elements.homeNoticeTitle.textContent = appSettings.homeNoticeTitle || 'Important Notice';
+        if (elements.homeNoticeMessage) elements.homeNoticeMessage.innerHTML = escapeHtml(appSettings.homeNoticeMessage || 'Latest tournament aur wallet updates yahan milenge.').replace(/\n/g, '<br>');
+    }
+    const downloadLink = String(appSettings.appDownloadLink || appSettings.updateLink || '').trim();
+    const downloadActive = !!appSettings.downloadButtonActive && !!downloadLink;
+    if (elements.downloadAppCard) elements.downloadAppCard.style.display = downloadActive ? 'flex' : 'none';
+    if (downloadActive) {
+        if (elements.downloadAppText) elements.downloadAppText.textContent = appSettings.downloadButtonText || 'Get the latest version for the best experience.';
+        if (elements.downloadAppBtn) elements.downloadAppBtn.href = downloadLink;
+    }
+}
+
+function applyMaintenanceMode() {
+    if (!appSettings.maintenanceModeActive) return false;
+    const title = appSettings.maintenanceTitle || 'Maintenance Mode';
+    const message = appSettings.maintenanceMessage || 'App abhi maintenance me hai. Thodi der baad try karein.';
+    document.body.innerHTML = `<div class="maintenance-body"><div class="maintenance-panel"><i class="bi bi-tools"></i><h3>${escapeHtml(title)}</h3><p>${escapeHtml(message).replace(/\n/g, '<br>')}</p></div></div>`;
+    return true;
+}
+
+function getSupportContactText(){return String(appSettings?.supportContact || appSettings?.adminContact || appSettings?.contactInfo || 'admin support').trim()}
+function applyPaymentSettingsToUi(){
+    const upiText = getManualPaymentUpiId();
+    querySelAll('.phonepe-number').forEach(el => { el.textContent = upiText; });
+    if (getElement('addUpiText')) getElement('addUpiText').textContent = upiText;
+    const contactInfoPEl = document.querySelector('.modal-body p strong#modalUserEmailEl')?.closest('p');
+    if (contactInfoPEl) {
+        contactInfoPEl.innerHTML = `<strong><i class="bi bi-exclamation-triangle-fill text-warning"></i> IMPORTANT:</strong> After payment, contact admin via ${escapeHtml(getSupportContactText())} with registered Email (<strong id="modalUserEmailEl">${escapeHtml(currentUser?.email || '...')}</strong>) & payment screenshot. Amount added manually after verification.`;
+        elements.modalUserEmail = getElement('modalUserEmailEl');
+    }
+}
+
+async function loadAppSettings() {
+try {
+        const settingsRef = ref(db, 'settings');
+        const snapshot = await get(settingsRef);
+        if (snapshot.exists()) {
+             appSettings = snapshot.val() || {};
+// Apply settings to UI
+             if (appSettings.logoUrl && elements.appLogo) elements.appLogo.src = appSettings.logoUrl;
+             if (appSettings.minWithdraw && elements.minWithdrawAmount) elements.minWithdrawAmount.textContent = appSettings.minWithdraw;
+             if (applyMaintenanceMode()) return;
+             applyHomeControls();
+
+             applyPaymentSettingsToUi();
+
+             applyUpdatePopupSettings();
+
+        } else {
+             console.warn("App Settings not found in database!");
+             appSettings = {}; // Use defaults or handle error
+              applyPaymentSettingsToUi();
+
+        }
+    } catch (e) {
+        console.error("Settings load failed", e);
+         // Don't halt the app, use defaults or proceed without settings
+         appSettings = {};
+         // Optionally show a non-blocking warning
+    }
+}
+
+function loadHomePageData() {
+if (!currentUser) {
+if(elements.promotionSlider?.querySelector('.swiper-wrapper')) elements.promotionSlider.querySelector('.swiper-wrapper').innerHTML = '';
+         if(elements.gamesList) elements.gamesList.innerHTML = '';
+         if(elements.myContestsList) elements.myContestsList.innerHTML = '<p class="text-secondary text-center">Login to view contests.</p>';
+         return;
+     }
+    loadPromotions();
+    loadGames();
+    loadMyContests();
+}
+
+function normalizePromoImageUrl(url) {
+     const value = String(url || '').trim();
+     if (!value) return '';
+     if (/^(https?:|data:image\/|blob:)/i.test(value)) return value;
+     if (value.startsWith('//')) return `https:${value}`;
+     if (/^[\w.-]+\.[a-z]{2,}/i.test(value)) return `https://${value}`;
+     return '';
+}
+function normalizePromoLink(url) {
+     const value = String(url || '').trim();
+     return /^https?:\/\//i.test(value) ? value : '';
+}
+
+async function loadPromotions() {
+if (!elements.promotionSlider) return;
+     const sliderWrapper = elements.promotionSlider.querySelector('.swiper-wrapper');
+     if (!sliderWrapper) return;
+     sliderWrapper.classList.add('placeholder-glow');
+     sliderWrapper.innerHTML = `<div class="swiper-slide"><span class="placeholder" style="height: 100%; border-radius: 10px; display: block; width: 100%;"></span></div>`;
+
+     const promoRef = ref(db, 'promotions');
+     try {
+         const snapshot = await get(promoRef);
+         const promotions = snapshot.val() || {};
+         const activePromotions = Object.values(promotions)
+             .map(promo => ({
+                 ...promo,
+                 imageUrl: normalizePromoImageUrl(promo?.imageUrl || promo?.imageURL || promo?.image || promo?.url),
+                 link: normalizePromoLink(promo?.link || promo?.targetUrl)
+             }))
+             .filter(promo => promo.imageUrl);
+removePlaceholders(elements.promotionSlider);
+         sliderWrapper.classList.remove('placeholder-glow');
+         sliderWrapper.innerHTML = '';
+
+         if (activePromotions.length > 0) {
+             elements.promotionSlider.style.display = 'block';
+             activePromotions.forEach((promo, index) => {
+                 const slide = document.createElement('div');
+                 slide.className = 'swiper-slide';
+
+                 const img = document.createElement('img');
+                 img.src = promo.imageUrl;
+                 img.alt = `Promo ${index + 1}`;
+                 img.loading = index === 0 ? 'eager' : 'lazy';
+                 img.referrerPolicy = 'no-referrer';
+                 img.onerror = () => {
+                     console.warn('Promotion image failed:', promo.imageUrl);
+                     slide.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 text-secondary small px-3 text-center">Promo image not loaded</div>';
+                 };
+
+                 if (promo.link) {
+                     const link = document.createElement('a');
+                     link.href = promo.link;
+                     link.target = '_blank';
+                     link.rel = 'noopener noreferrer';
+                     link.appendChild(img);
+                     slide.appendChild(link);
+                 } else {
+                     slide.appendChild(img);
+                 }
+                 sliderWrapper.appendChild(slide);
+             });
+             if (swiperInstance) swiperInstance.destroy(true, true);
+             swiperInstance = new Swiper(elements.promotionSlider, {
+                 loop: activePromotions.length > 1,
+                 autoplay: { delay: 3500, disableOnInteraction: false },
+                 pagination: { el: '.swiper-pagination', clickable: true },
+                 slidesPerView: 1,
+                 observer: true,
+                 observeParents: true,
+                 observeSlideChildren: true
+             });
+             setTimeout(() => swiperInstance?.update(), 100);
+         } else {
+             elements.promotionSlider.style.display = 'none';
+         }
+     } catch (e) {
+         console.error("Promo load failed:", e);
+         removePlaceholders(elements.promotionSlider);
+         sliderWrapper.classList.remove('placeholder-glow');
+         sliderWrapper.innerHTML = '<p class="text-danger text-center small p-3">Could not load promotions.</p>';
+         elements.promotionSlider.style.display = 'block';
+     }
+}
+
+async function loadGames() {
+if (!elements.gamesList) return;
+    elements.gamesList.classList.add('placeholder-glow');
+    elements.gamesList.innerHTML = `<div class="col-6"><div class="game-card custom-card"><span class="placeholder d-block" style="height: 130px;"></span><span class="placeholder d-block mt-2 col-8 mx-auto" style="height: 20px;"></span></div></div> <div class="col-6"><div class="game-card custom-card"><span class="placeholder d-block" style="height: 130px;"></span><span class="placeholder d-block mt-2 col-8 mx-auto" style="height: 20px;"></span></div></div>`;
+
+    const gamesRef = ref(db, 'games');
+    try {
+        const snapshot = await get(gamesRef);
+        const games = snapshot.val() || {};
+         const activeGames = Object.entries(games)
+                                .filter(([, game]) => game.imageUrl && game.name)
+                                .sort(([, gameA], [, gameB]) => (gameA.order || 0) - (gameB.order || 0));
+removePlaceholders(elements.gamesList);
+        elements.gamesList.innerHTML = ''; // Clear placeholders
+
+        if (activeGames.length > 0) {
+             if (!appSettings.games) appSettings.games = {};
+            activeGames.forEach(([gameId, game]) => {
+                 appSettings.games[gameId] = { name: game.name };
+                const col = document.createElement('div');
+                col.className = 'col-6';
+                col.innerHTML = `<div class="game-card custom-card" data-game-id="${escapeAttr(gameId)}" data-game-name="${escapeAttr(game.name)}"><img src="${escapeAttr(game.imageUrl)}" alt="${escapeAttr(game.name)}"><span>${escapeHtml(game.name)}</span></div>`;
+                col.querySelector('.game-card').addEventListener('click', () => {
+                    currentTournamentGameId = gameId;
+                    loadTournamentsForGame(gameId, game.name);
+                });
+                elements.gamesList.appendChild(col);
+            });
+        } else {
+            elements.gamesList.innerHTML = '<p class="text-secondary text-center col-12">No games available.</p>';
+        }
+    } catch (e) {
+        console.error("Games load failed:", e);
+        removePlaceholders(elements.gamesList);
+        elements.gamesList.innerHTML = '<p class="text-danger text-center col-12">Could not load games.</p>';
+    }
+}
+
+function loadTournamentsForGame(gameId, gameName) {
+if (!elements.tournamentsSection) return;
+     currentTournamentGameId = gameId;
+     elements.tournamentTabs.forEach(t => t.classList.remove('active'));
+     querySel('.tournament-tabs .tab-item[data-status="upcoming"]')?.classList.add('active');
+     showSection('tournaments-section'); // This will call filterTournaments
+     filterTournaments(gameId, 'upcoming');
+}
+
+async function filterTournaments(gameId, status) {
+if (!elements.tournamentsListContainer) return;
+    elements.tournamentsListContainer.innerHTML = ''; // Clear previous list
+    elements.tournamentsListContainer.classList.add('placeholder-glow');
+    elements.tournamentsListContainer.innerHTML = `<div class="tournament-card placeholder-glow mb-3"><span class="placeholder col-6"></span><span class="placeholder col-12 mt-2"></span><span class="placeholder col-10 mt-2"></span><div class="d-flex justify-content-between mt-3"><span class="placeholder col-4 h-30"></span><span class="placeholder col-4 h-30"></span></div></div>`; // Show placeholders
+    elements.noTournamentsMessage.style.display = 'none'; // Hide 'no tournaments' message
+    try {
+        const tQuery = query(ref(db, 'tournaments'), orderByChild('gameId'), equalTo(gameId));
+        const s = await get(tQuery);
+        const allT = s.val() || {};
+        const fT = Object.entries(allT).filter(([, t]) => t.status === status).sort(([, tA], [, tB]) => (tA.startTime || 0) - (tB.startTime || 0));
+removePlaceholders(elements.tournamentsListContainer);
+        elements.tournamentsListContainer.innerHTML = ''; // Clear placeholders again
+
+        if (fT.length > 0) {
+            fT.forEach(([tId, t]) => {
+                const card = createTournamentCardElement(tId, t);
+                elements.tournamentsListContainer.appendChild(card);
+            });
+        } else {
+            elements.noTournamentsMessage.style.display = 'block';
+            elements.noTournamentsMessage.textContent = `No ${status} tournaments found.`;
+        }
+    } catch (e) {
+        console.error(`Tournaments filter failed (${status}):`, e);
+        removePlaceholders(elements.tournamentsListContainer);
+        elements.tournamentsListContainer.innerHTML = '<p class="text-danger tc mt-4">Could not load tournaments.</p>';
+        elements.noTournamentsMessage.style.display = 'none';
+    }
+}
+
+function createTournamentCardElement(tId, t) {
+     const card = document.createElement('div'); card.className = 'tournament-card'; card.dataset.tournamentId = tId;
+     const eFee = t.entryFee || 0; const pkPrize = t.perKillPrize || 0; const pPool = t.prizePool || 0;
+     const sTime = t.startTime ? new Date(t.startTime) : null; const sTimeLoc = sTime ? sTime.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'TBA';
+     const regP = t.registeredPlayers || {}; const regC = Object.keys(regP).length; const maxP = t.maxPlayers || 0;
+
+     const spotsL = maxP > 0 ? Math.max(0, maxP - regC) : Infinity; const isF = maxP > 0 && spotsL <= 0;
+     const isJ = currentUser && userProfile?.joinedTournaments?.[tId];
+     const canJ = !isJ && !isF && t.status === 'upcoming'; let timerTxt = t.status?.toUpperCase() || 'N/A';
+     if (t.status === 'upcoming' && sTime) timerTxt = getTimeRemaining(t.startTime); else if (t.status === 'ongoing') timerTxt = 'LIVE'; else if (t.status === 'completed' || t.status === 'result') timerTxt = 'ENDED';
+     let spotsTxt = 'Unlimited Spots'; let progP = 0; if (maxP > 0) { spotsTxt = `<span class="${spotsL <= 5 ? 'text-danger' : 'text-accent'}">${spotsL}</span> Spots Left (${regC}/${maxP})`; progP = Math.min(100, (regC / maxP) * 100); }
+     const resultHtml = (isJ || t.status === 'result' || t.status === 'completed') ? getResultBreakdownHtml(t) : '';
+      const resultRibbon = resultHtml ? '<span class="tournament-result-ribbon"><i class="bi bi-award-fill"></i> Result</span>' : '';
+      const tagHtml = [t.mode, t.map, ...(t.tags ? (Array.isArray(t.tags) ? t.tags : Object.values(t.tags)) : [])].filter(Boolean).map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+      const iconHtml = `<i class="${safeIconClass(t.icon)}"></i>`;
+    let actBtn = ''; let idPassBtn = ''; if (isJ) { actBtn = `<button class="btn btn-custom btn-sm btn-joined" disabled><i class="bi bi-check-circle-fill"></i> Joined</button>`; if (t.status === 'ongoing' || canShowRoomIdPass(t)) { idPassBtn = `<button class="btn btn-custom btn-idpass w-100 mt-2 btn-sm" data-tournament-id="${escapeAttr(tId)}"><i class="bi bi-key-fill"></i> View ID & Pass</button>`; } } else if (canJ) { actBtn = `<button class="btn btn-custom btn-sm btn-custom-accent btn-join" data-tournament-id="${escapeAttr(tId)}" data-fee="${eFee}">₹${eFee} Join <i class="bi bi-arrow-right-short"></i></button>`; } else { let disR = t.status !== 'upcoming' ? t.status?.toUpperCase() : (isF ? 'Full' : 'Closed'); actBtn = `<button class="btn btn-custom btn-sm btn-disabled" disabled>${escapeHtml(disR || 'N/A')}</button>`; }
+     card.innerHTML = `<div class="tournament-card-header"><div class="tournament-card-tags">${tagHtml}</div><div class="d-flex align-items-center gap-2"><div class="tournament-card-timer">${escapeHtml(timerTxt)}</div>${resultRibbon}</div></div><h3 class="tournament-card-title">${iconHtml} ${escapeHtml(t.name || 'Tournament')}</h3><p class="small text-secondary mb-2"><i class="bi bi-calendar-event"></i> ${escapeHtml(sTimeLoc)}</p><div class="tournament-card-info"><div class="info-item"><span>Prize Pool</span><strong><i class="bi bi-trophy-fill text-accent prize-icon"></i> ₹${pPool}</strong></div><div class="info-item"><span>Per Kill</span><strong>₹${pkPrize}</strong></div><div class="info-item"><span>Entry Fee</span><strong class="${eFee > 0 ? 'text-info' : ''}">${eFee > 0 ? `₹${eFee}` : 'Free'}</strong></div></div><div class="tournament-card-spots">${spotsTxt}${maxP > 0 ? `<div class="progress mt-1" style="height: 6px;"><div class="progress-bar bg-warning" role="progressbar" style="width: ${progP}%"></div></div>` : ''}</div>${resultHtml}<div class="tournament-card-actions"><button class="btn btn-custom btn-custom-secondary btn-sm btn-details" data-tournament-id="${escapeAttr(tId)}">Details</button>${actBtn}</div>${idPassBtn}`;
+     const jBtn = card.querySelector('.btn-join'); if (jBtn) jBtn.addEventListener('click', handleJoinTournamentClick);
+     const dBtn = card.querySelector('.btn-details'); if (dBtn) dBtn.addEventListener('click', handleMatchDetailsClick);
+     const ipBtn = card.querySelector('.btn-idpass'); if (ipBtn) ipBtn.addEventListener('click', handleIdPasswordClick);
+     return card;
+}
+
+async function loadMyContests() {
+if (!currentUser || !elements.myContestsList) { if(elements.myContestsList) removePlaceholders(elements.myContestsList); if(elements.myContestsList) elements.myContestsList.innerHTML = ''; if (elements.noContestsMessage) elements.noContestsMessage.style.display = 'block'; return; }
+     const joinedIds = Object.keys(userProfile.joinedTournaments || {});
+     elements.myContestsList.classList.add('placeholder-glow');
+     elements.myContestsList.innerHTML = `<div class="tournament-card placeholder-glow mb-3"><span class="placeholder col-6"></span><span class="placeholder col-12 mt-2"></span><span class="placeholder col-10 mt-2"></span><div class="d-flex justify-content-between mt-3"><span class="placeholder col-4 h-30"></span><span class="placeholder col-4 h-30"></span></div></div>`; // Placeholder
+     if (elements.noContestsMessage) elements.noContestsMessage.style.display = 'none';
+     if (joinedIds.length === 0) { removePlaceholders(elements.myContestsList); elements.myContestsList.innerHTML = ''; if (elements.noContestsMessage) elements.noContestsMessage.style.display = 'block'; return; }
+try {
+         const contestPromises = joinedIds.map(id => get(ref(db, `tournaments/${id}`)));
+         const snapshots = await Promise.all(contestPromises);
+         removePlaceholders(elements.myContestsList);
+         elements.myContestsList.innerHTML = ''; // Clear placeholders
+         const contestCards = [];
+         snapshots.forEach((snapshot, index) => {
+             if (snapshot.exists()) {
+                 const t = snapshot.val();
+                 // Filter to show only upcoming or ongoing in "My Contests"
+                 if (t.status === 'upcoming' || t.status === 'ongoing' || t.status === 'completed' || t.status === 'result') {
+                     const tId = joinedIds[index];
+                     contestCards.push({ startTime: t.startTime || 0, card: createTournamentCardElement(tId, t) });
+                 }
+             }
+         });
+         contestCards.sort((a, b) => a.startTime - b.startTime); // Sort by start time
+         if (contestCards.length > 0) {
+             contestCards.forEach(item => elements.myContestsList.appendChild(item.card));
+         } else if (elements.noContestsMessage) {
+             elements.noContestsMessage.style.display = 'block';
+             elements.noContestsMessage.textContent = "No joined contests found.";
+         }
+     } catch (e) { console.error("My contests load failed:", e); removePlaceholders(elements.myContestsList); elements.myContestsList.innerHTML = '<p class="text-danger tc">Could not load contests.</p>'; }
+}
+
+
+async function loadLeaderboards() {
+if (!currentUser || !elements.leaderboardList) return;
+    elements.leaderboardDetail?.classList.remove('active');
+    if (elements.leaderboardDetail) elements.leaderboardDetail.innerHTML = '';
+    elements.leaderboardList.classList.add('placeholder-glow');
+    elements.leaderboardList.innerHTML = '<div class="leaderboard-card"><span class="placeholder col-7" style="height:18px;"></span><span class="placeholder col-12 mt-3" style="height:34px;"></span></div>';
+    try {
+        const snap = await get(ref(db, 'tournaments'));
+        const tournaments = Object.entries(snap.val() || {})
+            .sort(([, a], [, b]) => Number(b.resultUpdatedAt || b.startTime || 0) - Number(a.resultUpdatedAt || a.startTime || 0));
+        removePlaceholders(elements.leaderboardList);
+        if (!tournaments.length) {
+            elements.leaderboardList.innerHTML = '<div class="leaderboard-empty"><i class="bi bi-trophy d-block fs-3 mb-2 text-accent"></i>No tournaments found.</div>';
+            return;
+        }
+        elements.leaderboardList.innerHTML = tournaments.map(([id, t]) => renderLeaderboardTournamentCard(id, t)).join('');
+    } catch (e) {
+        console.error('Leaderboard load failed:', e);
+        removePlaceholders(elements.leaderboardList);
+        elements.leaderboardList.innerHTML = '<div class="leaderboard-empty text-danger">Could not load leaderboards.</div>';
+    }
+}
+function renderLeaderboardTournamentCard(id, t) {
+    const players = getLeaderboardPlayers(t);
+    const registeredCount = Object.keys(t.registeredPlayers || {}).length;
+    const game = getTournamentGameName(t);
+    const totalWinning = players.reduce((sum, p) => sum + p.winning, 0);
+    const date = t.resultUpdatedAt || t.startTime;
+    const status = String(t.status || 'upcoming').toLowerCase();
+    const hasResult = players.length > 0 && ['completed', 'result'].includes(status);
+    return `<button type="button" class="leaderboard-card" data-tournament-id="${escapeHtml(id)}">
+        <div class="leaderboard-card-head"><div><div class="leaderboard-card-title">${escapeHtml(t.name || 'Tournament')}</div><small class="text-secondary">${escapeHtml(game)}${date ? ' - ' + escapeHtml(new Date(date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })) : ''}</small></div><span class="leaderboard-status">${hasResult ? escapeHtml(status.toUpperCase()) : 'WAITING'}</span></div>
+        <div class="leaderboard-meta"><span><i class="bi bi-people-fill"></i> ${registeredCount || players.length} Players</span><span><i class="bi bi-cash-coin"></i> ₹${totalWinning.toFixed(2)}</span><span><i class="bi bi-bullseye"></i> Per Kill ₹${Number(t.perKillPrize || 0).toFixed(2)}</span></div>
+    </button>`;
+}
+async function openLeaderboardDetail(tournamentId) {
+    if (!tournamentId || !elements.leaderboardDetail) return;
+    elements.leaderboardDetail.classList.add('active');
+    elements.leaderboardDetail.innerHTML = '<div class="custom-card text-center"><div class="spinner-border spinner-border-sm"></div></div>';
+    try {
+        const snap = await get(ref(db, `tournaments/${tournamentId}`));
+        if (!snap.exists()) throw new Error('Tournament not found.');
+        const t = snap.val() || {};
+        const players = getLeaderboardPlayers(t);
+        const totalWinning = players.reduce((sum, p) => sum + p.winning, 0);
+        const status = String(t.status || 'upcoming').toLowerCase();
+        const registeredCount = Object.keys(t.registeredPlayers || {}).length;
+        const resultReady = players.length > 0 && ['completed', 'result'].includes(status);
+        const rows = players.map((p, i) => `<div class="leaderboard-row">
+            <div class="leaderboard-rank ${i < 3 ? 'top' : ''}">${p.rank || i + 1}</div>
+            <div class="leaderboard-player"><strong>${escapeHtml(p.name)}</strong><small>${escapeHtml(p.sub)}</small></div>
+            <div class="fw-bold">${p.kills}</div>
+            <div class="fw-bold text-success">₹${p.winning.toFixed(2)}</div>
+        </div>`).join('');
+        elements.leaderboardDetail.innerHTML = `<div class="custom-card">
+            <div class="leaderboard-detail-head"><div><h3 class="section-title mb-1">${escapeHtml(t.name || 'Tournament')}</h3><p class="small text-secondary mb-0">${escapeHtml(getTournamentGameName(t))} - ${registeredCount || players.length} players - Total winning ₹${totalWinning.toFixed(2)}</p></div><button type="button" class="btn btn-sm btn-custom btn-custom-secondary" id="closeLeaderboardDetailBtnEl"><i class="bi bi-x-lg"></i></button></div>
+            <div class="leaderboard-table-wrap"><div class="leaderboard-row header"><div>Rank</div><div>Player</div><div>Kills</div><div>Winning</div></div>${resultReady ? rows : '<div class="leaderboard-empty">Result abhi publish nahi hua.</div>'}</div>
+        </div>`;
+        getElement('closeLeaderboardDetailBtnEl')?.addEventListener('click', () => { elements.leaderboardDetail.classList.remove('active'); elements.leaderboardDetail.innerHTML = ''; });
+        elements.leaderboardDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+        console.error('Leaderboard detail failed:', e);
+        elements.leaderboardDetail.innerHTML = '<div class="leaderboard-empty text-danger">Could not load tournament leaderboard.</div>';
+    }
+}
+function getLeaderboardPlayers(t) {
+    const results = t?.results || t?.result || t?.winners || {};
+    const registered = t?.registeredPlayers || {};
+    const ids = new Set([...Object.keys(registered), ...Object.keys(results)]);
+    return Array.from(ids).map(uid => {
+        const reg = registered[uid] || {};
+        const result = results[uid] || reg.result || {};
+        const kills = Number(result.kills || result.kill || 0);
+        const winning = Number(result.winningAmount ?? result.totalWinning ?? result.amount ?? result.prize ?? 0);
+        const rank = Number(result.rank || result.position || 0) || null;
+        const name = reg.playerName || result.playerName || reg.userName || reg.displayName || `Player ${String(uid).slice(0, 6)}`;
+        const sub = reg.playerGameId ? `Game UID: ${reg.playerGameId}` : (reg.userEmail || reg.email || `UID: ${uid}`);
+        return { uid, rank, kills, winning, name, sub };
+    }).filter(p => p.rank || p.kills || p.winning).sort((a, b) => (a.rank || 9999) - (b.rank || 9999) || b.winning - a.winning || b.kills - a.kills);
+}
+function loadWalletData() {
+if (!currentUser) return;
+     loadRecentTransactions();
+     // Balance display is handled by populateUserInfo via the realtime listener
+}
+function loadProfileData() {
+if (!currentUser) return;
+     // Profile header data is handled by populateUserInfo via the realtime listener
+     // Ensure placeholders are removed if data already exists
+     if (userProfile?.displayName) { removePlaceholders(elements.profileName?.closest('.placeholder-glow')); removePlaceholders(elements.profileEmail?.closest('.placeholder-glow')); removePlaceholders(elements.profileTotalMatches?.closest('.placeholder-glow')); removePlaceholders(elements.profileWonMatches?.closest('.placeholder-glow')); removePlaceholders(elements.profileTotalEarnings?.closest('.placeholder-glow')); }
+ }
+function loadEarningsData() {
+if (!currentUser) return;
+     // Earnings data is handled by populateUserInfo via the realtime listener
+     if (typeof userProfile?.totalEarnings !== 'undefined') removePlaceholders(elements.earningsTotal?.closest('.placeholder-glow'));
+     if (typeof userProfile?.referralEarnings !== 'undefined') removePlaceholders(elements.earningsReferral?.closest('.placeholder-glow'));
+}
+
+async function recordTransaction(userId, type, amount, description, details = {}) {
+    if (!userId) return;
+    const transactionRef = ref(db, `transactions/${userId}`);
+    const newTransaction = { type, amount, description, timestamp: Date.now(), ...details }; // Use client time for simplicity here
+    try {
+        await push(transactionRef, newTransaction);
+} catch (e) {
+        console.error("Transaction record failed:", e);
+    }
+}
+
+async function loadRecentTransactions() {
+if (!currentUser || !elements.recentTransactionsList) return; const limit = 5;
+     elements.recentTransactionsList.innerHTML = ''; elements.recentTransactionsList.classList.add('placeholder-glow');
+     for (let i = 0; i < 2; i++) elements.recentTransactionsList.innerHTML += `<div class="custom-card p-2 mb-2 placeholder-glow"><div class="d-flex justify-content-between"><span class="placeholder col-5 h-16"></span><span class="placeholder col-3 h-16"></span></div><div class="small text-secondary mt-1"><span class="placeholder col-6 h-14"></span></div></div>`; // Placeholders
+     if (elements.noTransactionsMessage) { elements.noTransactionsMessage.style.display = 'block'; elements.noTransactionsMessage.textContent = 'Loading transactions...'; }
+     try {
+         const transRef = query(ref(db, `transactions/${currentUser.uid}`), limitToLast(limit));
+         const s = await get(transRef);
+         const transactions = s.val() || {};
+         const sortedT = Object.values(transactions).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+removePlaceholders(elements.recentTransactionsList);
+         elements.recentTransactionsList.innerHTML = ''; // Clear placeholders
+
+         if (sortedT.length > 0) {
+             if (elements.noTransactionsMessage) elements.noTransactionsMessage.style.display = 'none';
+             sortedT.forEach(t => { const item = document.createElement('div'); item.className = 'custom-card p-2 mb-2 d-flex justify-content-between align-items-center'; const isCr = t.amount > 0; const amt = `${isCr ? '+' : ''}₹${Math.abs(t.amount || 0).toFixed(2)}`; const time = t.timestamp ? new Date(t.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'N/A'; item.innerHTML = `<div><div class="small fw-bold">${t.description || t.type || 'Txn'}</div><div class="small text-secondary">${time}</div></div><div class="fw-bold ${isCr ? 'text-success' : 'text-danger'}">${amt}</div>`; elements.recentTransactionsList.appendChild(item); });
+         } else if (elements.noTransactionsMessage) {
+             elements.noTransactionsMessage.style.display = 'block';
+             elements.noTransactionsMessage.textContent = 'No recent transactions.';
+         }
+     } catch (e) { console.error("Transactions load failed:", e); removePlaceholders(elements.recentTransactionsList); elements.recentTransactionsList.innerHTML = '<p class="text-danger tc">Could not load transactions.</p>'; if (elements.noTransactionsMessage) elements.noTransactionsMessage.style.display = 'none'; }
+}
+
+
+let fullTransactionHistory=[],activeHistoryFilter='all',appNotifications=[];
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
+function safeIconClass(v,fallback='bi bi-joystick text-accent'){const s=String(v||'').trim();return /^[a-z0-9_:\-\s]+$/i.test(s)?s:fallback}
+function getTransactionAmount(t){const a=Number(t?.amount||0);return a!==0?a:Number(t?.requestedAmount||0)}
+function getTransactionKind(t){const s=String(t?.type||t?.status||'').toLowerCase();if(s.includes('pending'))return'pending';const a=getTransactionAmount(t);if(a<0||s.includes('withdraw')||s.includes('debit'))return'debit';return'credit'}
+function getTransactionIcon(k){return k==='pending'?'bi-hourglass-split text-warning':k==='debit'?'bi-arrow-up-right-circle text-danger':'bi-arrow-down-left-circle text-success'}
+function openTransactionHistory(){if(!currentUser){showSection('login-section');return}bootstrap.Modal.getOrCreateInstance(getElement('transactionHistoryModalEl')).show();enhancedLoadFullTransactionHistory().catch(e=>{console.error(e);const l=getElement('transactionHistoryListEl');if(l)l.innerHTML='<p class="text-danger text-center my-4">Could not load history.</p>'})}
+function normalizeNotification(id,d,scope){return{id,scope,title:d?.title||'Notification',message:d?.message||d?.body||'',createdAt:d?.createdAt||d?.timestamp||0,read:scope==='global'?!!d?.readBy?.[currentUser?.uid]:!!d?.read}}
+function renderNotifications(){const unread=appNotifications.filter(n=>!n.read).length;if(elements.notificationBadge){elements.notificationBadge.textContent=unread;elements.notificationBadge.style.display=unread?'flex':'none'}if(getElement('notificationCountEl'))getElement('notificationCountEl').textContent=unread;const list=getElement('notificationListEl');if(!list)return;if(!appNotifications.length){list.innerHTML='<p class="text-secondary text-center my-4">No notifications.</p>';return}list.innerHTML=appNotifications.map(n=>`<div class="notification-card ${n.read?'':'unread'}"><div class="d-flex justify-content-between gap-2"><strong>${escapeHtml(n.title)}</strong>${n.read?'<span class="notification-read-badge">Read</span>':'<span class="badge text-bg-warning">New</span>'}</div><div class="small text-secondary mt-1">${escapeHtml(n.createdAt?new Date(n.createdAt).toLocaleString([],{dateStyle:'medium',timeStyle:'short'}):'')}</div><p class="mb-0 mt-2">${escapeHtml(n.message)}</p></div>`).join('')}
+async function loadNotificationsOnce(){if(!currentUser)return;const[u,g]=await Promise.all([get(ref(db,`notifications/${currentUser.uid}`)),get(ref(db,'notifications/global'))]);appNotifications=[...Object.entries(u.val()||{}).map(([id,v])=>normalizeNotification(id,v,'user')),...Object.entries(g.val()||{}).map(([id,v])=>normalizeNotification(id,v,'global'))].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));renderNotifications()}
+function openNotifications(){bootstrap.Modal.getOrCreateInstance(getElement('notificationModalEl')).show();loadNotificationsOnce().catch(e=>console.error('Notification load failed',e))}
+function setupNotificationListeners(uid){if(!uid)return;const refresh=()=>loadNotificationsOnce().catch(e=>console.error('Notification refresh failed',e));dbListeners.notificationsUser={path:`notifications/${uid}`,func:onValue(ref(db,`notifications/${uid}`),refresh)};dbListeners.notificationsGlobal={path:'notifications/global',func:onValue(ref(db,'notifications/global'),refresh)}}
+async function markAllNotificationsRead(){if(!currentUser)return;const up={};appNotifications.forEach(n=>{if(n.scope==='global')up[`notifications/global/${n.id}/readBy/${currentUser.uid}`]=true;else up[`notifications/${currentUser.uid}/${n.id}/read`]=true});if(Object.keys(up).length)await update(ref(db),up);appNotifications=appNotifications.map(n=>({...n,read:true}));renderNotifications()}
+
+async function pushUserNotification(title, message, type = 'info', extra = {}) {
+    if (!currentUser) return;
+    try {
+        await push(ref(db, `notifications/${currentUser.uid}`), { title, message, type, read: false, createdAt: Date.now(), ...extra });
+    } catch (e) { console.warn('Notification write skipped:', e.message); }
+}
+function getStatusClass(status) {
+    const s = String(status || 'pending').toLowerCase();
+    if (['approved','success','completed','paid'].includes(s)) return 'approved';
+    if (['rejected','failed','cancelled'].includes(s)) return 'rejected';
+    return 'pending';
+}
+function statusBadge(status) {
+    const s = String(status || 'pending');
+    return `<span class="status-pill status-${getStatusClass(s)}"><i class="bi bi-circle-fill"></i>${escapeHtml(s.toUpperCase())}</span>`;
+}
+async function loadUserMoneyRequests() {
+    if (!currentUser) return [];
+    const [depSnap, widSnap] = await Promise.all([
+        get(query(ref(db, 'depositRequests'), orderByChild('userId'), equalTo(currentUser.uid))),
+        get(query(ref(db, 'withdrawals'), orderByChild('userId'), equalTo(currentUser.uid)))
+    ]);
+    const deposits = Object.entries(depSnap.val() || {}).map(([id, d]) => ({ id, type: 'deposit_request', description: `Add Amount - ${String(d.status || 'pending').toUpperCase()}`, amount: Number(d.amount || 0), requestedAmount: Number(d.amount || 0), status: d.status || 'pending', timestamp: d.createdAt || 0, createdAt: d.createdAt || 0, createdAtText: d.createdAtText || '', paymentReference: d.paymentReference || '', requestKind: 'deposit' }));
+    const withdrawals = Object.entries(widSnap.val() || {}).map(([id, w]) => ({ id, type: 'withdraw_request_status', description: `Withdraw - ${String(w.status || 'pending').toUpperCase()}`, amount: -Math.abs(Number(w.amount || 0)), requestedAmount: Number(w.amount || 0), status: w.status || 'pending', timestamp: w.createdAt || 0, createdAt: w.createdAt || 0, createdAtText: w.createdAtText || '', methodDetails: w.methodDetails || {}, rejectReason: w.rejectReason || w.reason || '', requestKind: 'withdraw' }));
+    return [...deposits, ...withdrawals];
+}
+async function enhancedLoadFullTransactionHistory() {
+    if (!currentUser) return;
+    const list = getElement('transactionHistoryListEl');
+    if (list) list.innerHTML = '<div class="text-center my-4"><div class="spinner-border spinner-border-sm"></div></div>';
+    const [txnSnap, requests] = await Promise.all([get(ref(db, `transactions/${currentUser.uid}`)), loadUserMoneyRequests()]);
+    const txns = Object.entries(txnSnap.val() || {}).map(([id, value]) => ({ id, ...value, requestKind: value.requestKind || 'transaction' }));
+    fullTransactionHistory = [...txns, ...requests].sort((a,b)=>(b.timestamp||b.createdAt||0)-(a.timestamp||a.createdAt||0));
+    renderHistoryList();
+}
+function renderRequestStatusToast() {
+    if (currentSectionId === 'wallet-section') loadRecentTransactions();
+    if (getElement('transactionHistoryModalEl')?.classList.contains('show')) enhancedLoadFullTransactionHistory().catch(console.error);
+}
+function setupMoneyRequestListeners(uid) {
+    if (!uid) return;
+    const depQ = query(ref(db, 'depositRequests'), orderByChild('userId'), equalTo(uid));
+    const widQ = query(ref(db, 'withdrawals'), orderByChild('userId'), equalTo(uid));
+    dbListeners.depositRequests = { path: 'depositRequests', func: onValue(depQ, renderRequestStatusToast) };
+    dbListeners.withdrawRequests = { path: 'withdrawals', func: onValue(widQ, renderRequestStatusToast) };
+}
+function getGameOptionsForManage() {
+    const games = appSettings.games || {};
+    const profileGames = userProfile.gameProfiles || {};
+    const map = { ...Object.fromEntries(Object.entries(profileGames).map(([id,p]) => [id, { name: p.gameName || id }])), ...games };
+    if (!Object.keys(map).length) map['free-fire'] = { name: 'Free Fire' };
+    return map;
+}
+function openGameIdsManager() {
+    if (!currentUser) return showSection('login-section');
+    const list = getElement('gameIdsManageListEl');
+    const profiles = userProfile.gameProfiles || {};
+    const games = getGameOptionsForManage();
+    list.innerHTML = Object.entries(games).map(([gameId, game]) => {
+        const saved = profiles[gameId] || {};
+        return `<div class="game-id-card" data-game-id="${escapeHtml(gameId)}"><div class="fw-bold mb-2"><i class="bi bi-controller text-accent me-1"></i>${escapeHtml(game.name || gameId)}</div><label class="form-label">In-game name</label><input class="form-control mb-2 game-profile-name" value="${escapeHtml(saved.playerName || '')}" placeholder="Player name"><label class="form-label">Game ID / UID</label><input class="form-control game-profile-id" value="${escapeHtml(saved.playerGameId || '')}" placeholder="Game ID"></div>`;
+    }).join('');
+    clearStatusMessage(getElement('gameIdsManageStatusEl'));
+    bootstrap.Modal.getOrCreateInstance(getElement('gameIdsManageModalEl')).show();
+}
+async function saveGameIdsManager() {
+    if (!currentUser) return;
+    const btn = getElement('saveGameIdsBtnEl');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...'; }
+    try {
+        const updates = {};
+        querySelAll('#gameIdsManageListEl .game-id-card').forEach(card => {
+            const gameId = card.dataset.gameId;
+            const gameName = card.querySelector('.fw-bold')?.textContent.trim() || gameId;
+            const playerName = card.querySelector('.game-profile-name')?.value.trim() || '';
+            const playerGameId = card.querySelector('.game-profile-id')?.value.trim() || '';
+            if (playerName || playerGameId) updates[`users/${currentUser.uid}/gameProfiles/${gameId}`] = { gameId, gameName, playerName, playerGameId, updatedAt: Date.now() };
+        });
+        if (Object.keys(updates).length) await update(ref(db), updates);
+        showStatusMessage(getElement('gameIdsManageStatusEl'), 'Game IDs saved.', 'success', false);
+    } catch (e) { showStatusMessage(getElement('gameIdsManageStatusEl'), `Error: ${e.message}`, 'danger'); }
+    finally { if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-save-fill"></i> Save'; } }
+}
+function openSupportTicketModal() {
+    if (!currentUser) return showSection('login-section');
+    getElement('supportSubjectInputEl').value = '';
+    getElement('supportMessageInputEl').value = '';
+    clearStatusMessage(getElement('supportTicketStatusEl'));
+    bootstrap.Modal.getOrCreateInstance(getElement('supportTicketModalEl')).show();
+    loadSupportHistory().catch(e => console.error('Support history load failed:', e));
+}
+async function loadSupportHistory() {
+    const list = getElement('supportHistoryListEl');
+    if (!currentUser || !list) return;
+    list.innerHTML = '<p class="text-secondary text-center my-3">Loading tickets...</p>';
+    try {
+        let snap;
+        try {
+            snap = await get(query(ref(db, 'supportTickets'), orderByChild('userId'), equalTo(currentUser.uid)));
+        } catch (queryError) {
+            console.warn('Support indexed query failed, using fallback:', queryError);
+            snap = await get(ref(db, 'supportTickets'));
+        }
+        const tickets = Object.entries(snap.val() || {}).map(([id, t]) => ({ id, ...t })).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+        const myTickets = tickets.filter(t => t.userId === currentUser.uid);
+        if (!myTickets.length) {
+            list.innerHTML = '<p class="text-secondary text-center my-3">Abhi koi support ticket nahi hai.</p>';
+            return;
+        }
+        list.innerHTML = myTickets.map(t => {
+            const status = String(t.status || 'open').toLowerCase();
+            const statusClass = status === 'closed' ? 'status-completed' : 'status-pending';
+            const reply = t.adminReply ? `<div class="support-reply-box"><strong><i class="bi bi-reply-fill me-1"></i>Admin Reply</strong><span>${escapeHtml(t.adminReply)}</span><small class="d-block text-secondary mt-1">${escapeHtml(t.repliedAt ? new Date(t.repliedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '')}</small></div>` : '<p class="small text-warning mb-0 mt-2">Admin reply pending hai.</p>';
+            return `<div class="support-history-card"><div class="support-history-head"><div><strong>${escapeHtml(t.subject || 'Support Ticket')}</strong><small class="d-block text-secondary">${escapeHtml(t.type || 'other')} - ${escapeHtml(t.createdAt ? new Date(t.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '')}</small></div><span class="status-pill ${statusClass}">${escapeHtml(status)}</span></div><p>${escapeHtml(t.message || '')}</p>${reply}</div>`;
+        }).join('');
+    } catch (e) {
+        console.error('Support history failed:', e);
+        list.innerHTML = '<p class="text-danger text-center my-3">Support history load nahi hua.</p>';
+    }
+}
+async function submitSupportTicket() {
+    const type = querySel('#supportTypeGridEl .support-type-card.active')?.dataset.type || 'other';
+    const subject = getElement('supportSubjectInputEl')?.value.trim() || '';
+    const message = getElement('supportMessageInputEl')?.value.trim() || '';
+    if (!subject || !message) { showStatusMessage(getElement('supportTicketStatusEl'), 'Subject aur message dono enter karein.', 'warning'); return; }
+    const btn = getElement('submitSupportTicketBtnEl');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...'; }
+    try {
+        await push(ref(db, 'supportTickets'), { userId: currentUser.uid, userEmail: currentUser.email || 'N/A', userName: userProfile.displayName || currentUser.email || 'User', type, subject, message, status: 'open', createdAt: Date.now(), createdAtText: new Date().toLocaleString(), requestTimestamp: serverTimestamp() });
+        await pushUserNotification('Support ticket created', `Ticket: ${subject}`, 'support');
+        showStatusMessage(getElement('supportTicketStatusEl'), 'Ticket submit ho gaya. Admin reply karega.', 'success', false);
+        loadSupportHistory().catch(e => console.error('Support history refresh failed:', e));
+        setTimeout(() => bootstrap.Modal.getInstance(getElement('supportTicketModalEl'))?.hide(), 1400);
+    } catch (e) { showStatusMessage(getElement('supportTicketStatusEl'), `Error: ${e.message}`, 'danger'); }
+    finally { if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send-fill"></i> Submit'; } }
+}
+function confirmJoinTournamentModal(tData, gameProfile, fee) {
+    const modalEl = getElement('joinConfirmModalEl');
+    if (!modalEl) return Promise.resolve(true);
+    const balance = Number(userProfile.balance || 0);
+    getElement('joinConfirmBodyEl').innerHTML = `<div class="join-confirm-row"><span>Tournament</span><strong>${escapeHtml(tData.name || 'Tournament')}</strong></div><div class="join-confirm-row"><span>Entry Fee</span><strong>₹${fee.toFixed(2)}</strong></div><div class="join-confirm-row"><span>Wallet Balance</span><strong>₹${balance.toFixed(2)}</strong></div><div class="join-confirm-row"><span>After Join</span><strong class="${balance-fee<0?'text-danger':'text-success'}">₹${(balance-fee).toFixed(2)}</strong></div><hr><div class="mini-status-grid"><div><span class="small text-secondary">Game</span><div class="fw-bold">${escapeHtml(gameProfile.gameName)}</div></div><div><span class="small text-secondary">Player</span><div class="fw-bold">${escapeHtml(gameProfile.playerName)}</div></div><div><span class="small text-secondary">Game ID</span><div class="fw-bold">${escapeHtml(gameProfile.playerGameId)}</div></div><div><span class="small text-secondary">Prize</span><div class="fw-bold">₹${Number(tData.prizePool||0).toFixed(2)}</div></div></div>`;
+    clearStatusMessage(getElement('joinConfirmStatusEl'));
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    return new Promise(resolve => {
+        let done = false;
+        const finish = v => { if (done) return; done = true; ok.removeEventListener('click', yes); cancel.removeEventListener('click', no); modalEl.removeEventListener('hidden.bs.modal', hidden); modal.hide(); resolve(v); };
+        const ok = getElement('confirmJoinBtnEl'), cancel = getElement('cancelJoinConfirmBtnEl');
+        const yes = () => finish(true), no = () => finish(false), hidden = () => finish(false);
+        ok.addEventListener('click', yes); cancel.addEventListener('click', no); modalEl.addEventListener('hidden.bs.modal', hidden); modal.show();
+    });
+}
+function getUserResultData(t) {
+    const uid = currentUser?.uid;
+    if (!uid || !t) return null;
+    return t.results?.[uid] || t.result?.[uid] || t.winners?.[uid] || t.registeredPlayers?.[uid]?.result || null;
+}
+function getResultBreakdownHtml(t) {
+    const r = getUserResultData(t);
+    if (!r) return '';
+    const kills = Number(r.kills || r.kill || 0), perKill = Number(t.perKillPrize || r.perKillPrize || 0), killWin = Number(r.killWinning || kills * perKill || 0), rankWin = Number(r.rankWinning || r.prize || r.amount || 0), total = Number(r.totalWinning || r.winningAmount || (killWin + rankWin));
+    return `<div class="result-breakdown-card mt-3"><h5><i class="bi bi-award-fill text-accent me-1"></i>Your Result</h5><div class="result-kpi-grid"><div class="result-kpi"><span>Rank</span><strong>${escapeHtml(r.rank || r.position || 'N/A')}</strong></div><div class="result-kpi"><span>Kills</span><strong>${kills}</strong></div><div class="result-kpi"><span>Winning</span><strong class="text-success">₹${total.toFixed(2)}</strong></div></div><p class="small text-secondary mt-2 mb-0">Kill earning ₹${killWin.toFixed(2)} + Rank prize ₹${rankWin.toFixed(2)}</p></div>`;
+}
+function getTournamentGameName(tData) {
+    return appSettings.games?.[tData?.gameId]?.name || tData?.gameName || tData?.game || tData?.gameId || 'Game';
+}
+
+function getSavedJoinGameProfile(gameId) {
+    const profile = userProfile?.gameProfiles?.[gameId] || null;
+    if (profile?.playerName && profile?.playerGameId) return profile;
+    return null;
+}
+
+function showJoinGameProfileStatus(message, type = 'warning') {
+    const el = getElement('joinGameProfileStatusEl');
+    if (!el) return;
+    el.className = `alert alert-${type} mt-3`;
+    el.textContent = message;
+    el.style.display = 'block';
+}
+
+async function ensureJoinGameProfile(tData) {
+    const gameId = tData?.gameId || 'default-game';
+    const gameName = getTournamentGameName(tData);
+    const saved = getSavedJoinGameProfile(gameId);
+    if (saved) return { gameId, gameName: saved.gameName || gameName, playerName: saved.playerName, playerGameId: saved.playerGameId };
+
+    const modalEl = getElement('gameProfileModalEl');
+    if (!modalEl) return null;
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    const gameNameInput = getElement('joinGameNameInputEl');
+    const playerNameInput = getElement('joinPlayerNameInputEl');
+    const playerGameIdInput = getElement('joinPlayerGameIdInputEl');
+    const statusEl = getElement('joinGameProfileStatusEl');
+    const saveBtn = getElement('saveGameProfileBtnEl');
+    const cancelBtn = getElement('cancelGameProfileBtnEl');
+    if (gameNameInput) gameNameInput.value = gameName;
+    if (playerNameInput) playerNameInput.value = '';
+    if (playerGameIdInput) playerGameIdInput.value = '';
+    if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+
+    return await new Promise((resolve) => {
+        let settled = false;
+        const finish = (value) => {
+            if (settled) return;
+            settled = true;
+            saveBtn?.removeEventListener('click', onSave);
+            cancelBtn?.removeEventListener('click', onCancel);
+            modalEl.removeEventListener('hidden.bs.modal', onHidden);
+            modal.hide();
+            resolve(value);
+        };
+        const onCancel = () => finish(null);
+        const onHidden = () => finish(null);
+        const onSave = async () => {
+            const playerName = playerNameInput?.value.trim() || '';
+            const playerGameId = playerGameIdInput?.value.trim() || '';
+            if (!playerName) { showJoinGameProfileStatus('Enter in-game name.'); return; }
+            if (!playerGameId) { showJoinGameProfileStatus('Enter game ID / UID.'); return; }
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...'; }
+            const profile = { gameId, gameName, playerName, playerGameId, updatedAt: Date.now() };
+            try {
+                await update(ref(db, `users/${currentUser.uid}/gameProfiles/${gameId}`), profile);
+                if (!userProfile.gameProfiles) userProfile.gameProfiles = {};
+                userProfile.gameProfiles[gameId] = profile;
+                finish(profile);
+            } catch (e) {
+                console.error('Game profile save failed:', e);
+                showJoinGameProfileStatus(`Could not save game profile: ${e.message}`, 'danger');
+            } finally {
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="bi bi-save-fill me-1"></i>Save & Join'; }
+            }
+        };
+        saveBtn?.addEventListener('click', onSave);
+        cancelBtn?.addEventListener('click', onCancel);
+        modalEl.addEventListener('hidden.bs.modal', onHidden);
+        modal.show();
+    });
+}
+async function handleJoinTournamentClick(event) {
+     if (!currentUser) { alert("Login to join."); showSection('login-section'); return; }
+     const btn = event.currentTarget; const tId = btn.dataset.tournamentId; const fee = parseFloat(btn.dataset.fee || 0);
+     if (!tId) return;
+     const uRef = ref(db, `users/${currentUser.uid}`); const tRef = ref(db, `tournaments/${tId}`);
+     let tData = null;
+     let transactionResult = null;
+     let gameProfile = null;
+
+     try {
+         const preJoinSnapshot = await get(tRef);
+         if (!preJoinSnapshot.exists()) throw new Error("Tournament not found.");
+         tData = preJoinSnapshot.val();
+         if (tData.status !== 'upcoming') throw new Error("Tournament closed.");
+         const preRegCount = tData.registeredPlayers ? Object.keys(tData.registeredPlayers).length : 0;
+         if (tData.maxPlayers > 0 && preRegCount >= tData.maxPlayers) throw new Error("Tournament full.");
+         gameProfile = await ensureJoinGameProfile(tData);
+         if (!gameProfile) throw new Error("Game name and ID required to join.");
+         if (!(await confirmJoinTournamentModal(tData, gameProfile, fee))) return;
+         btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+         transactionResult = await runTransaction(uRef, (profileData) => {
+             if (!profileData) throw new Error("User profile missing.");
+             if ((profileData.balance || 0) < fee) throw new Error("Insufficient balance.");
+             if (profileData.joinedTournaments?.[tId]) return;
+             profileData.balance = (profileData.balance || 0) - fee;
+             if (!profileData.joinedTournaments) profileData.joinedTournaments = {};
+             profileData.joinedTournaments[tId] = true;
+             return profileData;
+         });
+
+         if (!transactionResult.committed && userProfile?.joinedTournaments?.[tId]) throw new Error("Already joined this tournament.");
+         if (!transactionResult.committed) throw new Error("Join transaction failed.");
+
+         const snapshot = await get(tRef);
+         if (!snapshot.exists()) throw new Error("Tournament not found after transaction.");
+         tData = snapshot.val();
+         if (tData.status !== 'upcoming') throw new Error("Tournament closed after balance check.");
+         const rC = tData.registeredPlayers ? Object.keys(tData.registeredPlayers).length : 0;
+         if (tData.maxPlayers > 0 && rC >= tData.maxPlayers) throw new Error("Tournament full after balance check.");
+
+         const updates = {};
+         updates[`tournaments/${tId}/registeredPlayers/${currentUser.uid}`] = {
+             joinedAt: serverTimestamp(),
+             playerName: gameProfile.playerName,
+             playerGameId: gameProfile.playerGameId,
+             gameName: gameProfile.gameName,
+             gameId: gameProfile.gameId,
+             userEmail: currentUser.email || 'N/A'
+         };
+         await update(ref(db), updates);
+
+         await recordTransaction(currentUser.uid, 'tournament_join', -fee, `Joined: ${tData.name || 'Tournament'}`, { tournamentId: tId, playerName: gameProfile.playerName, playerGameId: gameProfile.playerGameId, gameName: gameProfile.gameName });
+         await pushUserNotification('Tournament joined', `${tData.name || 'Tournament'} joined. Entry fee ₹${fee.toFixed(2)} deducted.`, 'tournament', { tournamentId: tId }); alert(`Joined! ₹${fee.toFixed(2)} deducted.`);
+
+         const finalSnapshot = await get(tRef);
+         if (finalSnapshot.exists()) {
+             const finalTData = finalSnapshot.val();
+             const cardEl = btn.closest('.tournament-card');
+             if (cardEl) cardEl.parentNode.replaceChild(createTournamentCardElement(tId, finalTData), cardEl);
+             else if (currentSectionId === 'tournaments-section' && currentTournamentGameId) filterTournaments(currentTournamentGameId, 'upcoming');
+             if (currentSectionId === 'home-section') loadMyContests();
+         }
+         if (currentSectionId === 'wallet-section') loadRecentTransactions();
+
+     } catch (e) {
+         console.error("Join failed:", e);
+         alert(`Failed: ${e.message}`);
+         const currentBtn = event.currentTarget;
+         if (currentBtn && e.message !== "Already joined this tournament.") {
+              currentBtn.disabled = false;
+              currentBtn.innerHTML = `₹${fee.toFixed(2)} Join <i class="bi bi-arrow-right-short"></i>`;
+         }
+         if (e.message !== "Insufficient balance." && e.message !== "User profile missing." && e.message !== "Already joined this tournament." && transactionResult?.committed) {
+             try {
+                 const refundTx = await runTransaction(uRef, (profileData) => {
+                     if (profileData) {
+                         profileData.balance = (profileData.balance || 0) + fee;
+                         if(profileData.joinedTournaments?.[tId]) {
+                             delete profileData.joinedTournaments[tId];
+                             if(Object.keys(profileData.joinedTournaments).length === 0) delete profileData.joinedTournaments;
+                         }
+                     }
+                     return profileData;
+                 });
+                 if(refundTx.committed) {
+                     await recordTransaction(currentUser.uid, 'join_failed_refund', fee, `Refund Failed Join: ${tData?.name || 'Tournament'}`);
+                     alert("Join failed, but your balance was refunded.");
+                 }
+             } catch (refundError) {
+                 console.error("CRITICAL: FAILED TO REFUND BALANCE!", refundError);
+                 alert(`Join failed. CRITICAL: Failed to refund balance (₹${fee.toFixed(2)})! Contact support immediately.`);
+             }
+         }
+     }
+}
+
+// --- Modal Handlers ---
+let withdrawIfscTimer=null;
+function setWithdrawMethod(m){const e=getElement('withdrawMethodTypeEl');if(e)e.value=m;querySelAll('#withdrawMethodTabs .withdraw-method-tab').forEach(b=>b.classList.toggle('active',b.dataset.method===m));if(getElement('withdrawUpiGroup'))getElement('withdrawUpiGroup').style.display=m==='upi'?'block':'none';if(getElement('withdrawBankGroup'))getElement('withdrawBankGroup').style.display=m==='bank'?'block':'none';updateWithdrawSummary()}
+function hasSavedPayoutDetails(saved){return !!(saved&&(saved.upi?.upiId||saved.bank?.accountNumber))}
+function maskPayoutValue(v,keep=4){const s=String(v||'').trim();if(!s)return'';if(s.includes('@')){const [name,domain]=s.split('@');return `${name.slice(0,2)}***@${domain||'upi'}`}return s.length<=keep?`***${s}`:`***${s.slice(-keep)}`}
+function setWithdrawDetailsEditing(editing){const form=getElement('withdrawDetailsFormEl'),card=getElement('savedPayoutCardEl');if(form)form.classList.toggle('is-collapsed',!editing);if(card)card.dataset.editing=editing?'true':'false'}
+function renderSavedPayoutCard(){const saved=userProfile.payoutDetails||{},card=getElement('savedPayoutCardEl');if(!card)return;const hasSaved=hasSavedPayoutDetails(saved);card.style.display=hasSaved?'block':'none';if(!hasSaved){card.innerHTML='';setWithdrawDetailsEditing(true);return}const method=(saved.lastMethod||saved.method||'upi')==='bank'&&saved.bank?'bank':'upi';const label=method==='bank'?'Bank Account':'UPI Account';const icon=method==='bank'?'bi-bank':'bi-phone';const holder=saved.accountHolderName||saved.upi?.upiHolderName||userProfile.displayName||'Not set';const primary=method==='bank'?maskPayoutValue(saved.bank?.accountNumber):maskPayoutValue(saved.upi?.upiId);const extra=method==='bank'?(saved.bank?.bankName||saved.bank?.ifscCode||'Bank details saved'):(saved.upi?.upiHolderName||'UPI details saved');card.innerHTML=`<div class="saved-payout-head"><div><div class="saved-payout-title"><i class="bi ${icon} text-accent"></i>${label}</div><span class="saved-payout-badge"><i class="bi bi-shield-check"></i> Saved for next withdraw</span></div><button type="button" class="btn btn-custom btn-custom-secondary btn-sm" id="editSavedPayoutBtnEl"><i class="bi bi-pencil-square"></i> Edit</button></div><div class="saved-payout-lines"><div class="saved-payout-line"><span>Holder</span><strong>${escapeHtml(holder)}</strong></div><div class="saved-payout-line"><span>${method==='bank'?'Account':'UPI ID'}</span><strong>${escapeHtml(primary)}</strong></div><div class="saved-payout-line"><span>Details</span><strong>${escapeHtml(extra)}</strong></div></div><div class="saved-payout-actions"><button type="button" class="btn btn-custom btn-custom-primary" id="useSavedPayoutBtnEl"><i class="bi bi-check2-circle"></i> Use Saved</button><button type="button" class="btn btn-custom btn-custom-secondary" id="changeSavedPayoutBtnEl"><i class="bi bi-arrow-repeat"></i> Change</button></div>`;setWithdrawDetailsEditing(false)}
+function fillSavedWithdrawDetails(){const saved=userProfile.payoutDetails||{};const method=saved.lastMethod||saved.method||'upi';if(getElement('withdrawAccountNameEl'))getElement('withdrawAccountNameEl').value=saved.accountHolderName||userProfile.displayName||'';if(saved.upi){if(elements.withdrawMethodInput)elements.withdrawMethodInput.value=saved.upi.upiId||'';if(getElement('withdrawUpiNameEl'))getElement('withdrawUpiNameEl').value=saved.upi.upiHolderName||saved.accountHolderName||userProfile.displayName||''}else{if(elements.withdrawMethodInput)elements.withdrawMethodInput.value=userProfile.upiId||'';if(getElement('withdrawUpiNameEl'))getElement('withdrawUpiNameEl').value=userProfile.upiName||userProfile.displayName||''}if(saved.bank){if(getElement('withdrawAccountNumberEl'))getElement('withdrawAccountNumberEl').value=saved.bank.accountNumber||'';if(getElement('withdrawIfscCodeEl'))getElement('withdrawIfscCodeEl').value=saved.bank.ifscCode||'';if(getElement('withdrawBankNameEl'))getElement('withdrawBankNameEl').value=saved.bank.bankName||'';if(getElement('withdrawBranchNameEl'))getElement('withdrawBranchNameEl').value=saved.bank.branchName||'';if(getElement('withdrawBankAddressEl'))getElement('withdrawBankAddressEl').value=saved.bank.bankAddress||''}else{if(getElement('withdrawAccountNumberEl'))getElement('withdrawAccountNumberEl').value='';if(getElement('withdrawIfscCodeEl'))getElement('withdrawIfscCodeEl').value=''}setWithdrawMethod(method==='bank'?'bank':'upi');renderSavedPayoutCard()}
+async function savePayoutDetails(details){if(!currentUser||!details)return;const existing=userProfile.payoutDetails||{};const payout={...existing,lastMethod:details.methodName==='Bank'?'bank':'upi',accountHolderName:details.accountHolderName||existing.accountHolderName||''};if(details.methodName==='Bank')payout.bank={accountNumber:details.accountNumber||'',ifscCode:details.ifscCode||'',bankName:details.bankName||'',branchName:details.branchName||'',bankAddress:details.bankAddress||''};else payout.upi={upiId:details.upiId||'',upiHolderName:details.upiHolderName||''};await update(ref(db,`users/${currentUser.uid}`),{payoutDetails:payout});userProfile.payoutDetails=payout;renderSavedPayoutCard()}
+function clearBankLookupInfo(){const box=getElement('bankLookupBoxEl');if(box){box.style.display='none';box.innerHTML=''}['withdrawBankNameEl','withdrawBranchNameEl','withdrawBankAddressEl'].forEach(id=>{const e=getElement(id);if(e)e.value=''})}
+function getWithdrawMethodDetails(){const m=getElement('withdrawMethodTypeEl')?.value||'upi',holder=getElement('withdrawAccountNameEl')?.value.trim()||'';if(m==='bank'){const accountNumber=getElement('withdrawAccountNumberEl')?.value.trim()||'',ifscCode=(getElement('withdrawIfscCodeEl')?.value.trim()||'').toUpperCase(),bankName=getElement('withdrawBankNameEl')?.value||'',branchName=getElement('withdrawBranchNameEl')?.value||'',bankAddress=getElement('withdrawBankAddressEl')?.value||'';return{methodName:'Bank',accountHolderName:holder,accountInfo:`${accountNumber} / ${ifscCode}`,accountNumber,ifscCode,bankName,branchName,bankAddress}}const upiId=getElement('withdrawMethodInputEl')?.value.trim()||'',upiHolderName=getElement('withdrawUpiNameEl')?.value.trim()||'';return{methodName:'UPI',accountHolderName:holder,accountInfo:upiId,upiId,upiHolderName}}
+function updateWithdrawSummary(){const amount=Number(getElement('withdrawAmountInputEl')?.value||0),d=getWithdrawMethodDetails(),s=getElement('withdrawSummaryEl');if(!s)return;const target=d.methodName==='Bank'?([d.bankName,d.branchName].filter(Boolean).join(' • ')||d.ifscCode||'Bank details'):(d.upiId||'UPI ID');s.innerHTML=`Request: <strong>₹${amount?amount.toFixed(2):'0.00'}</strong><br>To: <strong>${escapeHtml(target)}</strong>`}
+async function lookupIfscDetails(){const ifsc=(getElement('withdrawIfscCodeEl')?.value||'').trim().toUpperCase(),box=getElement('bankLookupBoxEl');clearBankLookupInfo();if(!ifsc||ifsc.length<11){updateWithdrawSummary();return}if(box){box.style.display='block';box.innerHTML='<span class="text-secondary">Finding bank details...</span>'}try{const r=await fetch(`https://ifsc.razorpay.com/${encodeURIComponent(ifsc)}`);if(!r.ok)throw new Error('Invalid IFSC');const d=await r.json();if(getElement('withdrawBankNameEl'))getElement('withdrawBankNameEl').value=d.BANK||'';if(getElement('withdrawBranchNameEl'))getElement('withdrawBranchNameEl').value=d.BRANCH||'';if(getElement('withdrawBankAddressEl'))getElement('withdrawBankAddressEl').value=d.ADDRESS||'';if(box)box.innerHTML=`<strong>${escapeHtml(d.BANK||'')}</strong><br>${escapeHtml(d.BRANCH||'')}<br><span class="small">${escapeHtml(d.ADDRESS||'')}</span>`}catch(e){if(box)box.innerHTML='<span class="text-warning">Bank details auto find nahi hua. IFSC check karein.</span>'}updateWithdrawSummary()}
+function scheduleIfscLookup(){clearTimeout(withdrawIfscTimer);withdrawIfscTimer=setTimeout(lookupIfscDetails,500);updateWithdrawSummary()}
+function handleWithdrawClick(){if(!currentUser||!elements.withdrawModalInstance)return;const wc=Number(userProfile.winningCash||0),minW=Number(appSettings?.minWithdraw||50);if(elements.minWithdrawAmount)elements.minWithdrawAmount.textContent=minW;if(elements.withdrawModalBalance)elements.withdrawModalBalance.textContent=`₹${wc.toFixed(2)}`;if(elements.withdrawAmountInput){elements.withdrawAmountInput.value='';elements.withdrawAmountInput.min=minW}clearBankLookupInfo();clearStatusMessage(elements.withdrawStatusMessage);fillSavedWithdrawDetails();elements.withdrawModalInstance.show()}
+
+async function handleMatchDetailsClick(event) {
+if (!elements.matchDetailsModalInstance) return; const tId = event.currentTarget.dataset.tournamentId; if (!tId) return;
+     elements.matchDetailsModalTitle.textContent = 'Loading...'; elements.matchDetailsModalBody.innerHTML = '<div class="tc p-5"><div class="spinner-border spinner-border-sm"></div></div>';
+     elements.matchDetailsModalInstance.show();
+     try {
+         const tRef = ref(db, `tournaments/${tId}`);
+         const s = await get(tRef);
+         if (s.exists()) {
+             const t = s.val();
+             const gName = appSettings.games?.[t.gameId]?.name || t.gameId || 'N/A';
+             const sTimeLoc = t.startTime ? new Date(t.startTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short'}) : 'TBA';
+             let pDistHTML = '';
+             if (t.prizeDistribution) {
+                 // Try to format nicely, fallback to JSON string
+                 let fmtDist = '';
+                 if (typeof t.prizeDistribution === 'object') {
+                     fmtDist = Object.entries(t.prizeDistribution)
+                                  .map(([rank, prize]) => `Rank ${escapeHtml(rank)}: ₹${escapeHtml(prize)}`)
+                                  .join('\n');
+                 } else {
+                     fmtDist = String(t.prizeDistribution).replace(/\\n/g, '\n');
+                 }
+                 pDistHTML = `<h5>Prize Distribution:</h5><pre>${escapeHtml(fmtDist)}</pre>`;
+             }
+             const desc = t.description || 'Standard rules apply.';
+             const fmtDesc = escapeHtml(desc).replace(/\n/g, '<br>'); // Handle newlines in description
+             const userResultHTML = getResultBreakdownHtml(t);
+             elements.matchDetailsModalTitle.textContent = t.name || 'Match Details';
+             elements.matchDetailsModalBody.innerHTML = `<p><strong>Game:</strong> ${escapeHtml(gName)}</p><p><strong>Mode:</strong> ${escapeHtml(t.mode || 'N/A')}</p><p><strong>Map:</strong> ${escapeHtml(t.map || 'N/A')}</p><p><strong>Starts:</strong> ${escapeHtml(sTimeLoc)}</p><hr><p><strong>Entry:</strong> ${t.entryFee > 0 ? `₹${escapeHtml(t.entryFee)}` : 'Free'}</p><p><strong>Prize:</strong> ₹${escapeHtml(t.prizePool || 0)}</p><p><strong>Per Kill:</strong> ₹${escapeHtml(t.perKillPrize || 0)}</p><p><strong>Max Players:</strong> ${t.maxPlayers > 0 ? escapeHtml(t.maxPlayers) : 'Unlimited'}</p><hr><h5>Rules:</h5><div style="white-space: pre-wrap; line-height: 1.6;">${fmtDesc}</div>${pDistHTML}${userResultHTML}`;
+         } else elements.matchDetailsModalBody.innerHTML = '<p class="text-danger">Details not found.</p>';
+     } catch (e) { console.error("Details load failed:", e); elements.matchDetailsModalBody.innerHTML = '<p class="text-danger">Error loading details.</p>'; }
+ }
+
+ async function handleIdPasswordClick(event) {
+     if (!elements.idPasswordModalInstance) return;
+     const tId = event.currentTarget.dataset.tournamentId;
+     if (!tId) return; if (!currentUser || !userProfile?.joinedTournaments?.[tId]) {
+         console.warn("Client-side check failed: User not logged in or tId not found in userProfile.joinedTournaments");
+         alert("Join the tournament first or refresh the page.");
+         return;
+     }
+
+     elements.roomIdDisplay.innerHTML = '<span class="placeholder col-6"></span>';
+     elements.roomPasswordDisplay.innerHTML = '<span class="placeholder col-6"></span>';
+     elements.idPasswordModalInstance.show();
+     try {
+         const tournamentRef = ref(db, `tournaments/${tId}`); // <<< Correct path
+const s = await get(tournamentRef);
+removePlaceholders(elements.roomIdDisplay.closest('.placeholder-glow'));
+         removePlaceholders(elements.roomPasswordDisplay.closest('.placeholder-glow'));
+
+         if (s.exists()) {
+             const tournamentData = s.val();
+             // Check manual show or auto-release timing from tournament data
+              if (canShowRoomIdPass(tournamentData)) {
+                  elements.roomIdDisplay.textContent = tournamentData.roomId || 'Not updated yet';
+                  elements.roomPasswordDisplay.textContent = tournamentData.roomPassword || 'Not updated yet';
+             } else {
+                 const mins = Number(tournamentData.roomReleaseMinutes ?? 15);
+                 elements.roomIdDisplay.textContent = tournamentData.autoReleaseRoom === false ? 'Hidden by Admin' : `${mins} min before match`;
+                 elements.roomPasswordDisplay.textContent = 'Hidden by Admin';
+             }
+         } else {
+             elements.roomIdDisplay.textContent = 'Not Found'; // Tournament doesn't exist
+             elements.roomPasswordDisplay.textContent = 'Not Found';
+         }
+     } catch (e) {
+         console.error("ID/Pass fetch error:", e);
+         removePlaceholders(elements.roomIdDisplay.closest('.placeholder-glow'));
+         removePlaceholders(elements.roomPasswordDisplay.closest('.placeholder-glow'));
+         elements.roomIdDisplay.textContent = 'Error';
+         elements.roomPasswordDisplay.textContent = 'Error';
+         alert("Error loading ID/Password. Check permissions or network.");
+     }
+ }
+
+ async function handlePolicyClick(event) {
+if (!elements.policyModalInstance) { console.error("Policy modal instance not found"); return; }
+     event.preventDefault();
+     const target = event.currentTarget;
+     const policyType = target.dataset.policy;
+if (!policyType) return;
+
+     let title = '', contentRefPath = '', modalBodyContent = '<div class="text-center p-5"><div class="spinner-border spinner-border-sm"></div></div>';
+     elements.policyModalBody.innerHTML = modalBodyContent;
+
+     // Use settings data for policies (adjust path based on your settings structure if needed)
+     switch (policyType) {
+         case 'privacy': title = 'Privacy Policy'; modalBodyContent = appSettings.policyPrivacy || 'Content not available.'; break;
+         case 'terms': title = 'Terms and Conditions'; modalBodyContent = appSettings.policyTerms || 'Content not available.'; break;
+         case 'refund': title = 'Refund and Cancellation'; modalBodyContent = appSettings.policyRefund || 'Content not available.'; break;
+         case 'fairPlay': title = 'Fair Play Policy'; modalBodyContent = appSettings.policyFairPlay || 'Content not available.'; break;
+         case 'refer':
+             title = 'Refer & Earn';
+             if (!currentUser) { alert("Login to view referral."); return; }
+             const refCode = userProfile.referralCode || 'N/A';
+             const refBonus = appSettings?.referralBonus || 0; // Use loaded setting
+             const refDesc = appSettings?.referralDescription || `Get ₹${refBonus} when your friend joins using your code.`; // Use loaded setting
+             modalBodyContent = `<div class="text-center"><h4>Refer Friends!</h4><p class="text-secondary">Share code & earn!</p><div class="my-4 p-3" style="background: var(--primary-bg); border-radius: 8px;"><p class="small text-secondary mb-1">Your Code:</p><h3 class="text-accent referral-code" id="referralCodeDisplay">${refCode}</h3><div class="mt-3"><button class="btn btn-sm btn-custom btn-custom-secondary me-2 copy-btn" data-target="#referralCodeDisplay"><i class="bi bi-clipboard"></i> Copy</button><button class="btn btn-sm btn-custom btn-custom-secondary" id="shareReferralBtn"><i class="bi bi-share-fill"></i> Share</button></div></div><p class="mt-3 small text-secondary">${refDesc}</p></div>`;
+             break;
+         default:
+             title = 'Info';
+             console.warn("Unknown policy:", policyType);
+             modalBodyContent = '<p>Content unavailable.</p>';
+     }
+
+     elements.policyModalTitle.textContent = title;
+     // Handle simple text content, replace \n with <br>
+     if (typeof modalBodyContent === 'string' && policyType !== 'refer') {
+         elements.policyModalBody.innerHTML = modalBodyContent.replace(/\n/g, '<br>');
+     } else {
+         elements.policyModalBody.innerHTML = modalBodyContent; // For referral HTML or errors
+     }
+elements.policyModalInstance.show();
+ }
+
+
+// --- Realtime Listeners Setup ---
+ function setupRealtimeListeners(uid) {
+     if (!uid || !db || !currentUser) return;
+     detachAllDbListeners(); // Ensure no duplicates
+const uRef = ref(db, `users/${uid}`);
+     const listFunc = onValue(uRef, (s) => {
+         if (currentUser && currentUser.uid === uid) { // Check if user is still the logged-in one
+             if (s.exists()) {
+userProfile = s.val();
+                 populateUserInfo(currentUser, userProfile); // Update UI with latest data
+                 // Refresh sections that depend on profile changes (like My Contests)
+                 if (currentSectionId === 'home-section') loadMyContests();
+                 if (currentSectionId === 'wallet-section') loadRecentTransactions(); // Balance might change
+             } else {
+                 console.warn("User data deleted (realtime) for:", uid);
+                 alert("Account data missing or deleted. Logging out.");
+                 logoutUser();
+             }
+         } else {
+off(uRef, 'value', listFunc); // Detach listener if user changed
+         }
+     }, (e) => {
+         console.error("Listener error (user profile):", e);
+         // Optionally try to re-attach or show error
+     });
+     dbListeners['userProfile'] = { path: `users/${uid}`, func: listFunc };
+ }
+
+ function detachAllDbListeners() {
+let count = 0;
+     for (const k in dbListeners) {
+         try {
+             const { path, func } = dbListeners[k];
+             if (path && func) {
+                  if (typeof func === 'function') func(); else off(ref(db, path), 'value', func);
+                  count++;
+             } else {
+                 console.warn(`Listener object invalid for key: ${k}`);
+             }
+         } catch (e) { console.error(`Detach error ${k}:`, e); }
+     }
+     dbListeners = {};
+}
+// --- Event Listeners Initialization ---
+function initializeEventListeners() {
+     if (!elements) return; // Bottom Nav
+     document.querySelectorAll('.modal').forEach(modal => {
+         modal.addEventListener('hide.bs.modal', () => blurFocusedModalElement(modal));
+         modal.addEventListener('hidden.bs.modal', unlockPageScrollIfNoModal);
+     });
+     elements.bottomNavItems?.forEach(item => item.addEventListener('click', (e) => { e.preventDefault(); showSection(item.dataset.section); }));
+     elements.refreshLeaderboardBtn?.addEventListener('click', loadLeaderboards);
+     elements.leaderboardList?.addEventListener('click', (e) => { const card = e.target.closest('.leaderboard-card[data-tournament-id]'); if (card) openLeaderboardDetail(card.dataset.tournamentId); });
+     // Header Back
+     elements.headerBackBtn?.addEventListener('click', () => showSection('home-section'));
+     // Tournament Tabs
+     elements.tournamentTabs?.forEach(tab => tab.addEventListener('click', (e) => { const s = e.currentTarget.dataset.status; if (currentTournamentGameId && s) { elements.tournamentTabs.forEach(t => t.classList.remove('active')); e.currentTarget.classList.add('active'); filterTournaments(currentTournamentGameId, s); } }));
+
+     // Login/Signup Forms
+     elements.loginEmailBtn?.addEventListener('click', loginWithEmail);
+     elements.signupEmailBtn?.addEventListener('click', signUpWithEmail);
+     elements.showSignupToggleBtn?.addEventListener('click', () => toggleLoginForm(false)); // Show Signup
+     elements.showLoginToggleBtn?.addEventListener('click', () => toggleLoginForm(true)); // Show Login
+     elements.forgotPasswordLink?.addEventListener('click', (e) => { e.preventDefault(); resetPassword(); });
+
+     // Profile Actions
+     elements.logoutProfileBtn?.addEventListener('click', logoutUser);
+     elements.policyLinks?.forEach(link => link.addEventListener('click', handlePolicyClick)); // <<< Listener for policies
+     getElement('manageGameIdsBtnEl')?.addEventListener('click', openGameIdsManager);
+     getElement('saveGameIdsBtnEl')?.addEventListener('click', saveGameIdsManager);
+     getElement('supportTicketBtnEl')?.addEventListener('click', openSupportTicketModal);
+     getElement('submitSupportTicketBtnEl')?.addEventListener('click', submitSupportTicket);
+     getElement('refreshSupportHistoryBtnEl')?.addEventListener('click', () => loadSupportHistory().catch(e => console.error(e)));
+     getElement('supportTypeGridEl')?.addEventListener('click', (e) => { const btn=e.target.closest('.support-type-card'); if(!btn) return; querySelAll('#supportTypeGridEl .support-type-card').forEach(x=>x.classList.toggle('active', x===btn)); });
+
+     // Wallet Actions
+     elements.withdrawBtn?.addEventListener('click', handleWithdrawClick);
+     elements.addAmountWalletBtn?.addEventListener('click', openAddAmountModal);
+     elements.submitWithdrawRequestBtn?.addEventListener('click', submitWithdrawRequestHandler);
+     getElement('payNowBtn')?.addEventListener('click', generateAddAmountQr);
+     getElement('addAmountInput')?.addEventListener('input', updateQuickAmountState);
+     querySelAll('#quickAmountButtons .amount-chip').forEach(btn => btn.addEventListener('click', () => { getElement('addAmountInput').value = btn.dataset.amount; updateQuickAmountState(); generateAddAmountQr(); }));
+     getElement('copyAddUpiBtn')?.addEventListener('click', copyAddAmountUpi);
+     getElement('paidBtn')?.addEventListener('click', submitManualDepositRequest);
+     querySelAll('#withdrawQuickAmountButtons .amount-chip').forEach(btn => btn.addEventListener('click', () => { elements.withdrawAmountInput.value = btn.dataset.amount; updateWithdrawSummary(); }));
+     querySelAll('#withdrawMethodTabs .withdraw-method-tab').forEach(btn => btn.addEventListener('click', () => setWithdrawMethod(btn.dataset.method)));
+     ['withdrawAmountInputEl','withdrawAccountNameEl','withdrawMethodInputEl','withdrawUpiNameEl','withdrawAccountNumberEl'].forEach(id => getElement(id)?.addEventListener('input', updateWithdrawSummary));
+     getElement('withdrawIfscCodeEl')?.addEventListener('input', scheduleIfscLookup);
+     document.addEventListener('click', (event) => {const id=event.target?.closest?.('button')?.id;if(id==='editSavedPayoutBtnEl'||id==='changeSavedPayoutBtnEl')setWithdrawDetailsEditing(true);if(id==='useSavedPayoutBtnEl')fillSavedWithdrawDetails();});
+     getElement('historyRefreshBtnEl')?.addEventListener('click', enhancedLoadFullTransactionHistory);
+     getElement('historyFilterTabsEl')?.addEventListener('click', (e) => { const btn=e.target.closest('.history-filter'); if(!btn) return; activeHistoryFilter=btn.dataset.filter; querySelAll('#historyFilterTabsEl .history-filter').forEach(x=>x.classList.toggle('active', x===btn)); renderHistoryList(); });
+     getElement('markAllNotificationsReadBtnEl')?.addEventListener('click', () => markAllNotificationsRead().catch(e => console.error(e)));
+
+     // Other Actions
+     elements.notificationBtn?.addEventListener('click', openNotifications);
+     elements.allTransactionsBtn?.addEventListener('click', openTransactionHistory);
+     elements.viewEarningsHistoryBtn?.addEventListener('click', openTransactionHistory);
+     elements.appUpdateActionBtn?.addEventListener('click', (e) => { if (!String(appSettings.updateLink || '').trim()) e.preventDefault(); });
+
+     // Delegated Event Listener for Copy/Share buttons
+     document.body.addEventListener('click', (event) => {
+        // Copy Button
+        if (event.target.matches('.copy-btn') || event.target.closest('.copy-btn')) {
+            const btn = event.target.closest('.copy-btn');
+            const targetSelector = btn.dataset.target; // Expects #elementId selector
+            if (targetSelector) {
+                copyToClipboard(targetSelector);
+            } else {
+                console.warn("Copy button missing data-target selector.");
+            }
+        }
+        // Share Button (in Refer modal)
+        if (event.target.matches('#shareReferralBtn') || event.target.closest('#shareReferralBtn')) {
+            const cel = getElement('referralCodeDisplay');
+            if (cel) shareReferral(cel.textContent);
+        }
+     });
+}
+
+// --- App Initialization ---
+ document.addEventListener('DOMContentLoaded', () => {
+// Check if Firebase was initialized (handles the case where config was bad)
+     if (typeof initializeApp !== 'function' || !auth || !db) {
+         console.error("Firebase SDK failed/not ready. Cannot proceed.");
+         // The error message should already be displayed by the catch block during initialization
+         return;
+     }
+     showLoader(true);
+     // Load settings first, then set up listeners and auth state
+     loadAppSettings()
+         .then(() => {
+initializeEventListeners();
+             setupSettingsListener();
+             updateGlobalUI(false); // Initial UI state (logged out)
+             onAuthStateChanged(auth, handleAuthStateChange); // Start listening for auth changes
+         })
+         .catch(err => {
+             // Handle critical settings load failure if needed
+             console.error("CRITICAL: Initial settings load failed:", err);
+             alert("Error loading essential app settings. Please try again later.");
+             // Still try to initialize base UI and Auth listener if possible
+             initializeEventListeners();
+             setupSettingsListener();
+             updateGlobalUI(false);
+             onAuthStateChanged(auth, handleAuthStateChange);
+         })
+         .finally(() => {
+             // Loader should be hidden by onAuthStateChanged after login/logout logic completes
+         });
+ });
+
+
+function renderHistoryList(){
+    const list=getElement('transactionHistoryListEl'); if(!list)return;
+    const rows=fullTransactionHistory.filter(t=>activeHistoryFilter==='all'||getTransactionKind(t)===activeHistoryFilter);
+    const count=getElement('historyCountEl'); if(count)count.textContent=`${rows.length} records`;
+    const credit=fullTransactionHistory.filter(t=>getTransactionKind(t)==='credit').reduce((s,t)=>s+Math.abs(getTransactionAmount(t)),0);
+    const debit=fullTransactionHistory.filter(t=>getTransactionKind(t)==='debit').reduce((s,t)=>s+Math.abs(getTransactionAmount(t)),0);
+    const pending=fullTransactionHistory.filter(t=>getTransactionKind(t)==='pending').length;
+    if(getElement('historyCreditTotalEl'))getElement('historyCreditTotalEl').textContent=`₹${credit.toFixed(2)}`;
+    if(getElement('historyDebitTotalEl'))getElement('historyDebitTotalEl').textContent=`₹${debit.toFixed(2)}`;
+    if(getElement('historyPendingCountEl'))getElement('historyPendingCountEl').textContent=pending;
+    if(!rows.length){list.innerHTML='<p class="text-secondary text-center my-4">No records found.</p>';return;}
+    list.innerHTML=rows.map(t=>{
+        const k=getTransactionKind(t),a=getTransactionAmount(t),tm=t.timestamp||t.createdAt||0;
+        const ts=tm?new Date(tm).toLocaleString([],{dateStyle:'medium',timeStyle:'short'}):(t.createdAtText||'N/A');
+        const sg=k==='debit'?'-':'+';
+        const status=t.status?statusBadge(t.status):'';
+        const method=t.methodDetails?.methodName?`${t.methodDetails.methodName}: ${t.methodDetails.accountInfo||''}`:'';
+        const extra=[t.paymentReference?`UTR: ${t.paymentReference}`:'',method,t.rejectReason?`Reason: ${t.rejectReason}`:''].filter(Boolean).map(escapeHtml).join('<br>');
+        return `<div class="history-item"><div class="history-icon"><i class="bi ${getTransactionIcon(k)}"></i></div><div><div class="fw-bold">${escapeHtml(String(t.description||t.type||'Transaction').replace(/<[^>]*>/g,''))} ${status}</div><div class="small text-secondary">${escapeHtml(ts)}</div>${extra?`<div class="small text-secondary mt-1">${extra}</div>`:''}</div><div class="fw-bold ${k==='debit'?'text-danger':k==='pending'?'text-warning':'text-success'}">${k==='pending'?'':sg}₹${Math.abs(a).toFixed(2)}</div></div>`;
+    }).join('');
+}
+function getManualPaymentUpiId(){return (typeof appSettings?.upiDetails === 'string' ? appSettings.upiDetails : appSettings?.upiDetails?.upiId) || appSettings?.upiId || '9661905351-3@axl'}
+function getAddAmountValue(){return parseFloat(getElement('addAmountInput')?.value||'0')||0}
+function getAddAmountMin(){return Number(appSettings?.minDeposit||10)}
+function showAddAmountStatus(m,type='warning',autohide=true){showStatusMessage(getElement('addAmountStatusMessage'),m,type,autohide)}
+function updateQuickAmountState(){const v=getAddAmountValue();querySelAll('#quickAmountButtons .amount-chip').forEach(b=>b.classList.toggle('active',Number(b.dataset.amount)===v))}
+function buildManualUpiUrl(a){const upi=getManualPaymentUpiId(),name=(typeof appSettings?.upiDetails === 'object' ? appSettings?.upiDetails?.name : '')||appSettings?.appName||'TechSource';return`upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(name)}&am=${encodeURIComponent(a.toFixed(2))}&cu=INR`}
+function openAddAmountModal(){if(!currentUser){alert('Login first.');showSection('login-section');return}clearStatusMessage(getElement('addAmountStatusMessage'));if(getElement('addAmountInput'))getElement('addAmountInput').value='';if(getElement('paymentReferenceInput'))getElement('paymentReferenceInput').value='';if(getElement('qrSection'))getElement('qrSection').style.display='none';if(getElement('qrImage'))getElement('qrImage').src='';applyPaymentSettingsToUi();updateQuickAmountState();elements.addAmountModalInstance?.show()}
+function generateAddAmountQr(){const amount=getAddAmountValue(),min=getAddAmountMin();if(!amount||amount<min){showAddAmountStatus(`Minimum ₹${min} enter karo.`,'warning');return}const upiUrl=buildManualUpiUrl(amount);if(getElement('qrImage'))getElement('qrImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUrl)}`;if(getElement('qrSection'))getElement('qrSection').style.display='block';if(getElement('addUpiText'))getElement('addUpiText').textContent=getManualPaymentUpiId();const o=getElement('openAddUpiAppBtn');if(o)o.href=upiUrl;showAddAmountStatus('QR ready. Payment ke baad Payment Done dabayein.','success')}
+async function copyAddAmountUpi(){const upi=getManualPaymentUpiId();try{await navigator.clipboard.writeText(upi);showAddAmountStatus('UPI copied.','success')}catch{alert(upi)}}
+async function hasPendingMoneyRequest(path){if(!currentUser)return false;const snap=await get(query(ref(db,path),orderByChild('userId'),equalTo(currentUser.uid)));let found=false;snap.forEach(c=>{if(String(c.val()?.status||'pending').toLowerCase()==='pending')found=true});return found}
+function getBalanceSnapshot(){return{balanceBefore:Number(userProfile.balance||0),winningCashBefore:Number(userProfile.winningCash||0),bonusCashBefore:Number(userProfile.bonusCash||0)}}
+async function submitManualDepositRequest(){if(!currentUser){alert('Login required');return}const amount=getAddAmountValue(),min=getAddAmountMin();if(!amount||amount<min){showAddAmountStatus(`Minimum ₹${min} enter karo.`,'warning');return}const btn=getElement('paidBtn');if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm"></span> Sending...'}try{if(await hasPendingMoneyRequest('depositRequests')){showAddAmountStatus('Aapka ek add amount request already pending hai. Admin verification ka wait karein.','warning',false);return}const snap=getBalanceSnapshot();const req={userId:currentUser.uid,userEmail:currentUser.email||'N/A',userName:userProfile.displayName||currentUser.email||'User',amount,upiId:getManualPaymentUpiId(),paymentReference:getElement('paymentReferenceInput')?.value.trim()||'',status:'pending',...snap,createdAt:Date.now(),createdAtText:new Date().toLocaleString(),requestTimestamp:serverTimestamp()};const nr=await push(ref(db,'depositRequests'),req);await pushUserNotification('Add amount requested', `₹${amount.toFixed(2)} deposit request pending hai.`, 'payment', { depositRequestId: nr.key });await recordTransaction(currentUser.uid,'add_amount_pending',0,`Add Amount Pending: ₹${amount.toFixed(2)}`,{depositRequestId:nr.key,requestedAmount:amount,status:'pending',...snap});showAddAmountStatus('Request admin verification ke liye send ho gaya.','success');setTimeout(()=>elements.addAmountModalInstance?.hide(),1600);if(currentSectionId==='wallet-section')loadRecentTransactions()}catch(e){console.error(e);showAddAmountStatus('Request failed. Try again.','danger')}finally{if(btn){btn.disabled=false;btn.innerHTML='<i class="bi bi-check2-circle"></i> Payment Done'}}}
+async function submitWithdrawRequestHandler(){
+    if(!currentUser||!elements.withdrawModalInstance)return;
+    const amt=parseFloat(elements.withdrawAmountInput.value),wc=Number(userProfile.winningCash||0),minW=Number(appSettings?.minWithdraw||50),d=getWithdrawMethodDetails();
+    clearStatusMessage(elements.withdrawStatusMessage);
+    if(isNaN(amt)||amt<=0){showStatusMessage(elements.withdrawStatusMessage,'Invalid amount.','warning');return}
+    if(amt<minW){showStatusMessage(elements.withdrawStatusMessage,`Min withdraw ₹${minW}.`,'warning');return}
+    if(amt>wc){showStatusMessage(elements.withdrawStatusMessage,'Insufficient winning balance.','warning');return}
+    if(!d.accountHolderName){showStatusMessage(elements.withdrawStatusMessage,'Holder name enter karein.','warning');return}
+    if(d.methodName==='UPI'&&!d.upiId){showStatusMessage(elements.withdrawStatusMessage,'UPI ID enter karein.','warning');return}
+    if(d.methodName==='Bank'&&(!d.accountNumber||!d.ifscCode)){showStatusMessage(elements.withdrawStatusMessage,'Account number aur IFSC enter karein.','warning');return}
+    if(await hasPendingMoneyRequest('withdrawals')){showStatusMessage(elements.withdrawStatusMessage,'Aapka ek withdraw request already pending hai. Admin processing ka wait karein.','warning',false);return}
+    elements.submitWithdrawRequestBtn.disabled=true;
+    elements.submitWithdrawRequestBtn.innerHTML='<span class="spinner-border spinner-border-sm"></span> Sending...';
+    let done=false,beforeSnap=getBalanceSnapshot(),afterSnap={};
+    try{
+        const tx=await runTransaction(ref(db,`users/${currentUser.uid}`),p=>{
+            if(!p)throw new Error('Profile missing (Tx).');
+            beforeSnap={balanceBefore:Number(p.balance||0),winningCashBefore:Number(p.winningCash||0),bonusCashBefore:Number(p.bonusCash||0)};
+            const w=Number(p.winningCash||0),b=Number(p.bonusCash||0);
+            if(w<amt)throw new Error('Insufficient winning balance (Tx).');
+            p.winningCash=w-amt;p.balance=p.winningCash+b;
+            afterSnap={balanceAfter:Number(p.balance||0),winningCashAfter:Number(p.winningCash||0),bonusCashAfter:b};
+            return p;
+        });
+        if(!tx.committed)throw new Error('Failed to update balance.');
+        done=true;
+        try{await savePayoutDetails(d)}catch(saveErr){console.warn('Payout detail save failed:',saveErr)}
+        const wr=await push(ref(db,'withdrawals'),{userId:currentUser.uid,userName:userProfile.displayName||currentUser.email,userEmail:currentUser.email||'N/A',amount:amt,methodDetails:d,status:'pending',...beforeSnap,...afterSnap,createdAt:Date.now(),createdAtText:new Date().toLocaleString(),requestTimestamp:serverTimestamp()});
+        await pushUserNotification('Withdraw requested', `₹${amt.toFixed(2)} withdraw request pending hai.`, 'withdraw', { withdrawalId: wr.key });
+        await recordTransaction(currentUser.uid,'withdraw_request',-amt,`Withdrawal Request to ${d.methodName}`,{withdrawalId:wr.key,methodDetails:d,...beforeSnap,...afterSnap});
+        showStatusMessage(elements.withdrawStatusMessage,'Request submitted successfully!','success',false);
+        setTimeout(()=>elements.withdrawModalInstance?.hide(),1600);
+        if(currentSectionId==='wallet-section')loadRecentTransactions();
+    }catch(e){
+        console.error('Withdraw error:',e);
+        showStatusMessage(elements.withdrawStatusMessage,`Error: ${e.message}`,'danger');
+        if(done){try{await runTransaction(ref(db,`users/${currentUser.uid}`),p=>{if(p){p.winningCash=Number(p.winningCash||0)+amt;p.balance=Number(p.balance||0)+amt}return p});await recordTransaction(currentUser.uid,'withdraw_failed_refund',amt,'Refund Failed Withdrawal Request')}catch(r){console.error('refund failed',r)}}
+    }finally{
+        elements.submitWithdrawRequestBtn.disabled=false;
+        elements.submitWithdrawRequestBtn.innerHTML='<i class="bi bi-send-fill"></i> Submit Request';
+    }
+}
+</script>
+</body>
+</html>
