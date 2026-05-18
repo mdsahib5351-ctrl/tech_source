@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Image Tools | Tech Source</title>
+  <meta name="description" content="Upload images, create links, remove backgrounds, convert images to PDF and export PDF pages as JPEG">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/image.css">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="topbar">
+    <h1 class="logo">Image Tools</h1>
+    <button class="dark-btn" type="button" onclick="toggleDark()" aria-label="Toggle dark mode">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="container">
+
+    <section class="card">
+
+      <section id="home" class="tab active tools-home">
+        <div class="tools-hero">
+          <span>Tech Source Utility</span>
+          <h2>Image & PDF Tools</h2>
+          <p>Upload image links, remove background, make PDF from multiple images, and convert PDF pages into JPEG.</p>
+        </div>
+
+        <div class="home-tool-grid">
+          <button class="home-tool-card" type="button" data-open-tool="upload">
+            <i class="fa-solid fa-link"></i>
+            <strong>Image To URL</strong>
+            <small>Upload image and copy shareable link.</small>
+          </button>
+
+          <button class="home-tool-card" type="button" data-open-tool="remove-bg">
+            <i class="fa-solid fa-eraser"></i>
+            <strong>Background Remove</strong>
+            <small>Use remove.bg or Clipdrop API key.</small>
+          </button>
+
+          <button class="home-tool-card" type="button" data-open-tool="image-to-pdf">
+            <i class="fa-solid fa-file-pdf"></i>
+            <strong>Multiple Image To PDF</strong>
+            <small>Select many images and download one PDF.</small>
+          </button>
+
+          <button class="home-tool-card" type="button" data-open-tool="pdf-to-jpeg">
+            <i class="fa-solid fa-file-image"></i>
+            <strong>PDF To JPEG</strong>
+            <small>Convert every PDF page into JPG files.</small>
+          </button>
+        </div>
+      </section>
+
+      <!-- Tabs -->
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="home">
+          <i class="fa-solid fa-house"></i> Home
+        </button>
+        <button class="tab-btn" data-tab="upload">
+          <i class="fa-solid fa-upload"></i> Upload
+        </button>
+        <button class="tab-btn" data-tab="tools">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Tools
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <i class="fa-solid fa-clock"></i> History
+        </button>
+      </nav>
+
+      <!-- ===== Upload Tab ===== -->
+      <section id="upload" class="tab">
+
+        <!-- Drop Area -->
+        <div id="drop" class="drop">
+          <div class="drop-content">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>Image to URL</p>
+            <span>Drag & drop images or click to upload</span>
+          </div>
+          <input type="file" id="file" multiple accept="image/*">
+        </div>
+
+        <!-- Preview -->
+        <div id="preview" class="preview-grid"></div>
+
+      </section>
+
+      <!-- ===== Tools Tab ===== -->
+      <section id="tools" class="tab">
+
+        <div class="tool-grid">
+          <article class="tool-card" id="remove-bg">
+            <div class="tool-title">
+              <i class="fa-solid fa-eraser"></i>
+              <div>
+                <h3>Background Remove</h3>
+                <p>Use a free-tier API key from remove.bg or Clipdrop.</p>
+              </div>
+            </div>
+
+            <div class="tool-form">
+              <label>
+                Provider
+                <select id="bgProvider">
+                  <option value="removebg">remove.bg</option>
+                  <option value="clipdrop">Clipdrop</option>
+                </select>
+              </label>
+              <label>
+                API Key
+                <input type="password" id="bgApiKey" placeholder="Paste API key">
+              </label>
+              <label>
+                Image
+                <input type="file" id="bgFile" accept="image/*">
+              </label>
+              <button type="button" id="bgRemoveBtn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Remove BG
+              </button>
+            </div>
+
+            <div id="bgResult" class="tool-result"></div>
+          </article>
+
+          <article class="tool-card" id="image-to-pdf">
+            <div class="tool-title">
+              <i class="fa-solid fa-file-pdf"></i>
+              <div>
+                <h3>Image to PDF</h3>
+                <p>Convert one or more images into a PDF in your browser.</p>
+              </div>
+            </div>
+
+            <div class="tool-form">
+              <label>
+                Images
+                <input type="file" id="pdfImageFiles" multiple accept="image/*">
+              </label>
+              <button type="button" id="makePdfBtn">
+                <i class="fa-solid fa-file-arrow-down"></i> Download PDF
+              </button>
+            </div>
+
+            <div id="imagePdfResult" class="tool-result compact"></div>
+          </article>
+
+          <article class="tool-card" id="pdf-to-jpeg">
+            <div class="tool-title">
+              <i class="fa-solid fa-file-image"></i>
+              <div>
+                <h3>PDF to JPEG</h3>
+                <p>Export every PDF page as a high quality JPEG.</p>
+              </div>
+            </div>
+
+            <div class="tool-form">
+              <label>
+                PDF File
+                <input type="file" id="pdfFile" accept="application/pdf">
+              </label>
+              <button type="button" id="pdfToJpegBtn">
+                <i class="fa-solid fa-images"></i> Convert Pages
+              </button>
+            </div>
+
+            <div id="pdfJpegResult" class="tool-result"></div>
+          </article>
+        </div>
+
+      </section>
+
+      <!-- ===== History Tab ===== -->
+      <section id="history" class="tab">
+
+        <div class="history-head">
+          <h3>Upload History</h3>
+        <button class="clear-btn" type="button" onclick="clearHistory()">Clear</button>
+        </div>
+
+        <div id="historyBox" class="history-grid"></div>
+
+      </section>
+
+    </section>
+
+  </main>
+
+  <!-- ===== IMAGE VIEWER ===== -->
+  <div id="viewer" class="viewer" aria-hidden="true">
+    <div class="viewer-panel">
+      <button class="viewer-close" type="button" onclick="closeViewer()" aria-label="Close preview">&times;</button>
+      <img id="viewerImg" alt="Preview">
+      <div class="viewer-meta">
+        <input id="viewerUrl" readonly aria-label="Image URL">
+        <div class="viewer-actions">
+          <button type="button" onclick="copyViewerUrl()">Copy URL</button>
+          <button type="button" onclick="openViewerUrl()">Open</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ocrPopup" class="tool-popup hidden" aria-hidden="true">
+    <div class="tool-box">
+      <button class="viewer-close" type="button" onclick="closeOcrPopup()" aria-label="Close OCR">&times;</button>
+      <h3>Extracted Text</h3>
+      <textarea id="ocrText" readonly rows="8"></textarea>
+      <div class="viewer-actions">
+        <button type="button" onclick="copyOcrText()">Copy Text</button>
+        <button type="button" onclick="closeOcrPopup()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+
+    <div class="footer-container">
+
+      <!-- Brand -->
+      <div class="footer-box">
+        <h2>Tech Source</h2>
+        <p>
+          Fast & easy digital services provider. Upload images,
+          generate links and manage your files instantly.
+        </p>
+
+        <div class="social">
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="footer-box">
+        <h3>Features</h3>
+        <ul>
+          <li>Image Upload</li>
+          <li>Instant Link</li>
+          <li>History Save</li>
+          <li>Fast Download</li>
+        </ul>
+      </div>
+
+      <!-- Links -->
+      <div class="footer-box">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="image.html">Uploader</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="footer-box">
+        <h3>Newsletter</h3>
+        <p>Get updates and new features.</p>
+
+        <form class="newsletter">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      © 2026 Tech Source | All Rights Reserved
+    </div>
+
+  </footer>
+
+  <!-- JS -->
+  <script src="script/image.js"></script>
+
+</body>
+</html>

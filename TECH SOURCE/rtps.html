@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RTPS Certificate Form | TECH SOURCE</title>
+    <link rel="stylesheet" href="css/rtps.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html">
+        <span>TS</span>
+        <div>
+          <strong>TECH SOURCE</strong>
+          <small>RTPS Certificate Assistance</small>
+        </div>
+      </a>
+      <nav id="mainNav" class="hidden">
+        <button type="button" data-view="home">Services</button>
+        <button type="button" data-view="history">History</button>
+        <button type="button" data-view="profile">Profile</button>
+        <button type="button" id="logoutBtn">Logout</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="loginView" class="auth-layout">
+        <div class="auth-copy">
+          <p>Niwas, Caste, EWS, Income</p>
+          <h1>RTPS certificate form with Firebase records.</h1>
+          <span>Login/register, select service card, fill detailed form, submit to Firebase, track history, and download receipt.</span>
+        </div>
+        <form id="loginForm" class="auth-card">
+          <h2>Login / Register</h2>
+          <label>Full Name<input name="name" required placeholder="Full name"></label>
+          <label>Mobile Number<input name="mobile" maxlength="10" inputmode="numeric" required placeholder="10 digit mobile"></label>
+          <label>Email<input name="email" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input name="password" type="password" required placeholder="Minimum 6 characters"></label>
+          <label>Address<textarea name="address" required placeholder="Full address"></textarea></label>
+          <div class="action-row">
+            <button class="primary" data-auth="login">Login</button>
+            <button class="secondary" data-auth="register">Register</button>
+          </div>
+          <p id="authMessage" class="muted"></p>
+        </form>
+      </section>
+
+      <section id="appView" class="hidden">
+        <section id="homeView">
+          <section class="hero">
+            <div>
+              <p id="welcomeText">Welcome</p>
+              <h1>Select certificate service.</h1>
+            </div>
+          </section>
+
+          <section class="service-grid" id="serviceGrid">
+            <button class="service-card" data-certificate="Niwas Certificate">
+              <span>01</span>
+              <strong>Niwas Certificate</strong>
+              <small>Residence / niwas praman patra</small>
+              <b>Normal Rs. 50 | Tatkal Rs. 200</b>
+            </button>
+            <button class="service-card" data-certificate="Caste Certificate">
+              <span>02</span>
+              <strong>Caste Certificate</strong>
+              <small>Jati praman patra</small>
+              <b>Normal Rs. 50 | Tatkal Rs. 200</b>
+            </button>
+            <button class="service-card" data-certificate="EWS Certificate">
+              <span>03</span>
+              <strong>EWS Certificate</strong>
+              <small>Economically weaker section</small>
+              <b>Normal Rs. 100 | Tatkal Rs. 300</b>
+            </button>
+            <button class="service-card" data-certificate="Income Certificate">
+              <span>04</span>
+              <strong>Income Certificate</strong>
+              <small>Aay praman patra</small>
+              <b>Normal Rs. 50 | Tatkal Rs. 200</b>
+            </button>
+          </section>
+
+          <section id="applyPanel" class="panel hidden">
+            <div class="section-head">
+              <div>
+                <p>Application form</p>
+                <h2 id="selectedTitle">Certificate Apply Karein</h2>
+              </div>
+              <div class="fee-box">
+                <span id="selectedMode">Normal</span>
+                <strong id="selectedFee">Rs. 50</strong>
+              </div>
+            </div>
+
+            <div class="stepbar">
+              <span class="active">1. Applicant</span>
+              <span>2. Address</span>
+              <span>3. Certificate Details</span>
+              <span>4. Documents</span>
+            </div>
+
+            <div class="mode-switch">
+              <button type="button" class="active" data-mode="Normal">Normal Apply</button>
+              <button type="button" data-mode="Tatkal">Tatkal Apply</button>
+            </div>
+
+            <form id="rtpsForm">
+              <input type="hidden" name="certificateType">
+              <input type="hidden" name="applyMode">
+              <input type="hidden" name="fee">
+
+              <fieldset class="form-section">
+                <legend>Applicant Details / आवेदक विवरण</legend>
+                <div class="form-grid">
+                  <label>Applicant Name (English)<input name="name" data-hi-target="nameHi" required placeholder="Full name"></label>
+                  <label>आवेदक का नाम (Hindi)<input name="nameHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Father/Husband Name (English)<input name="guardian" data-hi-target="guardianHi" required placeholder="Guardian name"></label>
+                  <label>पिता/पति का नाम (Hindi)<input name="guardianHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Mother Name (English)<input name="mother" data-hi-target="motherHi" placeholder="Mother name"></label>
+                  <label>माता का नाम (Hindi)<input name="motherHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Mobile Number<input name="mobile" maxlength="10" inputmode="numeric" required placeholder="10 digit mobile"></label>
+                  <label>Email<input name="email" type="email" placeholder="Email"></label>
+                  <label>Aadhaar Number<input name="aadhaar" maxlength="12" inputmode="numeric" required placeholder="12 digit Aadhaar"></label>
+                  <label>Date of Birth<input name="dob" type="date" required></label>
+                  <label>Gender<select name="gender" required><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-section">
+                <legend>Permanent Address / स्थायी पता</legend>
+                <div class="form-grid">
+                  <label>State (English)<input name="stateName" data-hi-target="stateNameHi" value="Bihar" required></label>
+                  <label>राज्य (Hindi)<input name="stateNameHi" value="बिहार"></label>
+                  <label>District (English)<input name="district" data-hi-target="districtHi" required placeholder="District"></label>
+                  <label>जिला (Hindi)<input name="districtHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Subdivision (English)<input name="subdivision" data-hi-target="subdivisionHi" placeholder="Subdivision"></label>
+                  <label>अनुमंडल (Hindi)<input name="subdivisionHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Block / Circle (English)<input name="block" data-hi-target="blockHi" required placeholder="Block or circle"></label>
+                  <label>प्रखंड / अंचल (Hindi)<input name="blockHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Panchayat / Ward (English)<input name="panchayat" data-hi-target="panchayatHi" required placeholder="Panchayat or ward"></label>
+                  <label>पंचायत / वार्ड (Hindi)<input name="panchayatHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Village / Mohalla (English)<input name="village" data-hi-target="villageHi" required placeholder="Village or mohalla"></label>
+                  <label>गांव / मोहल्ला (Hindi)<input name="villageHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Post Office (English)<input name="postOffice" data-hi-target="postOfficeHi" placeholder="Post office"></label>
+                  <label>डाकघर (Hindi)<input name="postOfficeHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>PIN Code<input name="pin" maxlength="6" inputmode="numeric" placeholder="PIN code"></label>
+                  <label class="wide">Full Address (English)<textarea name="address" data-hi-target="addressHi" required placeholder="House no, street, landmark"></textarea></label>
+                  <label class="wide">पूरा पता (Hindi)<textarea name="addressHi" placeholder="Auto Hindi, correction allowed"></textarea></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-section">
+                <legend>Certificate Details / प्रमाण पत्र विवरण</legend>
+                <div class="form-grid">
+                  <label>Category<select name="category" required><option value="">Select</option><option>General</option><option>OBC</option><option>EBC</option><option>SC</option><option>ST</option></select></label>
+                  <label>Caste / Sub Caste (English)<input name="caste" data-hi-target="casteHi" placeholder="Required for caste certificate"></label>
+                  <label>जाति / उपजाति (Hindi)<input name="casteHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Religion (English)<input name="religion" data-hi-target="religionHi" placeholder="Religion"></label>
+                  <label>धर्म (Hindi)<input name="religionHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Occupation (English)<input name="occupation" data-hi-target="occupationHi" placeholder="Student, Farmer, Business..."></label>
+                  <label>व्यवसाय (Hindi)<input name="occupationHi" placeholder="Auto Hindi, correction allowed"></label>
+                  <label>Annual Income<input name="income" type="number" min="0" placeholder="Required for Income/EWS"></label>
+                  <label>Purpose<select name="purpose" required><option value="">Select</option><option>Education</option><option>Job</option><option>Scholarship</option><option>Government Scheme</option><option>Other</option></select></label>
+                  <label class="wide">Purpose Details (English)<textarea name="purposeDetails" data-hi-target="purposeDetailsHi" placeholder="Why certificate is required"></textarea></label>
+                  <label class="wide">उद्देश्य विवरण (Hindi)<textarea name="purposeDetailsHi" placeholder="Auto Hindi, correction allowed"></textarea></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-section">
+                <legend>Documents & Declaration / दस्तावेज़</legend>
+                <div class="check-grid">
+                  <label><input type="checkbox" name="docAadhaar" value="Aadhaar Card"> Aadhaar Card</label>
+                  <label><input type="checkbox" name="docPhoto" value="Photo"> Passport Size Photo</label>
+                  <label><input type="checkbox" name="docRation" value="Ration Card"> Ration Card</label>
+                  <label><input type="checkbox" name="docIncome" value="Income Proof"> Income Proof</label>
+                  <label><input type="checkbox" name="docCaste" value="Caste Proof"> Caste Proof</label>
+                  <label><input type="checkbox" name="docOther" value="Other Document"> Other Document</label>
+                </div>
+                <label class="wide">Document Notes<textarea name="documents" placeholder="Document details / remarks"></textarea></label>
+                <label class="declaration"><input type="checkbox" name="declaration" required> I confirm all details are correct and documents are available.</label>
+              </fieldset>
+
+              <div class="action-row">
+                <button class="primary">Submit to Firebase</button>
+                <button type="button" class="secondary" id="clearForm">Clear</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p>Process steps</p>
+                <h2>Application ke baad kya hoga?</h2>
+              </div>
+            </div>
+            <div class="steps">
+              <article><span>1</span><strong>Apply</strong><small>Card select karke detailed form bharein.</small></article>
+              <article><span>2</span><strong>Verify</strong><small>Documents aur details verify honge.</small></article>
+              <article><span>3</span><strong>Process</strong><small>Normal/Tatkal fee ke hisaab se process.</small></article>
+              <article><span>4</span><strong>Download</strong><small>History se receipt download karein.</small></article>
+            </div>
+          </section>
+        </section>
+
+        <section id="historyView" class="panel hidden">
+          <div class="section-head">
+            <div>
+              <p>Application history</p>
+              <h2>History & Status</h2>
+            </div>
+            <div class="status-search">
+              <input id="statusInput" placeholder="Application ID">
+              <button type="button" class="primary" id="checkStatus">Check</button>
+            </div>
+          </div>
+          <div id="statusResult"></div>
+          <div id="applicationList" class="application-list"></div>
+        </section>
+
+        <section id="profileView" class="panel hidden">
+          <div class="section-head">
+            <div>
+              <p>Your profile</p>
+              <h2>Saved Profile</h2>
+            </div>
+            <span class="badge">Firebase profile</span>
+          </div>
+          <form id="profileForm" class="form-grid">
+            <label>Name<input name="name" required></label>
+            <label>Mobile<input name="mobile" maxlength="10" inputmode="numeric" required></label>
+            <label>Email<input name="email" type="email" readonly></label>
+            <label class="wide">Address<textarea name="address" required></textarea></label>
+            <div class="wide action-row"><button class="primary">Save Profile</button></div>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="successDialog">
+      <div class="dialog-card">
+        <h2>Application Submitted</h2>
+        <p id="successText"></p>
+        <div class="action-row">
+          <button type="button" class="primary" id="downloadLatest">Download Receipt</button>
+          <button type="button" class="secondary" id="closeDialog">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script/rtps.js"></script>
+  </body>
+</html>

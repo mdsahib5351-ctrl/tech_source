@@ -1,0 +1,457 @@
+:root{
+  --bg:#eef3f8;
+  --panel:#ffffff;
+  --soft:#f8fbff;
+  --ink:#172033;
+  --muted:#64748b;
+  --line:#d8e2f2;
+  --primary:#0d6efd;
+  --primary-dark:#0848a6;
+  --success:#16a34a;
+  --danger:#dc3545;
+  --warning:#f59e0b;
+  --shadow:0 12px 30px rgba(17,24,39,.08);
+  --radius:14px;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:20px;
+  display:none;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Arial,sans-serif;
+}
+
+header{
+  margin-bottom:18px;
+  padding:24px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#12343b,#0d6efd 68%,#16a34a);
+  color:#fff;
+  box-shadow:0 18px 45px rgba(17,24,39,.16);
+}
+
+.header-inner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.header-inner h1{margin:0;font-size:30px;color:#fff}
+.header-sub{margin-top:4px;color:rgba(255,255,255,.8);font-size:14px}
+
+.brand-badge{
+  padding:10px 16px;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  font-weight:bold;
+}
+
+.top-controls{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--panel);
+  box-shadow:var(--shadow);
+}
+
+.top-controls input,
+.top-controls select{
+  min-height:38px;
+  padding:8px 12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  outline:none;
+}
+
+.top-controls input:focus,
+.top-controls select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(13,110,253,.14);
+}
+
+button{
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.clear,
+.homebtn{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  background-color:transparent;
+  transition:.2s;
+}
+
+.clear{background-image:url('https://i.ibb.co/MkLw14Fm/download.png')}
+.homebtn{background-image:url('https://i.ibb.co/S4GvHzjq/download-1.jpg')}
+.clear:hover,.homebtn:hover{transform:scale(1.08);filter:brightness(1.12)}
+
+.exportBtn{
+  min-height:42px;
+  padding:0 14px;
+  border-radius:22px;
+  background:var(--success);
+  color:#fff;
+}
+
+.tabbutton{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:15px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--panel);
+  box-shadow:0 10px 24px rgba(17,24,39,.06);
+}
+
+.tabBtn{
+  position:relative;
+  padding:12px 20px;
+  border-radius:10px;
+  background:#eef4ff;
+  color:#0d47a1;
+  font-size:14px;
+  transition:.2s;
+}
+
+.tabBtn:hover,
+.tabBtn.active{
+  background:var(--primary);
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(13,110,253,.25);
+}
+
+.notify-tab{padding-right:38px}
+
+.notify-badge{
+  display:none;
+  position:absolute;
+  top:-8px;
+  right:-6px;
+  min-width:24px;
+  height:24px;
+  padding:0 7px;
+  border:2px solid #fff;
+  border-radius:999px;
+  background:var(--danger);
+  color:#fff;
+  font-size:12px;
+  line-height:20px;
+  text-align:center;
+  box-shadow:0 8px 18px rgba(220,53,69,.35);
+}
+
+.notify-badge.show{display:inline-block}
+
+.dashboard-summary{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:12px;
+  margin-top:18px;
+}
+
+.summary-card{
+  min-width:0;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:#fff;
+  box-shadow:0 10px 24px rgba(17,24,39,.07);
+}
+
+.summary-card.highlight{
+  background:linear-gradient(135deg,#12343b,#0d6efd);
+  color:#fff;
+}
+
+.summary-title span,
+.summary-title strong,
+.summary-metrics small,
+.summary-metrics b{display:block}
+
+.summary-title span{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+
+.summary-title strong{margin-top:3px;color:var(--ink);font-size:15px}
+.summary-card.highlight .summary-title span{color:rgba(255,255,255,.72)}
+.summary-card.highlight .summary-title strong{color:#fff}
+
+.summary-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+
+.summary-metrics.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.summary-metrics div{
+  min-width:0;
+  padding:9px;
+  border-radius:10px;
+  background:var(--soft);
+}
+
+.summary-card.highlight .summary-metrics div{background:rgba(255,255,255,.14)}
+.summary-metrics small{color:var(--muted);font-size:11px;font-weight:800}
+.summary-card.highlight .summary-metrics small{color:rgba(255,255,255,.72)}
+.summary-metrics b{margin-top:4px;color:var(--primary);font-size:18px;overflow-wrap:anywhere}
+.summary-card.highlight .summary-metrics b{color:#fff}
+
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  margin-top:20px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 8px;
+}
+
+th{
+  padding:12px;
+  background:#12343b;
+  color:#fff;
+  white-space:nowrap;
+}
+
+td{
+  padding:12px;
+  border-top:1px solid #e5edf7;
+  border-bottom:1px solid #e5edf7;
+  background:var(--soft);
+  text-align:center;
+}
+
+tbody tr td:first-child{border-left:1px solid #e5edf7;border-radius:10px 0 0 10px}
+tbody tr td:last-child{border-right:1px solid #e5edf7;border-radius:0 10px 10px 0}
+
+.button-group button{
+  width:60px;
+  height:24px;
+  margin:3px;
+  border-radius:10px;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  font-size:0;
+  color:transparent;
+  transition:.2s;
+}
+
+.button-group button:hover{transform:scale(1.1);filter:brightness(1.12)}
+.viewBtn{background-image:url(https://i.ibb.co/cSDHkKT3/Chat-GPT-Image-Mar-12-2026-04-53-12-PM.jpg)}
+.editBtn{background-image:url(https://i.ibb.co/CptDdG8Y/Edit-button-with-pencil-icon.jpg)}
+.deleteBtn{background-image:url(https://i.ibb.co/84shrsSQ/Chat-GPT-Image-Mar-12-2026-04-55-08-PM.jpg)}
+.remindBtn,.whatsappBtn{background-image:url(https://i.ibb.co/Tx1xh1Km/Chat-GPT-Image-Mar-12-2026-05-02-13-PM.png)}
+
+.approveBtn,.rejectBtn,.docBtn,.statusBtn,.textBtn{
+  width:auto!important;
+  min-width:70px;
+  height:30px!important;
+  padding:6px 10px;
+  background-image:none!important;
+  color:#fff!important;
+  font-size:12px!important;
+}
+
+.approveBtn{background:#28a745}
+.rejectBtn{background:#dc3545}
+.docBtn{background:#6f42c1}
+.statusBtn,.textBtn{background:#0d6efd}
+
+.panRemindBtn{
+  width:auto!important;
+  min-width:86px;
+  height:30px!important;
+  padding:6px 12px;
+  border-radius:9px;
+  background:#16a34a!important;
+  background-image:none!important;
+  color:#fff!important;
+  font-size:12px!important;
+  font-weight:700;
+}
+
+.panRemindBtn::before{
+  content:"WhatsApp ";
+}
+
+.aadhaarActionBtn{
+  width:auto!important;
+  min-width:72px;
+  height:32px!important;
+  margin:3px;
+  padding:7px 10px;
+  border-radius:8px;
+  background-image:none!important;
+  color:#fff!important;
+  font-size:12px!important;
+  line-height:1;
+  transition:.2s;
+}
+
+.aadhaarActionBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.aadhaarActionBtn.view{background:#2563eb}
+.aadhaarActionBtn.status{background:#0f766e}
+.aadhaarActionBtn.remind{background:#16a34a}
+.aadhaarActionBtn.delete{background:#dc2626}
+
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,.6);
+}
+
+.modal{
+  width:400px;
+  max-width:90%;
+  max-height:90vh;
+  overflow-y:auto;
+  padding:25px 30px;
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 15px 40px rgba(0,0,0,.3);
+}
+
+.modal h3{margin-top:0;text-align:center;color:#333}
+.modal input,.modal select{
+  width:100%;
+  padding:12px 15px;
+  margin-bottom:15px;
+  border:1px solid #ccc;
+  border-radius:8px;
+}
+
+.modal .modal-buttons{display:flex;gap:10px;margin-top:10px}
+.modal .modal-buttons button{flex:1;padding:10px;color:#fff}
+.modal .modal-buttons button:first-child{background:#28a745}
+.modal .modal-buttons button:last-child{background:#dc3545}
+
+.customerLink{color:#0d6efd;cursor:pointer;font-weight:bold}
+.customerLink:hover{text-decoration:underline}
+
+.status{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:20px;
+  background:#e8f3ff;
+  color:#0b7dda;
+  font-weight:bold;
+  font-size:12px;
+}
+
+.status.paid,.status.approved,.status.completed{background:#e8fff0;color:#218838}
+.status.unpaid,.status.pending{background:#fff5dd;color:#b05b00}
+.status.rejected{background:#ffe8e8;color:#c82333}
+.status.rescheduled{background:#e8f3ff;color:#0b7dda}
+.muted{color:#777}
+
+.schedule-panel{max-width:980px;margin:0 auto;text-align:left}
+.schedule-panel h3{margin:0 0 12px;color:#222}
+
+.calendar-card,.schedule-item{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--soft);
+}
+
+.calendar-card{margin:16px 0 18px;padding:16px}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.calendar-head button,.schedule-actions button{min-height:36px;padding:8px 12px;background:var(--primary);color:#fff}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px;color:#555;font-size:13px;font-weight:bold}
+.calendar-legend span{display:inline-flex;align-items:center;gap:6px}
+.legend-dot{display:inline-block;width:12px;height:12px;border-radius:50%}
+.legend-dot.available{background:var(--success)}
+.legend-dot.holiday{background:var(--danger)}
+.legend-dot.partial{background:var(--warning)}
+
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.calendar-weekday{padding:8px 4px;color:var(--muted);font-size:12px;font-weight:bold;text-align:center}
+.calendar-empty{min-height:72px}
+.calendar-day{
+  min-height:78px;
+  padding:8px;
+  border:2px solid transparent;
+  border-radius:10px;
+  color:#fff;
+  text-align:left;
+  transition:.2s;
+}
+.calendar-day:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.16)}
+.calendar-day strong,.calendar-day span{display:block}
+.calendar-day strong{font-size:18px}
+.calendar-day span{margin-top:8px;font-size:11px;line-height:1.25}
+.calendar-day.available{background:var(--success)}
+.calendar-day.holiday{background:var(--danger)}
+.calendar-day.partial{background:var(--warning)}
+.calendar-day.selected{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.16)}
+.calendar-day.today{outline:3px solid rgba(33,150,243,.35)}
+
+.schedule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.schedule-field{display:flex;flex-direction:column;gap:6px}
+.schedule-field label,.holiday-row{font-weight:bold;color:#333}
+.schedule-field input,.schedule-field textarea{padding:10px 12px;border:1px solid #ccc;border-radius:8px}
+.holiday-row{display:flex;align-items:center;gap:8px;margin:8px 0 14px}
+.holiday-row input,.slot-check input{width:auto}
+.slot-check-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:10px 0 16px}
+.slot-check{display:flex;align-items:center;gap:6px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--soft);font-size:13px;font-weight:bold}
+.schedule-actions{display:flex;gap:10px;flex-wrap:wrap}
+.schedule-actions button.danger{background:var(--danger)}
+.schedule-list{display:grid;gap:10px;margin-top:18px}
+.schedule-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;background:#fff}
+.schedule-item strong,.schedule-item span{display:block}
+.schedule-item span{margin-top:4px;color:#666;font-size:13px}
+
+@media(max-width:1100px){
+  .dashboard-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:700px){
+  body{padding:12px}
+  .header-inner{align-items:flex-start;flex-direction:column}
+  .top-controls input,.top-controls select,.exportBtn{width:100%}
+  .dashboard-summary,.schedule-grid,.slot-check-grid,.calendar-grid{grid-template-columns:1fr}
+  .calendar-empty,.calendar-weekday{display:none}
+  .tabBtn{padding:10px 14px;font-size:14px}
+  .schedule-item{align-items:flex-start;flex-direction:column}
+}
