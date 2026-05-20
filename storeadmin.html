@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" type="image/jpeg">
+  <title>Store Admin - Tech Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <style>
+    :root{
+      --bg:#f8fafc;
+      --card:#fff;
+      --text:#172033;
+      --muted:#657186;
+      --line:#e2e8f0;
+      --brand:#01875f;
+      --brand-dark:#016c4c;
+      --blue:#1a73e8;
+      --danger:#dc2626;
+      --ok:#059669;
+      --warn:#f59e0b;
+      --shadow:0 18px 48px rgba(15,23,42,.11);
+    }
+    *{box-sizing:border-box}
+    body{display:none;margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .topbar{background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .topbar-inner{max-width:1220px;margin:auto;padding:12px 18px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px}
+    .brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-logo{width:42px;height:42px;border-radius:12px;object-fit:cover}
+    .brand{font-size:1.12rem;font-weight:800;line-height:1.2}
+    .admin-email{display:block;color:var(--muted);font-size:.82rem;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{border:0;border-radius:999px;padding:10px 14px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.primary:hover{background:var(--brand-dark)}
+    .btn.secondary{background:#eef3f8;color:var(--text);border:1px solid var(--line)}
+    .btn.danger{background:#fee2e2;color:var(--danger)}
+    .btn.warning{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+    .btn:disabled{opacity:.68;cursor:not-allowed}
+    .shell{max-width:1220px;margin:auto;padding:20px 18px 36px}
+    .hero{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,#e7f5ef,#fff 54%,#e8f0fe);padding:22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin-bottom:18px;box-shadow:0 10px 32px rgba(15,23,42,.07)}
+    .hero h1{margin:0 0 8px;font-size:clamp(1.8rem,4vw,3.3rem);line-height:1.04;letter-spacing:0}
+    .hero p{margin:0;color:var(--muted);line-height:1.6;max-width:720px}
+    .stats{display:grid;grid-template-columns:repeat(3,118px);gap:10px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+    .stat strong{display:block;font-size:1.35rem}
+    .stat span{display:block;color:var(--muted);font-size:.78rem;font-weight:800;margin-top:2px}
+    main{display:grid;grid-template-columns:390px minmax(0,1fr);gap:18px;align-items:start}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+    .panel h2{margin:0;font-size:1.25rem}
+    .panel-sub{margin:5px 0 16px;color:var(--muted);line-height:1.5}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-field.full{grid-column:1/-1}
+    label{display:block;font-weight:800;font-size:.82rem;margin:0 0 6px;color:#334155}
+    input,textarea,select{width:100%;border:1px solid var(--line);border-radius:13px;padding:12px;background:#fbfdff;color:var(--text);outline:none}
+    input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(1,135,95,.11)}
+    textarea{min-height:100px;resize:vertical}
+    input[type=file]{background:#fff;padding:10px}
+    .preview-card{margin:14px 0;border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden}
+    .preview-top{height:82px;background:linear-gradient(135deg,#e6f4ea,#e8f0fe)}
+    .preview-body{display:grid;grid-template-columns:76px 1fr;gap:12px;padding:0 14px 14px;margin-top:-34px;align-items:end}
+    .preview-body img{width:76px;height:76px;border-radius:18px;object-fit:cover;background:#eef3fa;border:4px solid #fff;box-shadow:0 10px 20px rgba(15,23,42,.12)}
+    .preview-body h3{margin:0 0 5px;font-size:1rem;line-height:1.25;word-break:break-word}
+    .preview-body small{color:var(--muted);font-weight:800}
+    .form-actions{display:flex;gap:9px;flex-wrap:wrap}
+    .form-actions .btn{flex:1}
+    .status{margin-top:12px;color:var(--muted);font-weight:800;font-size:.9rem;min-height:22px}
+    .status.ok{color:var(--ok)}.status.err{color:var(--danger)}
+    .list-panel{display:grid;gap:14px}
+    .list-head{display:grid;grid-template-columns:1fr minmax(210px,300px);gap:12px;align-items:end}
+    .list-head p{margin:5px 0 0;color:var(--muted);font-weight:700}
+    .search-box{position:relative}
+    .search-box i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .search-box input{border-radius:999px;padding-left:38px;background:#eef3f8;border-color:transparent}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .filter-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;font-weight:800;color:#334155}
+    .filter-chip.active{background:#e6f4ea;border-color:#a6d7bd;color:var(--brand)}
+    .app-list{display:grid;gap:12px}
+    .app-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:13px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:13px;background:#fff;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    .app-row.hidden-app{opacity:.72;background:#f8fafc}
+    .app-row img{width:64px;height:64px;border-radius:16px;object-fit:cover;background:#eef3fa}
+    .app-main{min-width:0}
+    .app-title-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .app-row h3{margin:0;font-size:1rem;line-height:1.25;word-break:break-word}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 8px;font-size:.72rem;font-weight:900}
+    .badge.live{background:#e6f4ea;color:var(--brand)}
+    .badge.hidden{background:#fee2e2;color:var(--danger)}
+    .badge.cat{background:#e8f0fe;color:#1d4ed8}
+    .app-row p{margin:6px 0 0;color:var(--muted);font-size:.86rem;line-height:1.45;word-break:break-word}
+    .app-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;color:#475569;font-size:.78rem;font-weight:800}
+    .row-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:250px}
+    .row-actions .btn{padding:9px 11px;min-height:38px}
+    .empty{border:1px dashed var(--line);border-radius:18px;padding:28px;text-align:center;color:var(--muted);background:#fff}
+    .empty i{font-size:1.8rem;color:var(--brand);margin-bottom:8px}
+    @media(max-width:980px){
+      .hero{grid-template-columns:1fr}
+      .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+      main{grid-template-columns:1fr}
+      .panel{border-radius:18px}
+    }
+    @media(max-width:680px){
+      .topbar-inner{grid-template-columns:1fr;padding:10px 12px}
+      .actions{justify-content:stretch}
+      .actions .btn{flex:1;padding:9px 10px}
+      .shell{padding:14px 12px 28px}
+      .hero{border-radius:20px;padding:16px}
+      .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+      .stat{padding:10px 6px;border-radius:13px}
+      .stat strong{font-size:1.08rem}
+      .form-grid,.list-head{grid-template-columns:1fr}
+      .app-row{grid-template-columns:56px 1fr;align-items:start;border-radius:15px;padding:11px}
+      .app-row img{width:56px;height:56px;border-radius:14px}
+      .row-actions{grid-column:1/-1;max-width:none;justify-content:stretch}
+      .row-actions .btn{flex:1}
+      .toolbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
+      .filter-chip{white-space:nowrap}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-wrap">
+        <img class="brand-logo" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source">
+        <div>
+          <div class="brand">Tech Source Store Admin</div>
+          <small class="admin-email" id="adminEmail">Checking admin...</small>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" type="button" onclick="window.open('appstore.html')"><i class="fa-solid fa-store"></i> Open Store</button>
+        <button class="btn danger" type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <h1>Manage your App Store like a pro.</h1>
+        <p>Apps add, edit, hide/show aur download links manage karein. Public app store live Firestore data se update hota hai.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="totalApps">0</strong><span>Total</span></div>
+        <div class="stat"><strong id="liveApps">0</strong><span>Live</span></div>
+        <div class="stat"><strong id="hiddenApps">0</strong><span>Hidden</span></div>
+      </div>
+    </section>
+
+    <main>
+      <section class="panel">
+        <h2 id="formTitle">Add App</h2>
+        <p class="panel-sub">Public store me app card, details popup aur featured area yahin ke data se banega.</p>
+
+        <form id="appForm">
+          <input type="hidden" id="editId">
+
+          <div class="form-grid">
+            <div class="form-field full">
+              <label for="appName">App Name</label>
+              <input id="appName" type="text" placeholder="Example: Tech Source APK" required>
+            </div>
+
+            <div class="form-field full">
+              <label for="downloadUrl">Download Link</label>
+              <input id="downloadUrl" type="url" placeholder="https://github.com/.../app.apk" required>
+            </div>
+
+            <div class="form-field">
+              <label for="appVersion">Version</label>
+              <input id="appVersion" type="text" placeholder="v1.0.0">
+            </div>
+
+            <div class="form-field">
+              <label for="appSize">App Size</label>
+              <input id="appSize" type="text" placeholder="15 MB">
+            </div>
+
+            <div class="form-field full">
+              <label for="appCategory">Category</label>
+              <select id="appCategory">
+                <option value="">Auto / General Apps</option>
+                <option>Apps</option>
+                <option>Tools</option>
+                <option>Billing</option>
+                <option>PAN</option>
+                <option>Aadhaar</option>
+                <option>Result</option>
+                <option>Service</option>
+              </select>
+            </div>
+
+            <div class="form-field full">
+              <label for="appDescription">Short Description</label>
+              <textarea id="appDescription" placeholder="Official Android app download."></textarea>
+            </div>
+
+            <div class="form-field full">
+              <label for="previewImages">Preview Photos</label>
+              <textarea id="previewImages" placeholder="One image URL per line. These photos show on the app details page."></textarea>
+            </div>
+
+            <div class="form-field full">
+              <label for="logoFile">Logo Upload</label>
+              <input id="logoFile" type="file" accept="image/*">
+            </div>
+
+            <div class="form-field full">
+              <label for="logoUrl">Logo Link</label>
+              <input id="logoUrl" type="url" placeholder="Upload logo or paste image link">
+            </div>
+          </div>
+
+          <div class="preview-card">
+            <div class="preview-top"></div>
+            <div class="preview-body">
+              <img id="logoPreview" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Logo preview">
+              <div>
+                <h3 id="previewName">App Preview</h3>
+                <small id="previewMeta">Latest APK · Apps</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn primary" id="saveBtn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save App</button>
+            <button class="btn secondary" type="button" onclick="resetForm()"><i class="fa-solid fa-rotate-left"></i> Clear</button>
+          </div>
+          <div class="status" id="statusText"></div>
+        </form>
+      </section>
+
+      <section class="panel list-panel">
+        <div class="list-head">
+          <div>
+            <h2>Apps Library</h2>
+            <p id="listCount">Loading...</p>
+          </div>
+          <label class="search-box" for="adminSearch">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="adminSearch" type="search" placeholder="Search apps">
+          </label>
+        </div>
+        <div class="toolbar" id="statusFilters">
+          <button class="filter-chip active" type="button" data-filter="all">All</button>
+          <button class="filter-chip" type="button" data-filter="live">Live</button>
+          <button class="filter-chip" type="button" data-filter="hidden">Hidden</button>
+        </div>
+        <div class="app-list" id="appList">
+          <div class="empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading apps...</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
+      authDomain: "tech-source-bill.firebaseapp.com",
+      databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
+      projectId: "tech-source-bill",
+      storageBucket: "tech-source-bill.firebasestorage.app",
+      messagingSenderId: "690209240188",
+      appId: "1:690209240188:web:6e54de365e7f839634c5f9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const ADMIN_EMAIL = "techsource@gmail.com";
+    const IMGBB_API_KEY = "fa4ad05090c8cc3f9ade673a64a52235";
+    const fallbackLogo = "https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg";
+
+    const form = document.getElementById("appForm");
+    const editId = document.getElementById("editId");
+    const appName = document.getElementById("appName");
+    const downloadUrl = document.getElementById("downloadUrl");
+    const appVersion = document.getElementById("appVersion");
+    const appSize = document.getElementById("appSize");
+    const appCategory = document.getElementById("appCategory");
+    const appDescription = document.getElementById("appDescription");
+    const previewImages = document.getElementById("previewImages");
+    const logoFile = document.getElementById("logoFile");
+    const logoUrl = document.getElementById("logoUrl");
+    const logoPreview = document.getElementById("logoPreview");
+    const previewName = document.getElementById("previewName");
+    const previewMeta = document.getElementById("previewMeta");
+    const saveBtn = document.getElementById("saveBtn");
+    const statusText = document.getElementById("statusText");
+    const appList = document.getElementById("appList");
+    const listCount = document.getElementById("listCount");
+    const formTitle = document.getElementById("formTitle");
+    const totalApps = document.getElementById("totalApps");
+    const liveApps = document.getElementById("liveApps");
+    const hiddenApps = document.getElementById("hiddenApps");
+    const adminSearch = document.getElementById("adminSearch");
+    const statusFilters = document.getElementById("statusFilters");
+
+    let appsCache = [];
+    let activeFilter = "all";
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.replace("login.html");
+        return;
+      }
+      if (user.email !== ADMIN_EMAIL) {
+        auth.signOut().then(() => window.location.replace("login.html"));
+        return;
+      }
+      document.body.style.display = "block";
+      document.getElementById("adminEmail").textContent = user.email;
+      loadApps();
+    });
+
+    function htmlSafe(value) {
+      const div = document.createElement("div");
+      div.textContent = value || "";
+      return div.innerHTML;
+    }
+
+    function setStatus(message, type) {
+      statusText.textContent = message || "";
+      statusText.className = `status ${type || ""}`;
+    }
+
+    function setSaving(isSaving) {
+      saveBtn.disabled = isSaving;
+      saveBtn.innerHTML = isSaving ? `<i class="fa-solid fa-spinner fa-spin"></i> Saving...` : `<i class="fa-solid fa-floppy-disk"></i> Save App`;
+    }
+
+    function currentPreviewCategory() {
+      return appCategory.value || "Apps";
+    }
+
+    function updatePreview() {
+      previewName.textContent = appName.value.trim() || "App Preview";
+      previewMeta.textContent = `${appVersion.value.trim() || "Latest APK"} · ${currentPreviewCategory()}`;
+      if (logoUrl.value.trim()) logoPreview.src = logoUrl.value.trim();
+    }
+
+    async function uploadToImgBB(file) {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (!data.success || !data.data?.url) throw new Error("Logo upload failed");
+      return data.data.url;
+    }
+
+    [appName, appVersion, appCategory, logoUrl].forEach((input) => input.addEventListener("input", updatePreview));
+    appCategory.addEventListener("change", updatePreview);
+
+    logoFile.addEventListener("change", () => {
+      const file = logoFile.files[0];
+      if (file) logoPreview.src = URL.createObjectURL(file);
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setSaving(true);
+      setStatus("Saving app...", "");
+
+      try {
+        let finalLogoUrl = logoUrl.value.trim();
+        const file = logoFile.files[0];
+        if (file) {
+          setStatus("Uploading logo...", "");
+          finalLogoUrl = await uploadToImgBB(file);
+          logoUrl.value = finalLogoUrl;
+        }
+
+        if (!finalLogoUrl) throw new Error("Logo upload karo ya logo link paste karo");
+
+        const payload = {
+          name: appName.value.trim(),
+          downloadUrl: downloadUrl.value.trim(),
+          version: appVersion.value.trim(),
+          size: appSize.value.trim(),
+          category: appCategory.value.trim(),
+          description: appDescription.value.trim(),
+          previewImages: previewImages.value.split(/\r?\n|,/).map((url) => url.trim()).filter(Boolean),
+          logoUrl: finalLogoUrl,
+          active: true,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (editId.value) {
+          await db.collection("appStoreApps").doc(editId.value).update(payload);
+          setStatus("App updated successfully", "ok");
+        } else {
+          payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection("appStoreApps").add(payload);
+          setStatus("App added successfully", "ok");
+        }
+
+        resetForm(false);
+      } catch (error) {
+        setStatus(error.message || "Save failed", "err");
+      } finally {
+        setSaving(false);
+      }
+    });
+
+    function resetForm(clearStatus = true) {
+      form.reset();
+      editId.value = "";
+      formTitle.textContent = "Add App";
+      logoPreview.src = fallbackLogo;
+      updatePreview();
+      if (clearStatus) setStatus("", "");
+    }
+
+    function editApp(id) {
+      const app = appsCache.find((item) => item.id === id);
+      if (!app) return;
+      editId.value = id;
+      appName.value = app.name || "";
+      downloadUrl.value = app.downloadUrl || "";
+      appVersion.value = app.version || "";
+      appSize.value = app.size || "";
+      appCategory.value = app.category || "";
+      appDescription.value = app.description || "";
+      previewImages.value = Array.isArray(app.previewImages) ? app.previewImages.join("\n") : (app.previewImages || "");
+      logoUrl.value = app.logoUrl || "";
+      logoPreview.src = app.logoUrl || fallbackLogo;
+      formTitle.textContent = "Edit App";
+      updatePreview();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteApp(id) {
+      if (!confirm("Delete this app from store?")) return;
+      await db.collection("appStoreApps").doc(id).delete();
+    }
+
+    async function toggleApp(id) {
+      const app = appsCache.find((item) => item.id === id);
+      if (!app) return;
+      await db.collection("appStoreApps").doc(id).update({
+        active: app.active === false,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    function filteredApps() {
+      const query = adminSearch.value.trim().toLowerCase();
+      return appsCache.filter((app) => {
+        const live = app.active !== false;
+        const statusOk = activeFilter === "all" || (activeFilter === "live" && live) || (activeFilter === "hidden" && !live);
+        const searchOk = !query || `${app.name || ""} ${app.description || ""} ${app.version || ""} ${app.category || ""} ${app.downloadUrl || ""}`.toLowerCase().includes(query);
+        return statusOk && searchOk;
+      });
+    }
+
+    function renderApps() {
+      const apps = filteredApps();
+      const liveCount = appsCache.filter((app) => app.active !== false).length;
+      const hiddenCount = appsCache.length - liveCount;
+      totalApps.textContent = appsCache.length;
+      liveApps.textContent = liveCount;
+      hiddenApps.textContent = hiddenCount;
+      listCount.textContent = appsCache.length ? `${apps.length} of ${appsCache.length} apps shown` : "No apps added";
+
+      if (!appsCache.length) {
+        appList.innerHTML = `<div class="empty"><i class="fa-solid fa-box-open"></i><h3>No apps added yet</h3><p>Left form se first app add karein.</p></div>`;
+        return;
+      }
+
+      if (!apps.length) {
+        appList.innerHTML = `<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><h3>No matching app</h3><p>Search ya filter change karein.</p></div>`;
+        return;
+      }
+
+      appList.innerHTML = apps.map((app) => {
+        const live = app.active !== false;
+        const category = app.category || "Apps";
+        const version = app.version || "Latest APK";
+        return `
+          <div class="app-row ${live ? "" : "hidden-app"}">
+            <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+            <div class="app-main">
+              <div class="app-title-line">
+                <h3>${htmlSafe(app.name)}</h3>
+                <span class="badge ${live ? "live" : "hidden"}"><i class="fa-solid ${live ? "fa-eye" : "fa-eye-slash"}"></i> ${live ? "Live" : "Hidden"}</span>
+                <span class="badge cat">${htmlSafe(category)}</span>
+              </div>
+              <p>${htmlSafe(app.description || "No description added.")}</p>
+              <div class="app-meta">
+                <span><i class="fa-solid fa-code-branch"></i> ${htmlSafe(version)}</span>
+                <span><i class="fa-solid fa-hard-drive"></i> ${htmlSafe(app.size || "Size not set")}</span>
+                <span><i class="fa-solid fa-images"></i> ${Array.isArray(app.previewImages) ? app.previewImages.length : 0} previews</span>
+                <span><i class="fa-solid fa-link"></i> ${htmlSafe(app.downloadUrl || "No link")}</span>
+              </div>
+            </div>
+            <div class="row-actions">
+              <button class="btn secondary" type="button" onclick="editApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-pen"></i> Edit</button>
+              <button class="btn warning" type="button" onclick="toggleApp('${htmlSafe(app.id)}')"><i class="fa-solid ${live ? "fa-eye-slash" : "fa-eye"}"></i> ${live ? "Hide" : "Show"}</button>
+              <button class="btn danger" type="button" onclick="deleteApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function loadApps() {
+      db.collection("appStoreApps").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+        appsCache = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        renderApps();
+      }, () => {
+        appList.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><h3>Apps load nahi ho raha</h3><p>Firebase rules/check karo.</p></div>`;
+      });
+    }
+
+    adminSearch.addEventListener("input", renderApps);
+    statusFilters.addEventListener("click", (event) => {
+      const button = event.target.closest(".filter-chip");
+      if (!button) return;
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.toggle("active", chip === button));
+      renderApps();
+    });
+
+    function logout() {
+      auth.signOut().then(() => window.location.replace("login.html"));
+    }
+
+    updatePreview();
+  </script>
+</body>
+</html>

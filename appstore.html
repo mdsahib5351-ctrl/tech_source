@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" type="image/jpeg">
+  <title>Tech Source Play Store</title>
+  <meta name="description" content="Download official Android apps and tools from Tech Source Store.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <style>
+    :root{--bg:#f8fafc;--surface:#fff;--text:#172033;--muted:#657186;--line:#e2e8f0;--brand:#01875f;--brand-dark:#016c4c;--blue:#1a73e8;--amber:#f9ab00;--danger:#d93025;--shadow:0 18px 48px rgba(15,23,42,.12)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{text-decoration:none;color:inherit}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+    .topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    .topbar-inner{max-width:1180px;margin:auto;padding:12px 18px;display:grid;grid-template-columns:auto minmax(240px,1fr) auto;gap:16px;align-items:center}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;min-width:0}
+    .brand img{width:38px;height:38px;border-radius:10px;object-fit:cover}
+    .brand span{white-space:nowrap}
+    .search-wrap{position:relative}
+    .search-wrap i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .search-wrap input{width:100%;height:46px;border:1px solid transparent;border-radius:999px;background:#eef3f8;padding:0 44px;color:var(--text);outline:none;font-weight:600}
+    .search-wrap input:focus{background:#fff;border-color:#b7c8dc;box-shadow:0 0 0 4px rgba(1,135,95,.1)}
+    .icon-link{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--text)}
+    .container,.detail-page{max-width:1180px;margin:auto;padding:22px 18px 42px}
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:stretch;margin-bottom:18px}
+    .hero-copy{background:linear-gradient(135deg,#e7f5ef,#f8fbff 58%,#fff4db);border:1px solid var(--line);border-radius:26px;padding:28px;min-height:260px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+    .hero-copy:after{content:"";position:absolute;right:-70px;bottom:-90px;width:260px;height:260px;border-radius:50%;background:rgba(1,135,95,.08)}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;width:max-content;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 12px;color:var(--brand);font-weight:800;font-size:.84rem}
+    h1{font-size:clamp(2rem,5vw,4.2rem);line-height:1.02;margin:22px 0 12px;letter-spacing:0;max-width:720px}
+    .hero-copy p{margin:0;color:var(--muted);font-size:1.02rem;line-height:1.65;max-width:650px}
+    .store-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;position:relative}
+    .stat-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;color:#334155;font-weight:800;font-size:.86rem}
+    .featured-panel{background:#111827;color:#fff;border-radius:26px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:space-between;min-height:260px;overflow:hidden;position:relative}
+    .featured-panel:before{content:"";position:absolute;inset:auto -80px -80px auto;width:220px;height:220px;border-radius:48px;background:linear-gradient(135deg,var(--brand),var(--blue));transform:rotate(18deg);opacity:.85}
+    .featured-title{position:relative;display:flex;align-items:center;gap:14px}
+    .featured-title img{width:78px;height:78px;border-radius:18px;object-fit:cover;background:#fff}
+    .featured-title h2{margin:0;font-size:1.25rem}
+    .featured-title small{color:#cbd5e1;font-weight:700}
+    .featured-panel p{position:relative;color:#dbe4ef;line-height:1.55;margin:18px 0}
+    .featured-actions{position:relative;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .primary-btn,.ghost-btn{border:0;border-radius:999px;padding:11px 17px;font-weight:800;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+    .primary-btn{background:var(--brand);color:#fff}
+    .primary-btn:hover{background:var(--brand-dark)}
+    .ghost-btn{background:#eef3f8;color:#172033;border:1px solid var(--line)}
+    .section-bar{position:sticky;top:71px;z-index:20;background:rgba(248,250,252,.92);backdrop-filter:blur(14px);padding:12px 0;border-bottom:1px solid rgba(226,232,240,.7);margin-bottom:18px}
+    .section-row{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .section-row h2{margin:0;font-size:1.35rem}
+    .section-row span{color:var(--muted);font-weight:700;font-size:.92rem}
+    .tabs{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{border:1px solid var(--line);background:#fff;color:#334155;border-radius:999px;padding:9px 14px;font-weight:800;white-space:nowrap}
+    .tab.active{background:#e6f4ea;border-color:#a6d7bd;color:var(--brand)}
+    .store-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
+    .apps-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .app-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;grid-template-columns:72px 1fr;gap:13px;min-width:0;box-shadow:0 8px 24px rgba(15,23,42,.06);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+    .app-card:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(15,23,42,.1);border-color:#cbd5e1}
+    .app-logo{width:72px;height:72px;border-radius:18px;object-fit:cover;background:#eef3fa;border:1px solid var(--line)}
+    .app-info{min-width:0;display:flex;flex-direction:column;gap:7px}
+    .app-info h3{margin:0;font-size:1rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .app-desc{margin:0;color:var(--muted);font-size:.86rem;line-height:1.42;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:39px}
+    .meta-row{display:flex;align-items:center;gap:11px;flex-wrap:wrap;color:#475569;font-weight:800;font-size:.78rem}
+    .meta-row span{display:inline-flex;align-items:center;gap:4px}
+    .mini-download{margin-top:auto;width:max-content;border:0;border-radius:999px;background:#e6f4ea;color:var(--brand);font-weight:900;padding:8px 13px}
+    .side-panel{position:sticky;top:150px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 8px 26px rgba(15,23,42,.07)}
+    .side-panel h3{margin:0 0 12px;font-size:1rem}
+    .safe-list{display:grid;gap:12px}
+    .safe-item{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}
+    .safe-item i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#e6f4ea;color:var(--brand)}
+    .safe-item strong{display:block;font-size:.9rem}
+    .safe-item small{display:block;color:var(--muted);line-height:1.45;margin-top:2px}
+    .empty,.loading{grid-column:1/-1;background:#fff;border:1px dashed var(--line);border-radius:18px;padding:32px;text-align:center;color:var(--muted)}
+    .empty i,.loading i{font-size:2rem;color:var(--brand);margin-bottom:10px}
+    .detail-page{display:none}
+    .detail-page.show{display:block}
+    .detail-top{display:grid;grid-template-columns:112px 1fr auto;gap:18px;align-items:center;margin:20px 0 22px}
+    .detail-logo{width:112px;height:112px;border-radius:24px;object-fit:cover;background:#eef3fa;border:1px solid var(--line)}
+    .detail-title h2{margin:0 0 8px;font-size:clamp(1.7rem,4vw,3rem);line-height:1.05}
+    .detail-title p{margin:0;color:var(--muted);font-weight:700}
+    .detail-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .detail-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 22px}
+    .detail-meta div{text-align:center;border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff}
+    .detail-meta strong{display:block;font-size:1rem}
+    .detail-meta span{display:block;color:var(--muted);font-size:.78rem;font-weight:800;margin-top:3px}
+    .screenshots{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;padding:2px 0 18px;scroll-snap-type:x mandatory}
+    .screenshots img{width:auto;max-width:min(86vw,420px);max-height:420px;height:auto;object-fit:contain;border-radius:20px;border:1px solid var(--line);background:#eef3f8;scroll-snap-align:start}
+    .detail-section{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:16px}
+    .detail-section h3{margin:0 0 10px;font-size:1.15rem}
+    .detail-section p{margin:0;color:#475569;line-height:1.7}
+    .rating-box{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .rate-buttons{display:flex;gap:6px}
+    .rate-star{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#94a3b8;font-size:1rem}
+    .rate-star.active,.rate-star:hover{background:#fff7ed;color:var(--amber);border-color:#facc15}
+    .suggestions{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .suggest-card{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:15px;padding:10px;background:#fff;cursor:pointer}
+    .suggest-card img{width:56px;height:56px;border-radius:14px;object-fit:cover;background:#eef3fa}
+    .suggest-card h4{margin:0;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .suggest-card small{color:var(--muted);font-weight:800}
+    .download-panel{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(620px,calc(100% - 24px));background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 22px 70px rgba(15,23,42,.22);z-index:60;display:none}
+    .download-panel.show{display:block}
+    .download-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .download-head strong{font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .download-head span{color:var(--brand);font-weight:900}
+    .download-close{width:30px;height:30px;border:0;border-radius:50%;background:#eef3f8;color:#334155;display:grid;place-items:center;flex:0 0 auto}
+    .download-track{height:18px;background:#e5e7eb;border-radius:999px;overflow:hidden;border:1px solid #d1d5db}
+    .download-fill{height:100%;width:0%;background:linear-gradient(90deg,#16a34a,#22c55e,#86efac);border-radius:999px;transition:width .2s ease}
+    .download-note{margin:9px 0 0;color:var(--muted);font-size:.84rem;font-weight:700;line-height:1.45}
+    .download-note.warning{color:#b45309}
+    footer{max-width:1180px;margin:0 auto;padding:24px 18px 34px;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.9rem}
+    @media(max-width:900px){.topbar-inner{grid-template-columns:auto 1fr auto;gap:10px}.brand span{display:none}.hero{grid-template-columns:1fr}.store-layout{grid-template-columns:1fr}.side-panel{position:static}}
+    @media(max-width:680px){
+      .topbar-inner{padding:10px;grid-template-columns:auto 1fr auto}.container,.detail-page{padding:16px 12px 32px}.hero-copy,.featured-panel{border-radius:20px;padding:18px}.hero-copy{min-height:235px}.featured-panel{min-height:230px}.section-bar{top:63px;margin-left:-12px;margin-right:-12px;padding:10px 12px}.section-row{align-items:flex-start;flex-direction:column;gap:5px}.apps-grid{grid-template-columns:1fr;gap:10px}.app-card{grid-template-columns:62px 1fr;border-radius:14px;padding:12px}.app-logo{width:62px;height:62px;border-radius:15px}.app-info h3{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.app-desc{font-size:.84rem}h1{font-size:2.1rem}.detail-top{grid-template-columns:78px 1fr;gap:12px;align-items:start}.detail-logo{width:78px;height:78px;border-radius:18px}.detail-actions{grid-column:1/-1;justify-content:stretch}.detail-actions .primary-btn,.detail-actions .ghost-btn{flex:1}.detail-meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.screenshots img{width:auto;max-width:82vw;max-height:360px;height:auto;border-radius:17px}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Tech Source Home">
+        <img src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source">
+        <span>Tech Source Play</span>
+      </a>
+      <label class="search-wrap" for="searchInput">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="searchInput" type="search" placeholder="Search apps and tools">
+      </label>
+      <a class="icon-link" href="index.html" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+    </div>
+  </header>
+
+  <main class="container" id="storeHome">
+    <section class="hero">
+      <div class="hero-copy">
+        <div>
+          <span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Official Tech Source Store</span>
+          <h1>Apps, tools and updates in one trusted place.</h1>
+          <p>Tech Source ke official Android apps aur service tools yahan se download karein. Har app admin panel se manage hota hai.</p>
+        </div>
+        <div class="store-stats">
+          <span class="stat-chip"><i class="fa-solid fa-circle-check"></i> Verified apps</span>
+          <span class="stat-chip"><i class="fa-solid fa-bolt"></i> Fast install</span>
+          <span class="stat-chip"><i class="fa-brands fa-android"></i> Android APK</span>
+        </div>
+      </div>
+      <aside class="featured-panel" id="featuredPanel">
+        <div class="featured-title">
+          <img src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Featured app">
+          <div><h2>Loading featured app</h2><small>Official APK</small></div>
+        </div>
+        <p>Store apps load ho rahe hain.</p>
+        <div class="featured-actions"><button class="primary-btn" type="button" disabled><i class="fa-solid fa-spinner fa-spin"></i> Loading</button></div>
+      </aside>
+    </section>
+
+    <section class="section-bar">
+      <div class="section-row">
+        <div><h2>For You</h2><span id="appCount">Loading apps...</span></div>
+        <span id="resultHint">Official download links</span>
+      </div>
+      <div class="tabs" id="categoryTabs" aria-label="App categories"></div>
+    </section>
+
+    <section class="store-layout">
+      <div class="apps-grid" id="appsGrid">
+        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading apps...</p></div>
+      </div>
+      <aside class="side-panel">
+        <h3>Store Safety</h3>
+        <div class="safe-list">
+          <div class="safe-item"><i class="fa-solid fa-user-shield"></i><div><strong>Admin verified</strong><small>Only active apps listed by Tech Source admin appear here.</small></div></div>
+          <div class="safe-item"><i class="fa-solid fa-link"></i><div><strong>Direct download</strong><small>Download button original app link par open hota hai.</small></div></div>
+          <div class="safe-item"><i class="fa-solid fa-rotate"></i><div><strong>Live updates</strong><small>Admin app update kare to listing automatically refresh hoti hai.</small></div></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <section class="detail-page" id="appDetailPage" aria-live="polite"></section>
+
+  <footer id="storeFooter">
+    <span>Copyright 2026 Tech Source.</span>
+    <span>Download only apps listed by official admin.</span>
+  </footer>
+
+  <div class="download-panel" id="downloadPanel" role="status" aria-live="polite">
+    <div class="download-head">
+      <strong id="downloadTitle">Preparing download...</strong>
+      <span id="downloadPercent">0%</span>
+      <button class="download-close" type="button" onclick="downloadPanel.classList.remove('show')" aria-label="Hide download panel"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="download-track"><div class="download-fill" id="downloadFill"></div></div>
+    <p class="download-note" id="downloadNote">Download start ho raha hai.</p>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
+      authDomain: "tech-source-bill.firebaseapp.com",
+      databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
+      projectId: "tech-source-bill",
+      storageBucket: "tech-source-bill.firebasestorage.app",
+      messagingSenderId: "690209240188",
+      appId: "1:690209240188:web:6e54de365e7f839634c5f9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const appsGrid = document.getElementById("appsGrid");
+    const appCount = document.getElementById("appCount");
+    const resultHint = document.getElementById("resultHint");
+    const searchInput = document.getElementById("searchInput");
+    const categoryTabs = document.getElementById("categoryTabs");
+    const featuredPanel = document.getElementById("featuredPanel");
+    const storeHome = document.getElementById("storeHome");
+    const storeFooter = document.getElementById("storeFooter");
+    const appDetailPage = document.getElementById("appDetailPage");
+    const downloadPanel = document.getElementById("downloadPanel");
+    const downloadTitle = document.getElementById("downloadTitle");
+    const downloadPercent = document.getElementById("downloadPercent");
+    const downloadFill = document.getElementById("downloadFill");
+    const downloadNote = document.getElementById("downloadNote");
+    const fallbackLogo = "https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg";
+    let allApps = [];
+    let activeCategory = "All";
+
+    function htmlSafe(value) {
+      const div = document.createElement("div");
+      div.textContent = value || "";
+      return div.innerHTML;
+    }
+
+    function plain(value) {
+      return String(value || "").trim();
+    }
+
+    function appVersion(app) {
+      return plain(app.version) || "Latest APK";
+    }
+
+    function inferCategory(app) {
+      if (plain(app.category)) return plain(app.category);
+      const text = `${app.name || ""} ${app.description || ""}`.toLowerCase();
+      if (text.includes("pan")) return "PAN";
+      if (text.includes("aadhaar") || text.includes("adhar")) return "Aadhaar";
+      if (text.includes("bill") || text.includes("payment")) return "Billing";
+      if (text.includes("image") || text.includes("pdf")) return "Tools";
+      if (text.includes("result")) return "Result";
+      return "Apps";
+    }
+
+    function ratingText(app) {
+      const count = Number(app.ratingCount || 0);
+      const total = Number(app.ratingTotal || 0);
+      if (!count || !total) return "No ratings";
+      return `${(total / count).toFixed(1)} star`;
+    }
+
+    function sizeText(app) {
+      return plain(app.size) || "Size not set";
+    }
+
+    function appScreenshots(app) {
+      const normalize = (item) => {
+        if (!item) return "";
+        if (typeof item === "string") return item.trim();
+        return String(item.url || item.src || item.imageUrl || "").trim();
+      };
+      if (Array.isArray(app.previewImages)) return app.previewImages.map(normalize).filter(Boolean);
+      if (typeof app.previewImages === "string") return app.previewImages.split(/\r?\n|,/).map((item) => item.trim()).filter(Boolean);
+      if (Array.isArray(app.screenshots)) return app.screenshots.map(normalize).filter(Boolean);
+      return [];
+    }
+
+    function decorateApps(apps) {
+      return apps.map((app) => ({ ...app, category: inferCategory(app) }));
+    }
+
+    function filteredApps() {
+      const query = searchInput.value.trim().toLowerCase();
+      return allApps.filter((app) => {
+        const categoryOk = activeCategory === "All" || app.category === activeCategory;
+        const searchOk = !query || `${app.name || ""} ${app.description || ""} ${app.version || ""} ${app.category || ""}`.toLowerCase().includes(query);
+        return categoryOk && searchOk;
+      });
+    }
+
+    function renderTabs() {
+      const categories = ["All", ...Array.from(new Set(allApps.map((app) => app.category))).sort()];
+      categoryTabs.innerHTML = categories.map((category) => `<button class="tab ${category === activeCategory ? "active" : ""}" type="button" data-category="${htmlSafe(category)}">${htmlSafe(category)}</button>`).join("");
+    }
+
+    function renderFeatured(apps) {
+      const app = apps[0] || allApps[0];
+      if (!app) {
+        featuredPanel.innerHTML = `<div class="featured-title"><img src="${fallbackLogo}" alt="Tech Source"><div><h2>No app available</h2><small>Official APK</small></div></div><p>Admin app add karega to featured listing yahan show hogi.</p><div class="featured-actions"><button class="primary-btn" type="button" disabled><i class="fa-solid fa-box-open"></i> No Apps</button></div>`;
+        return;
+      }
+      featuredPanel.innerHTML = `
+        <div class="featured-title">
+          <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+          <div><h2>${htmlSafe(app.name)}</h2><small>${htmlSafe(app.category)} · ${htmlSafe(appVersion(app))}</small></div>
+        </div>
+        <p>${htmlSafe(app.description || "Official Tech Source Android app download.")}</p>
+        <div class="featured-actions">
+          <button class="primary-btn" type="button" onclick="downloadApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-download"></i> Install</button>
+          <button class="ghost-btn" type="button" onclick="openAppDetails('${htmlSafe(app.id)}')"><i class="fa-solid fa-circle-info"></i> Details</button>
+        </div>`;
+    }
+
+    function renderApps() {
+      const apps = filteredApps();
+      appCount.textContent = allApps.length ? `${allApps.length} apps available` : "No apps available";
+      resultHint.textContent = apps.length === allApps.length ? "Official download links" : `${apps.length} result found`;
+      renderTabs();
+      renderFeatured(apps);
+      if (!allApps.length) {
+        appsGrid.innerHTML = `<div class="empty"><i class="fa-solid fa-box-open"></i><h3>No apps added yet</h3><p>Apps admin panel se add karne ke baad yahan dikhenge.</p></div>`;
+        return;
+      }
+      if (!apps.length) {
+        appsGrid.innerHTML = `<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><h3>No matching app</h3><p>Search ya category change karke dekhein.</p></div>`;
+        return;
+      }
+      appsGrid.innerHTML = apps.map((app) => `
+        <article class="app-card" tabindex="0" role="button" onclick="openAppDetails('${htmlSafe(app.id)}')" onkeydown="if(event.key==='Enter') openAppDetails('${htmlSafe(app.id)}')">
+          <img class="app-logo" src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)} logo" onerror="this.src='${fallbackLogo}'">
+          <div class="app-info">
+            <h3>${htmlSafe(app.name)}</h3>
+            <p class="app-desc">${htmlSafe(app.description || "Official app download from Tech Source.")}</p>
+            <div class="meta-row">
+              <span><i class="fa-solid fa-star" style="color:var(--amber)"></i> ${htmlSafe(ratingText(app))}</span>
+              <span>${htmlSafe(sizeText(app))}</span>
+              <span>${htmlSafe(app.category)}</span>
+            </div>
+            <button class="mini-download" type="button" onclick="event.stopPropagation(); downloadApp('${htmlSafe(app.id)}')">Install</button>
+          </div>
+        </article>`).join("");
+    }
+
+    function setDownloadProgress(percent, note) {
+      const safePercent = Math.max(0, Math.min(100, Math.round(percent)));
+      downloadPanel.classList.add("show");
+      downloadNote.classList.remove("warning");
+      downloadPercent.textContent = `${safePercent}%`;
+      downloadFill.style.width = `${safePercent}%`;
+      if (note) downloadNote.textContent = note;
+    }
+
+    function setDownloadFallback(note) {
+      downloadPanel.classList.add("show");
+      downloadNote.classList.add("warning");
+      downloadPercent.textContent = "Open";
+      downloadFill.style.width = "100%";
+      downloadNote.textContent = note;
+    }
+
+    function fileNameFor(app) {
+      try {
+        const url = new URL(app.downloadUrl);
+        const name = decodeURIComponent(url.pathname.split("/").filter(Boolean).pop() || "");
+        return name || `${plain(app.name).replace(/\s+/g, "-") || "tech-source-app"}.apk`;
+      } catch (error) {
+        return `${plain(app.name).replace(/\s+/g, "-") || "tech-source-app"}.apk`;
+      }
+    }
+
+    async function streamDownload(app) {
+      const response = await fetch(app.downloadUrl, { mode: "cors" });
+      if (!response.ok) throw new Error("Download request failed");
+      if (!response.body) throw new Error("Download progress not supported");
+      const total = Number(response.headers.get("content-length") || 0);
+      if (!total) throw new Error("Download size unavailable");
+      const reader = response.body.getReader();
+      const chunks = [];
+      let received = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        setDownloadProgress((received / total) * 100, `${Math.round(received / 1024)} KB downloaded`);
+      }
+      const blob = new Blob(chunks);
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileNameFor(app);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+      setDownloadProgress(100, "Download complete.");
+    }
+
+    async function downloadApp(id) {
+      const app = allApps.find((item) => item.id === id);
+      if (!app?.downloadUrl) return;
+      downloadTitle.textContent = `Downloading ${app.name || "app"}`;
+      setDownloadProgress(0, "Download prepare ho raha hai.");
+      try {
+        await streamDownload(app);
+      } catch (error) {
+        setDownloadFallback("Is link par browser exact percentage read nahi kar pa raha. Normal download open ho gaya hai.");
+        window.open(app.downloadUrl, "_blank", "noopener");
+      }
+    }
+
+    function ratingKey(id) {
+      return `tech_source_app_rating_${id}`;
+    }
+
+    function getUserRating(id) {
+      return Number(localStorage.getItem(ratingKey(id)) || 0);
+    }
+
+    async function rateApp(id, value) {
+      const previous = getUserRating(id);
+      const update = {
+        ratingTotal: firebase.firestore.FieldValue.increment(value - previous),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (!previous) update.ratingCount = firebase.firestore.FieldValue.increment(1);
+      localStorage.setItem(ratingKey(id), String(value));
+      try {
+        await db.collection("appStoreApps").doc(id).update(update);
+      } catch (error) {
+        alert("Rating save nahi hua. Firebase rules check karein.");
+      }
+      const current = allApps.find((item) => item.id === id);
+      if (current) {
+        current.ratingTotal = Number(current.ratingTotal || 0) + value - previous;
+        current.ratingCount = Number(current.ratingCount || 0) + (previous ? 0 : 1);
+      }
+      openAppDetails(id);
+    }
+
+    function shareApp(id) {
+      const app = allApps.find((item) => item.id === id);
+      if (!app) return;
+      const text = `${app.name}\nDownload from Tech Source Store:\n${location.origin}${location.pathname}#app=${encodeURIComponent(id)}`;
+      if (navigator.share) navigator.share({ title: app.name, text }).catch(() => {});
+      else {
+        navigator.clipboard?.writeText(text);
+        alert("App link copied.");
+      }
+    }
+
+    function openAppDetails(id) {
+      const app = allApps.find((item) => item.id === id);
+      if (!app) return;
+      const screenshots = appScreenshots(app);
+      const suggestions = allApps.filter((item) => item.id !== app.id).slice(0, 6);
+      const userRating = getUserRating(app.id);
+      storeHome.classList.add("hidden");
+      storeFooter.classList.add("hidden");
+      appDetailPage.classList.add("show");
+      appDetailPage.innerHTML = `
+        <button class="ghost-btn" type="button" onclick="closeDetails()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <div class="detail-top">
+          <img class="detail-logo" src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+          <div class="detail-title"><h2>${htmlSafe(app.name)}</h2><p>${htmlSafe(app.category)} · ${htmlSafe(appVersion(app))}</p></div>
+          <div class="detail-actions">
+            <button class="primary-btn" type="button" onclick="downloadApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-download"></i> Install</button>
+            <button class="ghost-btn" type="button" onclick="shareApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-share-nodes"></i> Share</button>
+          </div>
+        </div>
+        <div class="detail-meta">
+          <div><strong>${htmlSafe(ratingText(app))}</strong><span>${Number(app.ratingCount || 0)} ratings</span></div>
+          <div><strong>${htmlSafe(sizeText(app))}</strong><span>Size</span></div>
+          <div><strong>APK</strong><span>Android</span></div>
+        </div>
+        <div class="screenshots">
+          ${screenshots.length ? screenshots.map((src) => `<img src="${htmlSafe(src)}" alt="${htmlSafe(app.name)} preview" onerror="this.remove(); if(!document.querySelector('.screenshots img')) document.querySelector('.screenshots').innerHTML='<div class=&quot;empty&quot;><i class=&quot;fa-solid fa-image&quot;></i><h3>No preview photos</h3><p>Admin preview photo add karega to yahan show hoga.</p></div>';">`).join("") : `<div class="empty"><i class="fa-solid fa-image"></i><h3>No preview photos</h3><p>Admin preview photo add karega to yahan show hoga.</p></div>`}
+        </div>
+        <section class="detail-section"><h3>About this app</h3><p>${htmlSafe(app.description || "Download the latest official app from Tech Source.")}</p></section>
+        <section class="detail-section rating-box">
+          <div><h3>Rate this app</h3><p>${userRating ? `Your rating: ${userRating} star` : "Apna real rating dijiye."}</p></div>
+          <div class="rate-buttons">${[1,2,3,4,5].map((value) => `<button class="rate-star ${userRating >= value ? "active" : ""}" type="button" onclick="rateApp('${htmlSafe(app.id)}', ${value})"><i class="fa-solid fa-star"></i></button>`).join("")}</div>
+        </section>
+        <section class="detail-section">
+          <h3>More apps</h3>
+          <div class="suggestions">
+            ${suggestions.length ? suggestions.map((item) => `<article class="suggest-card" onclick="openAppDetails('${htmlSafe(item.id)}')"><img src="${htmlSafe(item.logoUrl || fallbackLogo)}" alt="${htmlSafe(item.name)}" onerror="this.src='${fallbackLogo}'"><div><h4>${htmlSafe(item.name)}</h4><small>${htmlSafe(item.category)} · ${htmlSafe(ratingText(item))}</small></div></article>`).join("") : `<p>No other apps available.</p>`}
+          </div>
+        </section>`;
+      history.replaceState(null, "", `#app=${encodeURIComponent(app.id)}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeDetails() {
+      appDetailPage.classList.remove("show");
+      appDetailPage.innerHTML = "";
+      storeHome.classList.remove("hidden");
+      storeFooter.classList.remove("hidden");
+      history.replaceState(null, "", location.pathname);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    categoryTabs.addEventListener("click", (event) => {
+      const button = event.target.closest(".tab");
+      if (!button) return;
+      activeCategory = button.dataset.category;
+      renderApps();
+    });
+    searchInput.addEventListener("input", renderApps);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && appDetailPage.classList.contains("show")) closeDetails();
+    });
+
+    Object.assign(window, { openAppDetails, closeDetails, downloadApp, rateApp, shareApp });
+
+    db.collection("appStoreApps").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+      allApps = decorateApps(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).filter((app) => app.active !== false));
+      if (!allApps.some((app) => app.category === activeCategory)) activeCategory = "All";
+      renderApps();
+      const hashApp = new URLSearchParams(location.hash.replace(/^#/, "")).get("app");
+      if (hashApp) openAppDetails(hashApp);
+    }, () => {
+      appCount.textContent = "Could not load apps";
+      resultHint.textContent = "Firebase loading error";
+      featuredPanel.innerHTML = `<div class="featured-title"><img src="${fallbackLogo}" alt="Tech Source"><div><h2>Unable to load apps</h2><small>Refresh required</small></div></div><p>Firebase se app list load nahi ho pa rahi hai. Internet ya rules check karein.</p><div class="featured-actions"><button class="primary-btn" type="button" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>`;
+      appsGrid.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><h3>Unable to load apps</h3><p>Please refresh the page.</p></div>`;
+    });
+  </script>
+</body>
+</html>
