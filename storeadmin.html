@@ -12,6 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <style>
     :root{
       --bg:#f8fafc;
@@ -28,7 +29,7 @@
       --shadow:0 18px 48px rgba(15,23,42,.11);
     }
     *{box-sizing:border-box}
-    body{display:none;margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
     button,input,textarea,select{font:inherit}
     button{cursor:pointer}
     .topbar{background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
@@ -45,15 +46,35 @@
     .btn.danger{background:#fee2e2;color:var(--danger)}
     .btn.warning{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
     .btn:disabled{opacity:.68;cursor:not-allowed}
+    .hidden{display:none!important}
+    .admin-auth{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(circle at top left,#e6f4ea,transparent 34%),radial-gradient(circle at bottom right,#e8f0fe,transparent 32%),var(--bg)}
+    .auth-card{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+    .auth-logo{width:58px;height:58px;border-radius:16px;object-fit:cover;margin-bottom:14px}
+    .auth-card h1{margin:0 0 8px;font-size:1.75rem;line-height:1.1}
+    .auth-card p{margin:0 0 18px;color:var(--muted);line-height:1.55}
+    .auth-card form{display:grid;gap:13px}
+    .auth-card label{margin:0 0 6px}
+    .auth-card input{background:#f8fafc}
+    .auth-message{min-height:22px;color:var(--muted);font-weight:800;font-size:.9rem}
+    .auth-message.err{color:var(--danger)}
     .shell{max-width:1220px;margin:auto;padding:20px 18px 36px}
     .hero{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,#e7f5ef,#fff 54%,#e8f0fe);padding:22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin-bottom:18px;box-shadow:0 10px 32px rgba(15,23,42,.07)}
     .hero h1{margin:0 0 8px;font-size:clamp(1.8rem,4vw,3.3rem);line-height:1.04;letter-spacing:0}
     .hero p{margin:0;color:var(--muted);line-height:1.6;max-width:720px}
-    .stats{display:grid;grid-template-columns:repeat(3,118px);gap:10px}
+    .stats{display:grid;grid-template-columns:repeat(4,104px);gap:10px}
     .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
     .stat strong{display:block;font-size:1.35rem}
     .stat span{display:block;color:var(--muted);font-size:.78rem;font-weight:800;margin-top:2px}
-    main{display:grid;grid-template-columns:390px minmax(0,1fr);gap:18px;align-items:start}
+    .admin-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 18px;padding-bottom:2px;scrollbar-width:none}
+    .admin-tabs::-webkit-scrollbar{display:none}
+    .admin-tab{border:1px solid var(--line);border-radius:14px;background:#fff;color:#334155;padding:12px 14px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;box-shadow:0 8px 22px rgba(15,23,42,.05)}
+    .admin-tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .admin-tab .count{min-width:24px;height:24px;border-radius:999px;display:grid;place-items:center;background:#eef3f8;color:#172033;font-size:.78rem;padding:0 7px}
+    .admin-tab.active .count{background:rgba(255,255,255,.22);color:#fff}
+    .admin-main{display:block}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .upload-panel{max-width:820px;margin:auto}
     .panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
     .panel h2{margin:0;font-size:1.25rem}
     .panel-sub{margin:5px 0 16px;color:var(--muted);line-height:1.5}
@@ -64,6 +85,7 @@
     input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(1,135,95,.11)}
     textarea{min-height:100px;resize:vertical}
     input[type=file]{background:#fff;padding:10px}
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     .preview-card{margin:14px 0;border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden}
     .preview-top{height:82px;background:linear-gradient(135deg,#e6f4ea,#e8f0fe)}
     .preview-body{display:grid;grid-template-columns:76px 1fr;gap:12px;padding:0 14px 14px;margin-top:-34px;align-items:end}
@@ -83,66 +105,195 @@
     .toolbar{display:flex;gap:8px;flex-wrap:wrap}
     .filter-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;font-weight:800;color:#334155}
     .filter-chip.active{background:#e6f4ea;border-color:#a6d7bd;color:var(--brand)}
-    .app-list{display:grid;gap:12px}
-    .app-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:13px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:13px;background:#fff;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    .app-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+    .admin-grid{display:grid;grid-template-columns:minmax(230px,320px) 1fr;gap:14px;align-items:start}
+    .user-list{display:grid;gap:10px}
+    .user-row{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff;cursor:pointer;display:grid;gap:5px}
+    .user-row.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(1,135,95,.1)}
+    .user-row strong{font-size:.95rem}
+    .user-row span,.user-row small{color:var(--muted);font-weight:700;word-break:break-word}
+    .user-detail{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;min-height:220px}
+    .request-layout{display:grid;grid-template-columns:1fr;gap:14px}
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px}
+    .dashboard-card{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    .dashboard-card strong{display:block;font-size:1.45rem}.dashboard-card span{display:block;color:var(--muted);font-weight:800;margin-top:4px}
+    .app-row{border:1px solid var(--line);border-radius:18px;padding:12px;background:#fff;box-shadow:0 8px 24px rgba(15,23,42,.05);cursor:pointer;min-width:0}
+    .app-compact{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:center}
     .app-row.hidden-app{opacity:.72;background:#f8fafc}
-    .app-row img{width:64px;height:64px;border-radius:16px;object-fit:cover;background:#eef3fa}
+    .app-row img{width:52px;height:52px;border-radius:14px;object-fit:cover;background:#eef3fa}
     .app-main{min-width:0}
     .app-title-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .app-row h3{margin:0;font-size:1rem;line-height:1.25;word-break:break-word}
+    .app-row h3{margin:0;font-size:.94rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 8px;font-size:.72rem;font-weight:900}
     .badge.live{background:#e6f4ea;color:var(--brand)}
     .badge.hidden{background:#fee2e2;color:var(--danger)}
     .badge.cat{background:#e8f0fe;color:#1d4ed8}
     .app-row p{margin:6px 0 0;color:var(--muted);font-size:.86rem;line-height:1.45;word-break:break-word}
     .app-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;color:#475569;font-size:.78rem;font-weight:800}
-    .row-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:250px}
+    .row-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-start;margin-top:12px}
     .row-actions .btn{padding:9px 11px;min-height:38px}
+    .collapsible-block{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}
+    .collapse-toggle{width:100%;border:0;background:#f8fafc;color:#172033;padding:13px 14px;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .collapse-toggle span{display:flex;align-items:center;gap:8px}
+    .collapse-content{display:none;padding:14px;border-top:1px solid var(--line)}
+    .collapsible-block.open .collapse-content{display:block}
+    .collapsible-block.open .collapse-toggle .fa-chevron-down{transform:rotate(180deg)}
+    .admin-detail-page{display:none}
+    #adminAppView.detail-mode .hero,#adminAppView.detail-mode .admin-tabs,#adminAppView.detail-mode .admin-main{display:none}
+    #adminAppView.detail-mode .admin-detail-page{display:block}
+    .detail-hero{background:#fff;border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+    .detail-top{display:grid;grid-template-columns:108px minmax(0,1fr) auto;gap:16px;align-items:center}
+    .detail-logo{width:108px;height:108px;border-radius:24px;object-fit:cover;background:#eef3fa}
+    .detail-title h2{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.6rem);line-height:1.08;word-break:break-word}
+    .detail-title p{margin:0;color:var(--muted);line-height:1.55}
+    .detail-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+    .detail-box{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fbfdff}
+    .detail-box h3{margin:0 0 8px;font-size:1rem}
+    .detail-box p{margin:0;color:var(--muted);line-height:1.55;word-break:break-word}
+    .detail-meta{display:flex;gap:8px;flex-wrap:wrap}
+    .preview-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:3px}
+    .preview-strip img{width:auto;max-width:240px;max-height:240px;border-radius:14px;border:1px solid var(--line);object-fit:contain;background:#eef3fa}
     .empty{border:1px dashed var(--line);border-radius:18px;padding:28px;text-align:center;color:var(--muted);background:#fff}
     .empty i{font-size:1.8rem;color:var(--brand);margin-bottom:8px}
+    .inline-check{display:flex;align-items:center;gap:9px;font-weight:900;color:#334155;margin-top:4px}
+    .inline-check input{width:auto}
+    .mini-list{display:grid;gap:8px;margin-top:12px}
+    .mini-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:13px;padding:10px;background:#fff}
+    .mini-row p{margin:4px 0 0;color:var(--muted);font-size:.84rem;line-height:1.45}
+    .mini-row strong{font-size:.92rem}
+    .request-card{align-items:flex-start;border-radius:16px;padding:14px}
+    .request-card .request-info{min-width:0}
+    .request-status{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:.72rem;font-weight:900;background:#eef3f8;color:#475569;margin-left:6px}
+    .request-status.pending{background:#fff7ed;color:#c2410c}
+    .request-status.approved{background:#e6f4ea;color:var(--brand)}
+    .request-status.rejected{background:#fee2e2;color:var(--danger)}
+    .request-message{margin-top:8px;padding:9px 10px;border-radius:12px;background:#f8fafc;color:#475569}
+    .preview-upload-box{border:1px dashed #b7c4d4;border-radius:16px;background:#fbfdff;padding:12px;display:grid;gap:12px}
+    .preview-upload-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+    .preview-upload-head p{margin:4px 0 0;color:var(--muted);font-size:.84rem}
+    .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+    .preview-item{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+    .preview-item img{width:100%;height:118px;object-fit:cover;background:#eef3fa;display:block}
+    .preview-item-body{padding:8px;display:grid;gap:7px}
+    .preview-item-body small{color:var(--muted);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .preview-item-actions{display:flex;gap:5px}
+    .preview-item-actions .btn{min-height:32px;padding:7px 8px;flex:1}
+    .uploading-note{color:var(--brand);font-weight:900;font-size:.88rem}
+    body{background:linear-gradient(180deg,#f6f8fb 0,#eef3f8 100%)}
+    .shell{max-width:1280px;display:grid;grid-template-columns:248px minmax(0,1fr);gap:18px;align-items:start}
+    .hero{grid-column:1/-1;border-radius:20px;background:#101827;color:#fff;border:0;box-shadow:0 18px 44px rgba(15,23,42,.2);overflow:hidden;position:relative}
+    .hero:after{content:"";position:absolute;right:-80px;top:-110px;width:260px;height:260px;border-radius:50%;background:rgba(1,135,95,.34)}
+    .hero h1{font-size:clamp(1.8rem,3.4vw,2.9rem)}
+    .hero p{color:#cbd5e1}
+    .stats{position:relative;z-index:1}
+    .stat{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff;text-align:left}
+    .stat span{color:#cbd5e1}
+    .admin-tabs{position:sticky;top:78px;display:grid;grid-template-columns:1fr;gap:8px;margin:0;padding:10px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px rgba(15,23,42,.07)}
+    .admin-tab{justify-content:flex-start;border:0;border-radius:12px;background:transparent;box-shadow:none;padding:12px;color:#475569;min-width:0}
+    .admin-tab:hover{background:#f1f5f9}
+    .admin-tab.active{background:#e6f4ea;color:var(--brand);border:0}
+    .admin-tab .count{margin-left:auto;background:#edf2f7;color:#475569}
+    .admin-tab.active .count{background:#fff;color:var(--brand)}
+    .admin-main{min-width:0}
+    .panel{border-radius:18px;border-color:#dbe3ec;box-shadow:0 12px 34px rgba(15,23,42,.08)}
+    .panel h2{font-size:1.35rem}
+    .dashboard-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .dashboard-card{border-radius:16px;background:linear-gradient(180deg,#fff,#f8fafc);box-shadow:none}
+    .dashboard-card strong{font-size:1.7rem;color:#0f172a}
+    .app-list{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+    .app-row{border-radius:16px;box-shadow:none;transition:.18s ease}
+    .app-row:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(15,23,42,.1)}
+    .app-row.hidden-app{opacity:1;background:#f8fafc}
+    .toolbar{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:8px}
+    .filter-chip{border-radius:10px}
+    .mini-row{border-radius:14px}
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
-      .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
-      main{grid-template-columns:1fr}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .shell{display:block}
+      .admin-tabs{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 14px}
+      .admin-tab{justify-content:flex-start}
       .panel{border-radius:18px}
+      .admin-grid{grid-template-columns:1fr}
+      .dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     @media(max-width:680px){
       .topbar-inner{grid-template-columns:1fr;padding:10px 12px}
       .actions{justify-content:stretch}
       .actions .btn{flex:1;padding:9px 10px}
       .shell{padding:14px 12px 28px}
-      .hero{border-radius:20px;padding:16px}
-      .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+      .hero{border-radius:18px;padding:16px;margin-bottom:12px}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
       .stat{padding:10px 6px;border-radius:13px}
       .stat strong{font-size:1.08rem}
+      .admin-tabs{grid-template-columns:1fr 1fr;gap:7px;padding:8px;border-radius:16px}
+      .admin-tab{padding:10px 9px;gap:6px;font-size:.82rem}
       .form-grid,.list-head{grid-template-columns:1fr}
-      .app-row{grid-template-columns:56px 1fr;align-items:start;border-radius:15px;padding:11px}
-      .app-row img{width:56px;height:56px;border-radius:14px}
-      .row-actions{grid-column:1/-1;max-width:none;justify-content:stretch}
+      .app-list{grid-template-columns:1fr;gap:9px}
+      .app-row{border-radius:15px;padding:10px}
+      .app-compact{grid-template-columns:46px minmax(0,1fr);gap:8px}
+      .app-row img{width:46px;height:46px;border-radius:13px}
+      .app-row h3{font-size:.86rem}
+      .row-actions{justify-content:stretch}
       .row-actions .btn{flex:1}
+      .admin-tab .count{min-width:22px;height:22px;font-size:.72rem}
+      .panel{padding:14px}
+      .dashboard-grid{grid-template-columns:1fr 1fr;gap:8px}
+      .dashboard-card{padding:11px}
+      .admin-grid{grid-template-columns:1fr}
+      .user-detail{padding:12px;border-radius:16px}
+      .mini-row{display:grid;gap:10px}
+      .mini-row .row-actions{margin-top:0}
+      .detail-top{grid-template-columns:76px 1fr;align-items:start}
+      .detail-logo{width:76px;height:76px;border-radius:18px}
+      .detail-actions{grid-column:1/-1;justify-content:stretch}
+      .detail-actions .btn{flex:1}
+      .detail-grid{grid-template-columns:1fr}
       .toolbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
       .filter-chip{white-space:nowrap}
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand-wrap">
-        <img class="brand-logo" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source">
+  <section class="admin-auth" id="adminLoginView">
+    <div class="auth-card">
+      <img class="auth-logo" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source">
+      <h1>Store Admin Login</h1>
+      <p>App Store manage karne ke liye admin email aur password se login karein.</p>
+      <form id="adminLoginForm">
         <div>
-          <div class="brand">Tech Source Store Admin</div>
-          <small class="admin-email" id="adminEmail">Checking admin...</small>
+          <label for="adminLoginEmail">Email</label>
+          <input id="adminLoginEmail" type="email" placeholder="techsource@gmail.com" autocomplete="email" required>
+        </div>
+        <div>
+          <label for="adminLoginPassword">Password</label>
+          <input id="adminLoginPassword" type="password" placeholder="Password" autocomplete="current-password" required>
+        </div>
+        <button class="btn primary" type="submit" id="adminLoginBtn"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+        <div class="auth-message" id="adminLoginMessage"></div>
+      </form>
+    </div>
+  </section>
+
+  <div id="adminAppView" class="hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-wrap">
+          <img class="brand-logo" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source">
+          <div>
+            <div class="brand">Tech Source Store Admin</div>
+            <small class="admin-email" id="adminEmail">Checking admin...</small>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" type="button" onclick="window.open('appstore.html')"><i class="fa-solid fa-store"></i> Open Store</button>
+          <button class="btn danger" type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </div>
       </div>
-      <div class="actions">
-        <button class="btn secondary" type="button" onclick="window.open('appstore.html')"><i class="fa-solid fa-store"></i> Open Store</button>
-        <button class="btn danger" type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <div class="shell">
+    <div class="shell">
     <section class="hero">
       <div>
         <h1>Manage your App Store like a pro.</h1>
@@ -152,11 +303,35 @@
         <div class="stat"><strong id="totalApps">0</strong><span>Total</span></div>
         <div class="stat"><strong id="liveApps">0</strong><span>Live</span></div>
         <div class="stat"><strong id="hiddenApps">0</strong><span>Hidden</span></div>
+        <div class="stat"><strong id="pendingApps">0</strong><span>Pending</span></div>
       </div>
     </section>
 
-    <main>
-      <section class="panel">
+    <nav class="admin-tabs" aria-label="Admin sections">
+      <button class="admin-tab active" type="button" data-admin-tab="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard <span class="count" id="dashboardPendingCount">0</span></button>
+      <button class="admin-tab" type="button" data-admin-tab="upload"><i class="fa-solid fa-cloud-arrow-up"></i> App Upload <span class="count" id="uploadModeLabel">New</span></button>
+      <button class="admin-tab" type="button" data-admin-tab="library"><i class="fa-solid fa-layer-group"></i> App Library <span class="count" id="libraryTabCount">0</span></button>
+      <button class="admin-tab" type="button" data-admin-tab="users"><i class="fa-solid fa-users-gear"></i> Users/Admin <span class="count" id="usersTabCount">0</span></button>
+      <button class="admin-tab" type="button" data-admin-tab="requests"><i class="fa-solid fa-bell"></i> Requests <span class="count" id="requestsTabCount">0</span></button>
+    </nav>
+
+    <main class="admin-main">
+      <section class="panel tab-panel active" id="dashboardPanel">
+        <div class="list-head">
+          <div><h2>Dashboard</h2><p>Pending work aur store summary.</p></div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="dashboard-card"><strong id="dashPendingApps">0</strong><span>Pending apps</span></div>
+          <div class="dashboard-card"><strong id="dashPendingRequests">0</strong><span>Pending requests</span></div>
+          <div class="dashboard-card"><strong id="dashLiveApps">0</strong><span>Live apps</span></div>
+          <div class="dashboard-card"><strong id="dashCreators">0</strong><span>Creators</span></div>
+        </div>
+        <h2>Pending Apps Queue</h2>
+        <p class="panel-sub">Creator uploads approve karne se pehle yahan review karein.</p>
+        <div class="app-list" id="pendingAppsQueue"><div class="empty">No pending apps.</div></div>
+      </section>
+
+      <section class="panel tab-panel upload-panel" id="uploadPanel">
         <h2 id="formTitle">Add App</h2>
         <p class="panel-sub">Public store me app card, details popup aur featured area yahin ke data se banega.</p>
 
@@ -171,7 +346,12 @@
 
             <div class="form-field full">
               <label for="downloadUrl">Download Link</label>
-              <input id="downloadUrl" type="url" placeholder="https://github.com/.../app.apk" required>
+              <input id="downloadUrl" type="url" placeholder="Upload APK or paste download link">
+            </div>
+
+            <div class="form-field full">
+              <label for="appApkFile">APK Upload to Releases</label>
+              <input id="appApkFile" type="file" accept=".apk,application/vnd.android.package-archive">
             </div>
 
             <div class="form-field">
@@ -186,16 +366,15 @@
 
             <div class="form-field full">
               <label for="appCategory">Category</label>
-              <select id="appCategory">
-                <option value="">Auto / General Apps</option>
-                <option>Apps</option>
-                <option>Tools</option>
-                <option>Billing</option>
-                <option>PAN</option>
-                <option>Aadhaar</option>
-                <option>Result</option>
-                <option>Service</option>
-              </select>
+              <input id="appCategory" list="categoryOptions" type="text" placeholder="Apps / Tools / Custom">
+              <datalist id="categoryOptions"></datalist>
+            </div>
+
+            <div class="form-field full">
+              <label class="inline-check" for="appFeatured">
+                <input id="appFeatured" type="checkbox">
+                Show as featured app
+              </label>
             </div>
 
             <div class="form-field full">
@@ -204,8 +383,25 @@
             </div>
 
             <div class="form-field full">
+              <label for="appWhatsNew">What's New / Update Notes</label>
+              <textarea id="appWhatsNew" placeholder="Example: v1.2 - bug fixes, new design, faster download."></textarea>
+            </div>
+
+            <div class="form-field full">
               <label for="previewImages">Preview Photos</label>
-              <textarea id="previewImages" placeholder="One image URL per line. These photos show on the app details page."></textarea>
+              <textarea class="sr-only" id="previewImages" aria-hidden="true" tabindex="-1"></textarea>
+              <div class="preview-upload-box">
+                <div class="preview-upload-head">
+                  <div>
+                    <strong>Upload screenshots</strong>
+                    <p>Image select karte hi Cloudinary upload hoga aur link save ho jayega.</p>
+                  </div>
+                  <button class="btn secondary" type="button" onclick="openPreviewPicker()"><i class="fa-solid fa-plus"></i> Add More</button>
+                </div>
+                <input class="sr-only" id="previewImageFile" type="file" accept="image/*" multiple>
+                <div class="uploading-note" id="previewUploadStatus"></div>
+                <div class="preview-grid" id="previewImageList"></div>
+              </div>
             </div>
 
             <div class="form-field full">
@@ -225,7 +421,7 @@
               <img id="logoPreview" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Logo preview">
               <div>
                 <h3 id="previewName">App Preview</h3>
-                <small id="previewMeta">Latest APK · Apps</small>
+                <small id="previewMeta">Latest APK - Apps</small>
               </div>
             </div>
           </div>
@@ -238,7 +434,7 @@
         </form>
       </section>
 
-      <section class="panel list-panel">
+      <section class="panel list-panel tab-panel" id="libraryPanel">
         <div class="list-head">
           <div>
             <h2>Apps Library</h2>
@@ -253,41 +449,131 @@
           <button class="filter-chip active" type="button" data-filter="all">All</button>
           <button class="filter-chip" type="button" data-filter="live">Live</button>
           <button class="filter-chip" type="button" data-filter="hidden">Hidden</button>
+          <button class="filter-chip" type="button" data-filter="pending">Pending</button>
+          <button class="filter-chip" type="button" data-filter="archived">Archived</button>
         </div>
         <div class="app-list" id="appList">
           <div class="empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading apps...</p></div>
         </div>
+
+        <div class="collapsible-block" id="categoryManagerBlock">
+          <button class="collapse-toggle" type="button" onclick="toggleCategoryManager()">
+            <span><i class="fa-solid fa-tags"></i> Category Manager</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="collapse-content">
+            <p class="panel-sub">Add custom categories for apps.</p>
+            <div class="form-actions">
+              <input id="newCategoryName" type="text" placeholder="New category name">
+              <button class="btn primary" type="button" onclick="addCategory()"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+            <div class="mini-list" id="categoryList"></div>
+          </div>
+        </div>
+
+        <div class="panel-sub">
+          <h2>Review Moderation</h2>
+          <p>Latest user reviews. Galat review delete kar sakte hain.</p>
+          <div class="mini-list" id="adminReviewsList">
+            <div class="empty">Loading reviews...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" id="usersPanel">
+        <div class="list-head">
+          <div>
+            <h2>Users / Admin</h2>
+            <p id="usersHint">Approved users aur admins yahan dikhenge.</p>
+          </div>
+        </div>
+        <div class="admin-grid">
+          <div class="user-list" id="adminUsersList">
+            <div class="empty">Loading users...</div>
+          </div>
+          <div class="user-detail" id="adminUserDetail">
+            <div class="empty">User select karein. Uske uploaded apps yahan dikhenge.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" id="requestsPanel">
+        <div class="list-head">
+          <div>
+            <h2>Admin Requests</h2>
+            <p>User side se aaye upload access requests approve/reject karein.</p>
+          </div>
+        </div>
+        <div class="request-layout">
+          <div class="mini-list" id="adminRequestsList">
+            <div class="empty">Loading requests...</div>
+          </div>
+        </div>
       </section>
     </main>
+    <section class="admin-detail-page" id="adminDetailPage"></section>
+    </div>
   </div>
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
-      authDomain: "tech-source-bill.firebaseapp.com",
-      databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
-      projectId: "tech-source-bill",
-      storageBucket: "tech-source-bill.firebasestorage.app",
-      messagingSenderId: "690209240188",
-      appId: "1:690209240188:web:6e54de365e7f839634c5f9"
+      apiKey: "AIzaSyBbExHmHSMEt_Keq6wk4Y9p0Zlj4gDWS5s",
+      authDomain: "appstore-fc878.firebaseapp.com",
+      projectId: "appstore-fc878",
+      storageBucket: "appstore-fc878.firebasestorage.app",
+      messagingSenderId: "522720513773",
+      appId: "1:522720513773:web:0006ecaf7b1916807386e4",
+      measurementId: "G-29LMHBNVLN"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    const storage = firebase.storage();
     const ADMIN_EMAIL = "techsource@gmail.com";
     const IMGBB_API_KEY = "fa4ad05090c8cc3f9ade673a64a52235";
+    const CLOUDINARY_API = "https://api.cloudinary.com/v1_1/dsnuatuc8/image/upload";
+    const CLOUDINARY_UPLOAD_PRESET = "ml_default";
     const fallbackLogo = "https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg";
 
+    const adminLoginView = document.getElementById("adminLoginView");
+    const adminAppView = document.getElementById("adminAppView");
+    const adminLoginForm = document.getElementById("adminLoginForm");
+    const adminLoginEmail = document.getElementById("adminLoginEmail");
+    const adminLoginPassword = document.getElementById("adminLoginPassword");
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+    const adminLoginMessage = document.getElementById("adminLoginMessage");
+    const uploadPanel = document.getElementById("uploadPanel");
+    const dashboardPanel = document.getElementById("dashboardPanel");
+    const libraryPanel = document.getElementById("libraryPanel");
+    const usersPanel = document.getElementById("usersPanel");
+    const requestsPanel = document.getElementById("requestsPanel");
+    const adminDetailPage = document.getElementById("adminDetailPage");
+    const uploadModeLabel = document.getElementById("uploadModeLabel");
+    const libraryTabCount = document.getElementById("libraryTabCount");
+    const usersTabCount = document.getElementById("usersTabCount");
+    const requestsTabCount = document.getElementById("requestsTabCount");
+    const dashboardPendingCount = document.getElementById("dashboardPendingCount");
+    const dashPendingApps = document.getElementById("dashPendingApps");
+    const dashPendingRequests = document.getElementById("dashPendingRequests");
+    const dashLiveApps = document.getElementById("dashLiveApps");
+    const dashCreators = document.getElementById("dashCreators");
+    const pendingAppsQueue = document.getElementById("pendingAppsQueue");
     const form = document.getElementById("appForm");
     const editId = document.getElementById("editId");
     const appName = document.getElementById("appName");
     const downloadUrl = document.getElementById("downloadUrl");
+    const appApkFile = document.getElementById("appApkFile");
     const appVersion = document.getElementById("appVersion");
     const appSize = document.getElementById("appSize");
     const appCategory = document.getElementById("appCategory");
+    const appFeatured = document.getElementById("appFeatured");
     const appDescription = document.getElementById("appDescription");
+    const appWhatsNew = document.getElementById("appWhatsNew");
     const previewImages = document.getElementById("previewImages");
+    const previewImageFile = document.getElementById("previewImageFile");
+    const previewUploadStatus = document.getElementById("previewUploadStatus");
+    const previewImageList = document.getElementById("previewImageList");
     const logoFile = document.getElementById("logoFile");
     const logoUrl = document.getElementById("logoUrl");
     const logoPreview = document.getElementById("logoPreview");
@@ -301,24 +587,81 @@
     const totalApps = document.getElementById("totalApps");
     const liveApps = document.getElementById("liveApps");
     const hiddenApps = document.getElementById("hiddenApps");
+    const pendingApps = document.getElementById("pendingApps");
     const adminSearch = document.getElementById("adminSearch");
     const statusFilters = document.getElementById("statusFilters");
+    const categoryOptions = document.getElementById("categoryOptions");
+    const categoryManagerBlock = document.getElementById("categoryManagerBlock");
+    const newCategoryName = document.getElementById("newCategoryName");
+    const categoryList = document.getElementById("categoryList");
+    const adminRequestsList = document.getElementById("adminRequestsList");
+    const adminUsersList = document.getElementById("adminUsersList");
+    const adminUserDetail = document.getElementById("adminUserDetail");
+    const adminReviewsList = document.getElementById("adminReviewsList");
 
     let appsCache = [];
+    let categoriesCache = ["Apps", "Tools", "Billing", "PAN", "Aadhaar", "Result", "Service"];
+    let reviewsCache = [];
+    let adminRequestsCache = [];
+    let usersCache = [];
+    let selectedUserId = "";
     let activeFilter = "all";
+    let activeAdminTab = "dashboard";
+    let activeDetailAppId = "";
+    let unsubscribeApps = null;
+    let unsubscribeCategories = null;
+    let unsubscribeReviews = null;
+    let unsubscribeAdminRequests = null;
+    let unsubscribeUsers = null;
 
     auth.onAuthStateChanged((user) => {
       if (!user) {
-        window.location.replace("login.html");
+        adminAppView.classList.add("hidden");
+        adminLoginView.classList.remove("hidden");
+        if (unsubscribeApps) {
+          unsubscribeApps();
+          unsubscribeApps = null;
+        }
         return;
       }
       if (user.email !== ADMIN_EMAIL) {
-        auth.signOut().then(() => window.location.replace("login.html"));
+        auth.signOut();
+        adminLoginMessage.textContent = "Only admin account can open this panel.";
+        adminLoginMessage.className = "auth-message err";
         return;
       }
-      document.body.style.display = "block";
+      adminLoginView.classList.add("hidden");
+      adminAppView.classList.remove("hidden");
       document.getElementById("adminEmail").textContent = user.email;
       loadApps();
+      loadCategories();
+      loadAdminRequests();
+      loadUsers();
+      loadReviewsModeration();
+    });
+
+    adminLoginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      adminLoginBtn.disabled = true;
+      adminLoginBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Logging in...`;
+      adminLoginMessage.textContent = "Checking admin...";
+      adminLoginMessage.className = "auth-message";
+      try {
+        const email = adminLoginEmail.value.trim();
+        const password = adminLoginPassword.value;
+        const cred = await auth.signInWithEmailAndPassword(email, password);
+        if (cred.user.email !== ADMIN_EMAIL) {
+          await auth.signOut();
+          throw new Error("Only admin account can open this panel.");
+        }
+        adminLoginForm.reset();
+      } catch (error) {
+        adminLoginMessage.textContent = error.message || "Login failed";
+        adminLoginMessage.className = "auth-message err";
+      } finally {
+        adminLoginBtn.disabled = false;
+        adminLoginBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login`;
+      }
     });
 
     function htmlSafe(value) {
@@ -327,14 +670,105 @@
       return div.innerHTML;
     }
 
+    function setAdminTab(tab) {
+      activeAdminTab = ["dashboard", "upload", "library", "users", "requests"].includes(tab) ? tab : "dashboard";
+      document.querySelectorAll(".admin-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.adminTab === activeAdminTab);
+      });
+      dashboardPanel.classList.toggle("active", activeAdminTab === "dashboard");
+      uploadPanel.classList.toggle("active", activeAdminTab === "upload");
+      libraryPanel.classList.toggle("active", activeAdminTab === "library");
+      usersPanel.classList.toggle("active", activeAdminTab === "users");
+      requestsPanel.classList.toggle("active", activeAdminTab === "requests");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function toggleCategoryManager() {
+      categoryManagerBlock.classList.toggle("open");
+    }
+
+    function closeAdminAppDetails() {
+      activeDetailAppId = "";
+      adminAppView.classList.remove("detail-mode");
+      adminDetailPage.innerHTML = "";
+      setAdminTab("library");
+    }
+
+    function appPreviewImages(app) {
+      if (Array.isArray(app.previewImages)) return app.previewImages.filter(Boolean);
+      if (typeof app.previewImages === "string") return app.previewImages.split(/\r?\n|,/).map((item) => item.trim()).filter(Boolean);
+      return [];
+    }
+
+    function appStatus(app) {
+      if (app.archived === true || app.status === "archived") return "archived";
+      if (app.status === "pending") return "pending";
+      return app.active === false ? "hidden" : "live";
+    }
+
+    function openAdminAppDetails(id) {
+      const app = appsCache.find((item) => item.id === id);
+      if (!app) return;
+      activeDetailAppId = id;
+      const status = appStatus(app);
+      const live = status === "live";
+      const pending = status === "pending";
+      const archived = status === "archived";
+      const category = app.category || "Apps";
+      const version = app.version || "Latest APK";
+      const previews = appPreviewImages(app);
+      adminDetailPage.innerHTML = `
+        <div class="detail-hero">
+          <div class="detail-top">
+            <img class="detail-logo" src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+            <div class="detail-title">
+              <div class="detail-meta">
+                <span class="badge ${live ? "live" : "hidden"}"><i class="fa-solid ${live ? "fa-eye" : archived ? "fa-box-archive" : pending ? "fa-clock" : "fa-eye-slash"}"></i> ${htmlSafe(status)}</span>
+                ${app.featured ? `<span class="badge live"><i class="fa-solid fa-star"></i> Featured</span>` : ""}
+                <span class="badge cat">${htmlSafe(category)}</span>
+              </div>
+              <h2>${htmlSafe(app.name)}</h2>
+              <p>${htmlSafe(app.description || "No description added.")}</p>
+            </div>
+            <div class="detail-actions">
+              <button class="btn secondary" type="button" onclick="closeAdminAppDetails()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+              <button class="btn primary" type="button" onclick="editApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-pen"></i> Update</button>
+              ${pending ? `<button class="btn primary" type="button" onclick="approveApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-check"></i> Approve</button>` : ""}
+              ${pending ? `<button class="btn danger" type="button" onclick="rejectApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-xmark"></i> Reject</button>` : ""}
+              ${archived ? `<button class="btn warning" type="button" onclick="restoreApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-rotate-left"></i> Restore</button>` : `<button class="btn warning" type="button" onclick="toggleApp('${htmlSafe(app.id)}')"><i class="fa-solid ${live ? "fa-eye-slash" : "fa-eye"}"></i> ${live ? "Hide" : "Show"}</button>`}
+              ${archived ? "" : `<button class="btn danger" type="button" onclick="archiveApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-box-archive"></i> Archive</button>`}
+            </div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-box"><h3>App Info</h3><p>Version: ${htmlSafe(version)}<br>Size: ${htmlSafe(app.size || "Size not set")}<br>Category: ${htmlSafe(category)}</p></div>
+            <div class="detail-box"><h3>Download Link</h3><p>${htmlSafe(app.downloadUrl || "No link")}</p></div>
+            <div class="detail-box"><h3>What's New</h3><p>${htmlSafe(app.whatsNew || "No update notes added.")}</p></div>
+            <div class="detail-box"><h3>Preview Photos</h3>${previews.length ? `<div class="preview-strip">${previews.map((src) => `<img src="${htmlSafe(src)}" alt="Preview" onerror="this.remove()">`).join("")}</div>` : `<p>No preview photos added.</p>`}</div>
+          </div>
+        </div>`;
+      adminAppView.classList.add("detail-mode");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     function setStatus(message, type) {
       statusText.textContent = message || "";
       statusText.className = `status ${type || ""}`;
     }
 
+    async function notifyUser(userId, title, message) {
+      if (!userId) return;
+      await db.collection("users").doc(userId).collection("notifications").add({
+        title,
+        message,
+        read: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(() => {});
+    }
+
     function setSaving(isSaving) {
       saveBtn.disabled = isSaving;
-      saveBtn.innerHTML = isSaving ? `<i class="fa-solid fa-spinner fa-spin"></i> Saving...` : `<i class="fa-solid fa-floppy-disk"></i> Save App`;
+      const label = editId.value ? "Update App" : "Save App";
+      saveBtn.innerHTML = isSaving ? `<i class="fa-solid fa-spinner fa-spin"></i> Saving...` : `<i class="fa-solid fa-floppy-disk"></i> ${label}`;
     }
 
     function currentPreviewCategory() {
@@ -343,7 +777,7 @@
 
     function updatePreview() {
       previewName.textContent = appName.value.trim() || "App Preview";
-      previewMeta.textContent = `${appVersion.value.trim() || "Latest APK"} · ${currentPreviewCategory()}`;
+      previewMeta.textContent = `${appVersion.value.trim() || "Latest APK"} - ${currentPreviewCategory()}`;
       if (logoUrl.value.trim()) logoPreview.src = logoUrl.value.trim();
     }
 
@@ -356,8 +790,101 @@
       return data.data.url;
     }
 
+    async function uploadPreviewToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      formData.append("folder", "appstore_previews");
+      const res = await fetch(CLOUDINARY_API, { method: "POST", body: formData });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.secure_url) throw new Error(data.error?.message || "Preview image upload failed");
+      return data.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
+    }
+
+    function safeFileName(name) {
+      return String(name || "app.apk").replace(/[^a-zA-Z0-9._-]+/g, "-");
+    }
+
+    async function uploadApkToStorage(file) {
+      const path = `releases/${Date.now()}-${safeFileName(file.name)}`;
+      const ref = storage.ref().child(path);
+      const task = await ref.put(file, {
+        contentType: file.type || "application/vnd.android.package-archive"
+      });
+      return task.ref.getDownloadURL();
+    }
+
+    function previewImageLines() {
+      return previewImages.value.split(/\r?\n|,/).map((url) => url.trim()).filter(Boolean);
+    }
+
+    function setPreviewImageLines(lines) {
+      previewImages.value = lines.join("\n");
+      renderPreviewImageList();
+    }
+
+    function renderPreviewImageList() {
+      const lines = previewImageLines();
+      previewImageList.innerHTML = lines.length ? lines.map((url, index) => `
+        <div class="preview-item">
+          <img src="${htmlSafe(url)}" alt="Preview ${index + 1}" onerror="this.style.display='none'">
+          <div class="preview-item-body">
+            <small title="${htmlSafe(url)}">Preview ${index + 1}</small>
+            <div class="preview-item-actions">
+              <button class="btn secondary" type="button" title="Move up" onclick="movePreviewImage(${index}, -1)"><i class="fa-solid fa-arrow-up"></i></button>
+              <button class="btn secondary" type="button" title="Move down" onclick="movePreviewImage(${index}, 1)"><i class="fa-solid fa-arrow-down"></i></button>
+              <button class="btn danger" type="button" title="Remove" onclick="removePreviewImage(${index})"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      `).join("") : `<div class="empty"><i class="fa-solid fa-images"></i><p>No preview photos yet. Add More se image upload karein.</p></div>`;
+    }
+
+    function movePreviewImage(index, direction) {
+      const lines = previewImageLines();
+      const next = index + direction;
+      if (next < 0 || next >= lines.length) return;
+      [lines[index], lines[next]] = [lines[next], lines[index]];
+      setPreviewImageLines(lines);
+    }
+
+    function removePreviewImage(index) {
+      const lines = previewImageLines();
+      lines.splice(index, 1);
+      setPreviewImageLines(lines);
+    }
+
+    function openPreviewPicker() {
+      previewImageFile.click();
+    }
+
+    async function handlePreviewFiles(files) {
+      const selected = Array.from(files || []).filter((file) => file.type.startsWith("image/"));
+      if (!selected.length) return;
+      previewUploadStatus.textContent = `Uploading ${selected.length} preview photo...`;
+      const lines = previewImageLines();
+      try {
+        for (let index = 0; index < selected.length; index += 1) {
+          previewUploadStatus.textContent = `Uploading ${index + 1}/${selected.length}: ${selected[index].name}`;
+          const url = await uploadPreviewToCloudinary(selected[index]);
+          lines.push(url);
+          setPreviewImageLines(lines);
+        }
+        previewUploadStatus.textContent = "Preview photos uploaded and saved in form.";
+      } catch (error) {
+        previewUploadStatus.textContent = "";
+        setStatus(error.message || "Preview upload failed", "err");
+      } finally {
+        previewImageFile.value = "";
+        setTimeout(() => {
+          if (previewUploadStatus.textContent.includes("uploaded")) previewUploadStatus.textContent = "";
+        }, 2500);
+      }
+    }
+
     [appName, appVersion, appCategory, logoUrl].forEach((input) => input.addEventListener("input", updatePreview));
-    appCategory.addEventListener("change", updatePreview);
+    previewImages.addEventListener("input", renderPreviewImageList);
+    previewImageFile.addEventListener("change", () => handlePreviewFiles(previewImageFile.files));
 
     logoFile.addEventListener("change", () => {
       const file = logoFile.files[0];
@@ -380,27 +907,50 @@
 
         if (!finalLogoUrl) throw new Error("Logo upload karo ya logo link paste karo");
 
+        let finalDownloadUrl = downloadUrl.value.trim();
+        const apkFile = appApkFile.files[0];
+        if (apkFile) {
+          setStatus("Uploading APK to releases...", "");
+          finalDownloadUrl = await uploadApkToStorage(apkFile);
+          downloadUrl.value = finalDownloadUrl;
+        }
+
+        if (!finalDownloadUrl) throw new Error("APK upload karo ya download link paste karo");
+
         const payload = {
           name: appName.value.trim(),
-          downloadUrl: downloadUrl.value.trim(),
+          downloadUrl: finalDownloadUrl,
           version: appVersion.value.trim(),
           size: appSize.value.trim(),
           category: appCategory.value.trim(),
+          featured: appFeatured.checked,
           description: appDescription.value.trim(),
-          previewImages: previewImages.value.split(/\r?\n|,/).map((url) => url.trim()).filter(Boolean),
+          whatsNew: appWhatsNew.value.trim(),
+          previewImages: previewImageLines(),
           logoUrl: finalLogoUrl,
           active: true,
+          archived: false,
+          status: "approved",
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
+        let savedRef;
         if (editId.value) {
-          await db.collection("appStoreApps").doc(editId.value).update(payload);
+          savedRef = db.collection("appStoreApps").doc(editId.value);
+          await savedRef.update(payload);
           setStatus("App updated successfully", "ok");
         } else {
           payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          await db.collection("appStoreApps").add(payload);
+          savedRef = await db.collection("appStoreApps").add(payload);
           setStatus("App added successfully", "ok");
         }
+        await savedRef.collection("versions").add({
+          version: payload.version || "Latest",
+          downloadUrl: payload.downloadUrl || "",
+          whatsNew: payload.whatsNew || "",
+          updatedBy: auth.currentUser?.uid || "admin",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
 
         resetForm(false);
       } catch (error) {
@@ -414,32 +964,97 @@
       form.reset();
       editId.value = "";
       formTitle.textContent = "Add App";
+      uploadModeLabel.textContent = "New";
+      saveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save App`;
+      previewUploadStatus.textContent = "";
       logoPreview.src = fallbackLogo;
       updatePreview();
+      renderPreviewImageList();
       if (clearStatus) setStatus("", "");
     }
 
     function editApp(id) {
       const app = appsCache.find((item) => item.id === id);
       if (!app) return;
+      adminAppView.classList.remove("detail-mode");
+      activeDetailAppId = "";
+      adminDetailPage.innerHTML = "";
       editId.value = id;
       appName.value = app.name || "";
       downloadUrl.value = app.downloadUrl || "";
       appVersion.value = app.version || "";
       appSize.value = app.size || "";
       appCategory.value = app.category || "";
+      appFeatured.checked = !!app.featured;
       appDescription.value = app.description || "";
+      appWhatsNew.value = app.whatsNew || "";
       previewImages.value = Array.isArray(app.previewImages) ? app.previewImages.join("\n") : (app.previewImages || "");
       logoUrl.value = app.logoUrl || "";
       logoPreview.src = app.logoUrl || fallbackLogo;
-      formTitle.textContent = "Edit App";
+      formTitle.textContent = "Update App";
+      uploadModeLabel.textContent = "Update";
+      saveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Update App`;
       updatePreview();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderPreviewImageList();
+      setAdminTab("upload");
     }
 
-    async function deleteApp(id) {
-      if (!confirm("Delete this app from store?")) return;
-      await db.collection("appStoreApps").doc(id).delete();
+    async function archiveApp(id) {
+      if (!confirm("Archive this app from store?")) return;
+      await db.collection("appStoreApps").doc(id).update({
+        active: false,
+        archived: true,
+        status: "archived",
+        archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      if (activeDetailAppId === id) closeAdminAppDetails();
+    }
+
+    async function approveApp(id) {
+      await db.collection("appStoreApps").doc(id).update({
+        active: true,
+        archived: false,
+        status: "approved",
+        reviewNote: "",
+        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const app = appsCache.find((item) => item.id === id);
+      if (app) Object.assign(app, { active: true, archived: false, status: "approved" });
+      await notifyUser(app?.submittedBy, "App approved", `${app?.name || "Your app"} is now live.`);
+      if (activeDetailAppId === id) openAdminAppDetails(id);
+    }
+
+    async function rejectApp(id) {
+      const app = appsCache.find((item) => item.id === id);
+      if (!app) return;
+      const note = prompt("Reject reason");
+      if (!note?.trim()) return;
+      await db.collection("appStoreApps").doc(id).update({
+        active: false,
+        status: "rejected",
+        reviewNote: note.trim(),
+        rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      Object.assign(app, { active: false, status: "rejected", reviewNote: note.trim() });
+      await notifyUser(app.submittedBy, "App rejected", `${app.name || "Your app"}: ${note.trim()}`);
+      if (activeDetailAppId === id) openAdminAppDetails(id);
+      renderApps();
+    }
+
+    async function restoreApp(id) {
+      await db.collection("appStoreApps").doc(id).update({
+        active: false,
+        archived: false,
+        status: "approved",
+        restoredAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const app = appsCache.find((item) => item.id === id);
+      if (app) Object.assign(app, { active: false, archived: false, status: "approved" });
+      if (activeDetailAppId === id) openAdminAppDetails(id);
     }
 
     async function toggleApp(id) {
@@ -447,15 +1062,21 @@
       if (!app) return;
       await db.collection("appStoreApps").doc(id).update({
         active: app.active === false,
+        archived: false,
+        status: "approved",
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      if (activeDetailAppId === id) {
+        app.active = app.active === false;
+        openAdminAppDetails(id);
+      }
     }
 
     function filteredApps() {
       const query = adminSearch.value.trim().toLowerCase();
       return appsCache.filter((app) => {
-        const live = app.active !== false;
-        const statusOk = activeFilter === "all" || (activeFilter === "live" && live) || (activeFilter === "hidden" && !live);
+        const status = appStatus(app);
+        const statusOk = activeFilter === "all" || activeFilter === status;
         const searchOk = !query || `${app.name || ""} ${app.description || ""} ${app.version || ""} ${app.category || ""} ${app.downloadUrl || ""}`.toLowerCase().includes(query);
         return statusOk && searchOk;
       });
@@ -463,12 +1084,16 @@
 
     function renderApps() {
       const apps = filteredApps();
-      const liveCount = appsCache.filter((app) => app.active !== false).length;
-      const hiddenCount = appsCache.length - liveCount;
+      const liveCount = appsCache.filter((app) => appStatus(app) === "live").length;
+      const hiddenCount = appsCache.filter((app) => appStatus(app) === "hidden").length;
+      const pendingCount = appsCache.filter((app) => appStatus(app) === "pending").length;
       totalApps.textContent = appsCache.length;
       liveApps.textContent = liveCount;
       hiddenApps.textContent = hiddenCount;
+      pendingApps.textContent = pendingCount;
+      libraryTabCount.textContent = appsCache.length;
       listCount.textContent = appsCache.length ? `${apps.length} of ${appsCache.length} apps shown` : "No apps added";
+      renderDashboard();
 
       if (!appsCache.length) {
         appList.innerHTML = `<div class="empty"><i class="fa-solid fa-box-open"></i><h3>No apps added yet</h3><p>Left form se first app add karein.</p></div>`;
@@ -481,46 +1106,289 @@
       }
 
       appList.innerHTML = apps.map((app) => {
-        const live = app.active !== false;
-        const category = app.category || "Apps";
-        const version = app.version || "Latest APK";
+        const status = appStatus(app);
+        const live = status === "live";
         return `
-          <div class="app-row ${live ? "" : "hidden-app"}">
-            <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
-            <div class="app-main">
-              <div class="app-title-line">
-                <h3>${htmlSafe(app.name)}</h3>
-                <span class="badge ${live ? "live" : "hidden"}"><i class="fa-solid ${live ? "fa-eye" : "fa-eye-slash"}"></i> ${live ? "Live" : "Hidden"}</span>
-                <span class="badge cat">${htmlSafe(category)}</span>
+          <div class="app-row ${live ? "" : "hidden-app"}" onclick="openAdminAppDetails('${htmlSafe(app.id)}')">
+            <div class="app-compact">
+              <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+              <div class="app-main">
+                <h3 title="${htmlSafe(app.name)}">${htmlSafe(app.name)}</h3>
+                <p>${htmlSafe(status)}</p>
               </div>
-              <p>${htmlSafe(app.description || "No description added.")}</p>
-              <div class="app-meta">
-                <span><i class="fa-solid fa-code-branch"></i> ${htmlSafe(version)}</span>
-                <span><i class="fa-solid fa-hard-drive"></i> ${htmlSafe(app.size || "Size not set")}</span>
-                <span><i class="fa-solid fa-images"></i> ${Array.isArray(app.previewImages) ? app.previewImages.length : 0} previews</span>
-                <span><i class="fa-solid fa-link"></i> ${htmlSafe(app.downloadUrl || "No link")}</span>
-              </div>
-            </div>
-            <div class="row-actions">
-              <button class="btn secondary" type="button" onclick="editApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-pen"></i> Edit</button>
-              <button class="btn warning" type="button" onclick="toggleApp('${htmlSafe(app.id)}')"><i class="fa-solid ${live ? "fa-eye-slash" : "fa-eye"}"></i> ${live ? "Hide" : "Show"}</button>
-              <button class="btn danger" type="button" onclick="deleteApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-trash"></i> Delete</button>
             </div>
           </div>
         `;
       }).join("");
+      renderSelectedUserApps();
+    }
+
+    function renderDashboard() {
+      const pendingApps = appsCache.filter((app) => appStatus(app) === "pending");
+      const pendingRequests = adminRequestsCache.filter((request) => request.status !== "approved" && request.status !== "rejected").length;
+      const creators = usersCache.filter((user) => user.adminApproved || user.role === "creator" || user.role === "admin").length;
+      dashboardPendingCount.textContent = pendingApps.length + pendingRequests;
+      dashPendingApps.textContent = pendingApps.length;
+      dashPendingRequests.textContent = pendingRequests;
+      dashLiveApps.textContent = appsCache.filter((app) => appStatus(app) === "live").length;
+      dashCreators.textContent = creators;
+      pendingAppsQueue.innerHTML = pendingApps.length ? pendingApps.map((app) => `
+        <div class="app-row hidden-app" onclick="openAdminAppDetails('${htmlSafe(app.id)}')">
+          <div class="app-compact">
+            <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+            <div class="app-main">
+              <h3 title="${htmlSafe(app.name)}">${htmlSafe(app.name)}</h3>
+              <p>${htmlSafe(app.submittedByEmail || "Creator")} - Pending approval</p>
+            </div>
+          </div>
+        </div>
+      `).join("") : `<div class="empty"><i class="fa-solid fa-circle-check"></i><h3>No pending apps</h3><p>Sab creator uploads review ho chuke hain.</p></div>`;
     }
 
     function loadApps() {
-      db.collection("appStoreApps").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+      if (unsubscribeApps) return;
+      unsubscribeApps = db.collection("appStoreApps").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
         appsCache = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         renderApps();
+        if (activeDetailAppId) openAdminAppDetails(activeDetailAppId);
       }, () => {
         appList.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><h3>Apps load nahi ho raha</h3><p>Firebase rules/check karo.</p></div>`;
       });
     }
 
+    function userDisplayName(user) {
+      return user.name || user.displayName || user.email || "User";
+    }
+
+    function userRoleText(user) {
+      if (user.role === "admin") return "admin";
+      if (user.adminApproved || user.role === "creator") return "creator";
+      return "user";
+    }
+
+    function renderUsers() {
+      const adminUsers = usersCache.filter((user) => user.adminApproved || user.role === "creator" || user.role === "admin");
+      usersTabCount.textContent = adminUsers.length;
+      if (!adminUsers.length) {
+        adminUsersList.innerHTML = `<div class="empty">No admin users approved yet.</div>`;
+        adminUserDetail.innerHTML = `<div class="empty">Approve request ke baad users yahan dikhenge.</div>`;
+        return;
+      }
+      if (!selectedUserId || !adminUsers.some((user) => user.id === selectedUserId)) selectedUserId = adminUsers[0].id;
+      adminUsersList.innerHTML = adminUsers.map((user) => `
+        <button class="user-row ${user.id === selectedUserId ? "active" : ""}" type="button" onclick="selectAdminUser('${htmlSafe(user.id)}')">
+          <strong>${htmlSafe(userDisplayName(user))}</strong>
+          <span>${htmlSafe(user.email || "No email")}</span>
+          <small>${htmlSafe(userRoleText(user))}</small>
+        </button>
+      `).join("");
+      renderSelectedUserApps();
+    }
+
+    function renderSelectedUserApps() {
+      if (!adminUserDetail || !selectedUserId) return;
+      const user = usersCache.find((item) => item.id === selectedUserId);
+      if (!user) return;
+      const userApps = appsCache.filter((app) => app.submittedBy === selectedUserId);
+      adminUserDetail.innerHTML = `
+        <div class="list-head">
+          <div>
+            <h2>${htmlSafe(userDisplayName(user))}</h2>
+            <p>${htmlSafe(user.email || "")} - ${userApps.length} uploaded app</p>
+          </div>
+          <button class="btn danger" type="button" onclick="removeAdminAccess('${htmlSafe(user.id)}')"><i class="fa-solid fa-user-minus"></i> Remove Admin</button>
+        </div>
+        <div class="app-list">
+          ${userApps.length ? userApps.map((app) => `
+            <div class="app-row ${appStatus(app) === "live" ? "" : "hidden-app"}" onclick="openAdminAppDetails('${htmlSafe(app.id)}')">
+              <div class="app-compact">
+                <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+                <div class="app-main">
+                  <h3 title="${htmlSafe(app.name)}">${htmlSafe(app.name)}</h3>
+                  <p>${htmlSafe(appStatus(app))}</p>
+                </div>
+              </div>
+            </div>
+          `).join("") : `<div class="empty">Is user ne abhi koi app upload nahi kiya.</div>`}
+        </div>`;
+    }
+
+    function selectAdminUser(id) {
+      selectedUserId = id;
+      renderUsers();
+    }
+
+    async function removeAdminAccess(id) {
+      const user = usersCache.find((item) => item.id === id);
+      if (!user || !confirm(`Remove admin access for ${userDisplayName(user)}?`)) return;
+      await db.collection("users").doc(id).set({
+        role: "user",
+        adminApproved: false,
+        adminRemovedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      const userAppsSnap = await db.collection("appStoreApps").where("submittedBy", "==", id).get().catch(() => null);
+      if (userAppsSnap && !userAppsSnap.empty) {
+        const batch = db.batch();
+        userAppsSnap.docs.forEach((doc) => {
+          batch.update(doc.ref, {
+            active: false,
+            status: "hidden",
+            hiddenReason: "creator_access_removed",
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        await batch.commit();
+      }
+      usersCache = usersCache.map((item) => item.id === id ? { ...item, role: "user", adminApproved: false } : item);
+      appsCache = appsCache.map((app) => app.submittedBy === id ? { ...app, active: false, status: "hidden", hiddenReason: "creator_access_removed" } : app);
+      selectedUserId = "";
+      renderUsers();
+      renderApps();
+    }
+
+    function loadUsers() {
+      if (unsubscribeUsers) return;
+      unsubscribeUsers = db.collection("users").limit(100).onSnapshot((snapshot) => {
+      usersCache = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      renderUsers();
+      renderDashboard();
+      }, () => {
+        adminUsersList.innerHTML = `<div class="empty">Users load nahi ho raha. Firebase rules/index check karein.</div>`;
+      });
+    }
+
+    function renderCategories() {
+      categoryOptions.innerHTML = categoriesCache.map((name) => `<option value="${htmlSafe(name)}"></option>`).join("");
+      categoryList.innerHTML = categoriesCache.map((name) => `
+        <div class="mini-row">
+          <strong>${htmlSafe(name)}</strong>
+          <button class="btn danger" type="button" onclick="deleteCategory('${htmlSafe(name)}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `).join("");
+    }
+
+    function loadCategories() {
+      if (unsubscribeCategories) return;
+      unsubscribeCategories = db.collection("appStoreCategories").orderBy("name").onSnapshot((snapshot) => {
+        const custom = snapshot.docs.map((doc) => doc.data().name).filter(Boolean);
+        categoriesCache = Array.from(new Set(["Apps", "Tools", "Billing", "PAN", "Aadhaar", "Result", "Service", ...custom])).sort();
+        renderCategories();
+      }, renderCategories);
+    }
+
+    async function addCategory() {
+      const name = newCategoryName.value.trim();
+      if (!name) return;
+      await db.collection("appStoreCategories").doc(name.toLowerCase().replace(/\s+/g, "-")).set({
+        name,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      newCategoryName.value = "";
+    }
+
+    async function deleteCategory(name) {
+      if (!confirm(`Delete category ${name}?`)) return;
+      await db.collection("appStoreCategories").doc(name.toLowerCase().replace(/\s+/g, "-")).delete();
+    }
+
+    function loadAdminRequests() {
+      if (unsubscribeAdminRequests) return;
+      unsubscribeAdminRequests = db.collection("adminRequests").orderBy("requestedAt", "desc").limit(40).onSnapshot((snapshot) => {
+        adminRequestsCache = snapshot.docs.map((doc) => ({ id: doc.id, ref: doc.ref, ...doc.data() }));
+        requestsTabCount.textContent = adminRequestsCache.filter((request) => request.status !== "approved" && request.status !== "rejected").length;
+        renderDashboard();
+        adminRequestsList.innerHTML = adminRequestsCache.length ? adminRequestsCache.map((request, index) => {
+          const requestDone = request.status === "approved" || request.status === "rejected";
+          return `
+          <div class="mini-row request-card">
+            <div class="request-info">
+              <strong>${htmlSafe(request.name || "User")} <span class="request-status ${htmlSafe(request.status || "pending")}">${htmlSafe(request.status || "pending")}</span></strong>
+              <p>${htmlSafe(request.email || "")}</p>
+              <p>Phone: ${htmlSafe(request.phone || "-")}</p>
+              ${request.message ? `<div class="request-message">${htmlSafe(request.message)}</div>` : ""}
+            </div>
+            ${requestDone ? "" : `<div class="row-actions">
+              <button class="btn primary" type="button" onclick="approveAdminRequest(${index})"><i class="fa-solid fa-check"></i> Approve</button>
+              <button class="btn danger" type="button" onclick="rejectAdminRequest(${index})"><i class="fa-solid fa-xmark"></i> Reject</button>
+            </div>`}
+          </div>
+        `}).join("") : `<div class="empty">No admin requests.</div>`;
+      }, () => {
+        adminRequestsList.innerHTML = `<div class="empty">Requests load nahi ho raha. Firebase rules/index check karein.</div>`;
+      });
+    }
+
+    async function approveAdminRequest(index) {
+      const request = adminRequestsCache[index];
+      if (!request?.userId) return;
+      await db.collection("users").doc(request.userId).set({
+        name: request.name || "User",
+        email: request.email || "",
+        phone: request.phone || "",
+        creatorMessage: request.message || "",
+        role: "creator",
+        adminApproved: true,
+        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await request.ref.set({
+        status: "approved",
+        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await notifyUser(request.userId, "Creator access approved", "Upload App and My Library tools are enabled.");
+    }
+
+    async function rejectAdminRequest(index) {
+      const request = adminRequestsCache[index];
+      if (!request) return;
+      const note = prompt("Reject reason");
+      if (!note?.trim()) return;
+      await request.ref.set({
+        status: "rejected",
+        note: note.trim(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await notifyUser(request.userId, "Creator request rejected", note.trim());
+    }
+
+    function loadReviewsModeration() {
+      if (unsubscribeReviews) return;
+      unsubscribeReviews = db.collectionGroup("reviews").orderBy("createdAt", "desc").limit(30).onSnapshot((snapshot) => {
+        reviewsCache = snapshot.docs.map((doc) => ({ id: doc.id, ref: doc.ref, ...doc.data() }));
+        adminReviewsList.innerHTML = reviewsCache.length ? reviewsCache.map((review, index) => `
+          <div class="mini-row">
+            <div>
+              <strong>${htmlSafe(review.appName || "App")} - ${Number(review.rating || 0)} star</strong>
+              <p>${htmlSafe(review.comment || "")}</p>
+              <p>${htmlSafe(review.userName || review.userEmail || "User")}</p>
+            </div>
+            <button class="btn danger" type="button" onclick="deleteReview(${index})"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `).join("") : `<div class="empty">No reviews yet.</div>`;
+      }, () => {
+        adminReviewsList.innerHTML = `<div class="empty">Reviews load nahi ho raha. Firebase index/rules check karein.</div>`;
+      });
+    }
+
+    async function deleteReview(index) {
+      const review = reviewsCache[index];
+      if (!review || !confirm("Delete this review?")) return;
+      if (review.appId && Number(review.rating || 0)) {
+        await db.collection("appStoreApps").doc(review.appId).update({
+          ratingTotal: firebase.firestore.FieldValue.increment(-Number(review.rating || 0)),
+          ratingCount: firebase.firestore.FieldValue.increment(-1),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+      }
+      await review.ref.delete();
+    }
+
     adminSearch.addEventListener("input", renderApps);
+    document.querySelectorAll(".admin-tab").forEach((button) => {
+      button.addEventListener("click", () => setAdminTab(button.dataset.adminTab));
+    });
     statusFilters.addEventListener("click", (event) => {
       const button = event.target.closest(".filter-chip");
       if (!button) return;
@@ -530,10 +1398,12 @@
     });
 
     function logout() {
-      auth.signOut().then(() => window.location.replace("login.html"));
+      auth.signOut();
     }
 
+    Object.assign(window, { addCategory, deleteCategory, deleteReview, approveAdminRequest, rejectAdminRequest, movePreviewImage, removePreviewImage, openPreviewPicker, toggleCategoryManager, openAdminAppDetails, closeAdminAppDetails, approveApp, rejectApp, archiveApp, restoreApp, toggleApp, editApp, resetForm, selectAdminUser, removeAdminAccess });
     updatePreview();
-  </script>
+    renderPreviewImageList();
+</script>
 </body>
 </html>

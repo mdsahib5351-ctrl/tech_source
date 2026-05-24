@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
     :root{--bg:#f8fafc;--surface:#fff;--text:#172033;--muted:#657186;--line:#e2e8f0;--brand:#01875f;--brand-dark:#016c4c;--blue:#1a73e8;--amber:#f9ab00;--danger:#d93025;--shadow:0 18px 48px rgba(15,23,42,.12)}
     *{box-sizing:border-box}
@@ -30,7 +31,94 @@
     .search-wrap i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted)}
     .search-wrap input{width:100%;height:46px;border:1px solid transparent;border-radius:999px;background:#eef3f8;padding:0 44px;color:var(--text);outline:none;font-weight:600}
     .search-wrap input:focus{background:#fff;border-color:#b7c8dc;box-shadow:0 0 0 4px rgba(1,135,95,.1)}
-    .icon-link{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--text)}
+    .search-recommendations{position:absolute;left:0;right:0;top:54px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 48px rgba(15,23,42,.16);padding:8px;display:none;z-index:50}
+    .search-recommendations.show{display:grid;gap:6px}
+    .search-item{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;border:0;background:transparent;border-radius:12px;padding:8px;text-align:left;width:100%}
+    .search-item:hover{background:#f1f5f9}
+    .search-item img{width:42px;height:42px;border-radius:10px;object-fit:cover;background:#eef3f8}
+    .search-item strong{display:block;color:#172033;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .search-item small{display:block;color:var(--muted);font-weight:800;margin-top:2px}
+    .search-item i{position:static;transform:none;color:var(--muted)}
+    .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+    .icon-link{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--text);flex:0 0 auto}
+    .store-login-btn{min-height:42px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#172033;font-weight:900;padding:0 13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+    .store-login-btn i{color:#ea4335}
+    .store-user-chip{min-height:42px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#172033;font-weight:900;padding:0 10px 0 6px;display:none;align-items:center;gap:8px;max-width:190px}
+    .store-user-chip.show{display:inline-flex}
+    .store-user-chip img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#eef3f8}
+    .store-user-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .profile-menu{position:absolute;right:18px;top:62px;width:min(326px,calc(100vw - 24px));background:#fff;border:1px solid #dadce0;border-radius:8px;box-shadow:0 4px 18px rgba(60,64,67,.3);padding:0;display:none;z-index:55;overflow:hidden}
+    .profile-menu.show{display:block}
+    .profile-head{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:18px 16px 10px}
+    .profile-head img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#8d6e63}
+    .profile-head strong{display:block;color:#303134;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+    .profile-head small{display:block;color:#3c4043;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px;font-size:.86rem}
+    .profile-manage{padding:0 16px 18px 72px;border-bottom:1px solid #e0e0e0}
+    .manage-account-btn{border:1px solid #dadce0;border-radius:999px;background:#fff;color:#3c4043;font-weight:500;padding:9px 16px;min-height:36px}
+    .profile-form{display:grid;gap:9px;margin:10px 0 12px}
+    .profile-form label{display:grid;gap:5px;color:#334155;font-size:.78rem;font-weight:900}
+    .profile-form input{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px;background:#fbfdff;color:var(--text);outline:none}
+    .profile-form input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(1,135,95,.1)}
+    .profile-form input:disabled{background:#eef3f8;color:#64748b}
+    .profile-form .profile-file{padding:8px;background:#fff}
+    .profile-message{min-height:18px;color:var(--muted);font-weight:800;font-size:.8rem}
+    .profile-message.ok{color:var(--brand)}
+    .profile-message.err{color:#dc2626}
+    .profile-menu .ghost-btn{width:100%}
+    .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .profile-extra{display:grid;padding:8px 0}
+    .profile-extra + .profile-extra{border-top:1px solid #e0e0e0}
+    .profile-menu-row{height:48px;border:0;background:#fff;color:#3c4043;padding:0 18px;display:grid;grid-template-columns:34px 1fr;align-items:center;gap:10px;text-align:left;font-weight:500}
+    .profile-menu-row:hover{background:#f1f3f4}
+    .profile-menu-row i{color:#5f6368;font-size:1.1rem;text-align:center}
+    .request-status-note{display:none;margin:0 16px 10px;padding:10px 12px;border-radius:12px;background:#f8fafc;color:#5f6368;font-weight:700;font-size:.85rem;line-height:1.4}
+    .request-status-note.show{display:block}
+    .request-status-note.pending{background:#fff7ed;color:#9a3412}
+    .request-status-note.approved{background:#e6f4ea;color:var(--brand)}
+    .request-status-note.rejected{background:#fee2e2;color:#b91c1c}
+    .admin-request-form{display:none;gap:10px;margin:0 16px 14px;padding:14px;border:1px solid #e0e0e0;border-radius:14px;background:#f8fafc}
+    .admin-request-form.show{display:grid}
+    .admin-request-form label{display:grid;gap:6px;margin:0;color:#3c4043;font-size:.78rem;font-weight:700}
+    .admin-request-form input{height:42px;border:1px solid #dadce0;border-radius:10px;background:#fff;color:#202124;padding:0 12px;outline:none;font-weight:500}
+    .admin-request-form input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(1,135,95,.12)}
+    .admin-request-form .primary-btn{width:100%;border-radius:10px;min-height:42px;margin-top:2px}
+    .creator-actions{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;margin:0 0 18px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+    .creator-actions.show{display:flex}
+    .creator-actions strong{margin-right:auto}
+    .settings-page{display:none;max-width:760px;margin:auto;padding:22px 18px 42px}
+    .settings-page.show{display:block}
+    .settings-shell{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+    .settings-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .settings-head h2{margin:0;font-size:1.45rem}
+    .settings-layout{display:grid;grid-template-columns:220px 1fr;gap:18px;align-items:start}
+    .settings-grid{display:grid;gap:4px;border-right:1px solid var(--line);padding-right:12px}
+    .settings-card{border:0;border-left:3px solid transparent;border-radius:6px;background:#fff;padding:10px 12px;display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:center;text-align:left;color:var(--text);font-weight:800}
+    .settings-card:hover,.settings-card.active{background:#f1f5f9;border-left-color:var(--blue)}
+    .settings-card i:first-child{color:#5f6368;text-align:center}
+    .settings-card span{display:none}
+    .settings-content{min-width:0}
+    .settings-section{display:none}.settings-section.show{display:block}
+    .settings-section h3{font-size:1.5rem;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .settings-note{border:1px dashed var(--line);border-radius:14px;padding:12px;color:var(--muted);font-weight:700;background:#fbfdff}
+    .mini-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0}
+    .mini-stat{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}.mini-stat strong{display:block;font-size:1.35rem}.mini-stat span{color:var(--muted);font-weight:800;font-size:.82rem}
+    .settings-list{display:grid;gap:8px;margin-top:12px}.settings-list .mini-row{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}.settings-list p{margin:4px 0 0;color:var(--muted)}
+    .creator-page{display:none;max-width:980px;margin:auto;padding:22px 18px 42px}
+    .creator-page.show{display:block}
+    .creator-shell{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+    .creator-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .creator-head h2{margin:0;font-size:1.45rem}
+    .creator-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .creator-form .full{grid-column:1/-1}
+    .creator-form label{display:grid;gap:6px;font-weight:900;color:#334155;font-size:.84rem}
+    .creator-form input,.creator-form textarea{width:100%;border:1px solid var(--line);border-radius:13px;padding:12px;background:#fbfdff;color:var(--text);outline:none}
+    .creator-form textarea{min-height:90px;resize:vertical}
+    .creator-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .creator-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:start}
+    .creator-card img{width:56px;height:56px;border-radius:14px;object-fit:cover;background:#eef3fa}
+    .creator-card h3{margin:0;font-size:.98rem}
+    .creator-card p{margin:5px 0 0;color:var(--muted);font-size:.84rem}
+    .creator-card-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
     .container,.detail-page{max-width:1180px;margin:auto;padding:22px 18px 42px}
     .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:stretch;margin-bottom:18px}
     .hero-copy{background:linear-gradient(135deg,#e7f5ef,#f8fbff 58%,#fff4db);border:1px solid var(--line);border-radius:26px;padding:28px;min-height:260px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
@@ -78,8 +166,16 @@
     .safe-item i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#e6f4ea;color:var(--brand)}
     .safe-item strong{display:block;font-size:.9rem}
     .safe-item small{display:block;color:var(--muted);line-height:1.45;margin-top:2px}
+    body.search-results-mode .hero,body.search-results-mode .side-panel{display:none}
+    body.search-results-mode .store-layout{grid-template-columns:1fr}
+    body.search-results-mode .section-bar{position:static;margin-top:12px}
+    body.search-results-mode .tabs{display:none}
+    body.search-results-mode .apps-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
     .empty,.loading{grid-column:1/-1;background:#fff;border:1px dashed var(--line);border-radius:18px;padding:32px;text-align:center;color:var(--muted)}
     .empty i,.loading i{font-size:2rem;color:var(--brand);margin-bottom:10px}
+    .search-empty{grid-column:1/-1;background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:center;text-align:left;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+    .search-empty i{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#eef3f8;color:var(--brand);font-size:1.35rem;margin:0}
+    .search-empty h3{margin:0 0 5px;color:var(--text)}.search-empty p{margin:0;color:var(--muted);line-height:1.45}
     .detail-page{display:none}
     .detail-page.show{display:block}
     .detail-top{display:grid;grid-template-columns:112px 1fr auto;gap:18px;align-items:center;margin:20px 0 22px}
@@ -100,44 +196,136 @@
     .rate-buttons{display:flex;gap:6px}
     .rate-star{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#94a3b8;font-size:1rem}
     .rate-star.active,.rate-star:hover{background:#fff7ed;color:var(--amber);border-color:#facc15}
+    .review-form{display:grid;gap:10px;margin-top:12px}
+    .review-stars{display:flex;gap:6px}
+    .review-stars .rate-star.selected{background:#fff7ed;color:var(--amber);border-color:#facc15}
+    .review-form textarea{width:100%;min-height:92px;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfdff;color:var(--text);resize:vertical;outline:none}
+    .review-form textarea:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(1,135,95,.11)}
+    .rating-summary{display:grid;gap:8px;margin:14px 0}
+    .rating-line{display:grid;grid-template-columns:48px 1fr 34px;gap:9px;align-items:center;color:#475569;font-size:.84rem;font-weight:900}
+    .rating-track{height:9px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .rating-fill{height:100%;background:var(--brand);border-radius:999px}
+    .reviews-list{display:grid;gap:10px;margin-top:14px;max-height:430px;overflow-y:auto;padding-right:6px;overscroll-behavior:contain}
+    .reviews-list::-webkit-scrollbar{width:7px}
+    .reviews-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+    .review-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff}
+    .review-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .review-head strong{font-size:.92rem}
+    .review-head span{color:var(--amber);font-weight:900;font-size:.86rem;white-space:nowrap}
+    .review-title{display:flex;align-items:center;gap:8px;min-width:0}
+    .review-title strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .review-tools{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+    .review-card p{margin:0;color:#475569;line-height:1.55}
+    .review-menu-wrap{position:relative;display:flex;justify-content:flex-end}
+    .review-more{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#f8fafc;color:#172033;font-size:1rem}
+    .review-actions{display:none;position:absolute;right:0;top:38px;z-index:5;min-width:132px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 14px 34px rgba(15,23,42,.14);padding:6px}
+    .review-actions.show{display:grid;gap:4px}
+    .review-actions button{width:100%;border:0;border-radius:9px;background:#fff;color:#172033;font-weight:800;padding:9px 10px;text-align:left}
+    .review-actions button:hover{background:#f1f5f9}
+    .review-edit{display:none;gap:8px;margin-top:10px}
+    .review-edit.show{display:grid}
+    .review-edit textarea{width:100%;min-height:78px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdff;color:var(--text);resize:vertical;outline:none}
+    .review-edit-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+    .review-edit-actions button{border:1px solid var(--line);border-radius:999px;background:#f8fafc;color:#172033;font-weight:900;padding:8px 12px}
+    .review-edit-actions button:first-child{border-color:rgba(1,135,95,.25);background:var(--brand);color:#fff}
     .suggestions{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
     .suggest-card{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:15px;padding:10px;background:#fff;cursor:pointer}
     .suggest-card img{width:56px;height:56px;border-radius:14px;object-fit:cover;background:#eef3fa}
     .suggest-card h4{margin:0;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .suggest-card small{color:var(--muted);font-weight:800}
-    .download-panel{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(620px,calc(100% - 24px));background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 22px 70px rgba(15,23,42,.22);z-index:60;display:none}
-    .download-panel.show{display:block}
-    .download-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-    .download-head strong{font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .download-head span{color:var(--brand);font-weight:900}
-    .download-close{width:30px;height:30px;border:0;border-radius:50%;background:#eef3f8;color:#334155;display:grid;place-items:center;flex:0 0 auto}
-    .download-track{height:18px;background:#e5e7eb;border-radius:999px;overflow:hidden;border:1px solid #d1d5db}
-    .download-fill{height:100%;width:0%;background:linear-gradient(90deg,#16a34a,#22c55e,#86efac);border-radius:999px;transition:width .2s ease}
-    .download-note{margin:9px 0 0;color:var(--muted);font-size:.84rem;font-weight:700;line-height:1.45}
-    .download-note.warning{color:#b45309}
     footer{max-width:1180px;margin:0 auto;padding:24px 18px 34px;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.9rem}
+    .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,18px);background:#172033;color:#fff;border-radius:999px;padding:12px 16px;box-shadow:0 16px 40px rgba(15,23,42,.22);font-weight:800;opacity:0;pointer-events:none;transition:.2s ease;z-index:80}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .mobile-nav{display:none}
     @media(max-width:900px){.topbar-inner{grid-template-columns:auto 1fr auto;gap:10px}.brand span{display:none}.hero{grid-template-columns:1fr}.store-layout{grid-template-columns:1fr}.side-panel{position:static}}
     @media(max-width:680px){
-      .topbar-inner{padding:10px;grid-template-columns:auto 1fr auto}.container,.detail-page{padding:16px 12px 32px}.hero-copy,.featured-panel{border-radius:20px;padding:18px}.hero-copy{min-height:235px}.featured-panel{min-height:230px}.section-bar{top:63px;margin-left:-12px;margin-right:-12px;padding:10px 12px}.section-row{align-items:flex-start;flex-direction:column;gap:5px}.apps-grid{grid-template-columns:1fr;gap:10px}.app-card{grid-template-columns:62px 1fr;border-radius:14px;padding:12px}.app-logo{width:62px;height:62px;border-radius:15px}.app-info h3{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.app-desc{font-size:.84rem}h1{font-size:2.1rem}.detail-top{grid-template-columns:78px 1fr;gap:12px;align-items:start}.detail-logo{width:78px;height:78px;border-radius:18px}.detail-actions{grid-column:1/-1;justify-content:stretch}.detail-actions .primary-btn,.detail-actions .ghost-btn{flex:1}.detail-meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.screenshots img{width:auto;max-width:82vw;max-height:360px;height:auto;border-radius:17px}
+      .topbar-inner{padding:10px;grid-template-columns:auto 1fr auto}.store-login-btn span{display:none}.store-user-chip{max-width:48px;padding-right:6px}.store-user-chip span{display:none}.container,.detail-page{padding:16px 12px 32px}.hero-copy,.featured-panel{border-radius:20px;padding:18px}.hero-copy{min-height:235px}.featured-panel{min-height:230px}.section-bar{top:63px;margin-left:-12px;margin-right:-12px;padding:10px 12px}.section-row{align-items:flex-start;flex-direction:column;gap:5px}.apps-grid{grid-template-columns:1fr;gap:10px}.app-card{grid-template-columns:62px 1fr;border-radius:14px;padding:12px}.app-logo{width:62px;height:62px;border-radius:15px}.app-info h3{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.app-desc{font-size:.84rem}h1{font-size:2.1rem}.detail-top{grid-template-columns:78px 1fr;gap:12px;align-items:start}.detail-logo{width:78px;height:78px;border-radius:18px}.detail-actions{grid-column:1/-1;justify-content:stretch}.detail-actions .primary-btn,.detail-actions .ghost-btn{flex:1}.detail-meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.screenshots img{width:auto;max-width:82vw;max-height:360px;height:auto;border-radius:17px}
+      .hero{gap:10px;margin-bottom:10px}.hero-copy{min-height:175px;padding:16px}.featured-panel{min-height:170px;padding:16px}.eyebrow{padding:6px 10px;font-size:.78rem}h1{font-size:1.85rem;margin:12px 0 8px}.hero-copy p{font-size:.92rem;line-height:1.45}.store-stats{margin-top:14px}.stat-chip{padding:7px 10px;font-size:.78rem}.featured-title img{width:54px;height:54px;border-radius:14px}.featured-title h2{font-size:1rem}.featured-panel p{margin:12px 0;font-size:.9rem;line-height:1.4}
+      .search-empty{grid-template-columns:42px 1fr;padding:16px;border-radius:16px}.search-empty i{width:42px;height:42px;border-radius:13px}
+      .creator-form{grid-template-columns:1fr}.creator-page{padding:16px 12px 32px}.creator-head{align-items:flex-start;flex-direction:column}
+      .profile-menu{position:fixed;left:12px;right:12px;top:58px;width:auto;max-height:calc(100vh - 74px);overflow-y:auto}
+      .profile-head{padding:16px 14px 8px}
+      .profile-manage{padding:0 14px 16px 70px}
+      .profile-menu-row{height:50px;padding:0 16px}
+      .creator-actions{align-items:stretch;border-radius:16px;padding:10px}
+      .creator-actions strong{width:100%;margin:0}
+      .creator-actions .primary-btn,.creator-actions .ghost-btn{flex:1;min-width:140px}
+      .admin-request-form{width:100%;grid-template-columns:1fr}
+      .settings-page{padding:16px 12px 32px}
+      .settings-shell{border-radius:18px;padding:14px}
+      .settings-head h2{font-size:1.2rem}
+      .settings-layout{grid-template-columns:1fr}
+      .settings-grid{border-right:0;border-bottom:1px solid var(--line);padding:0 0 10px}
+      body{padding-bottom:70px}
+      .mobile-nav{position:fixed;left:0;right:0;bottom:0;height:62px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:70;box-shadow:0 -10px 30px rgba(15,23,42,.08)}
+      .mobile-nav button{border:0;background:#fff;color:#5f6368;display:grid;place-items:center;font-size:.72rem;font-weight:800;padding:7px 4px}
+      .mobile-nav i{font-size:1.05rem}
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="index.html" aria-label="Tech Source Home">
+      <a class="brand" href="appstore.html" aria-label="Tech Source Home">
         <img src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source">
         <span>Tech Source Play</span>
       </a>
-      <label class="search-wrap" for="searchInput">
+      <div class="search-wrap">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="searchInput" type="search" placeholder="Search apps and tools">
-      </label>
-      <a class="icon-link" href="index.html" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+        <div class="search-recommendations" id="searchRecommendations"></div>
+      </div>
+      <div class="top-actions">
+        <button class="store-login-btn" type="button" id="storeGoogleLoginBtn">
+          <i class="fa-brands fa-google"></i>
+          <span>Login</span>
+        </button>
+        <button class="store-user-chip" type="button" id="storeUserChip" title="Account">
+          <img id="storeUserPhoto" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="User">
+          <span id="storeUserName">User</span>
+        </button>
+        <a class="icon-link" href="appstore.html" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+      </div>
+      <div class="profile-menu" id="storeProfileMenu">
+        <div class="profile-head">
+          <img id="profileMenuPhoto" src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="User">
+          <div>
+            <strong id="profileMenuName">User</strong>
+            <small id="profileMenuEmail">Signed in</small>
+          </div>
+        </div>
+        <div class="profile-manage">
+          <button class="manage-account-btn" type="button" id="profileManageBtn">Manage your profile</button>
+        </div>
+        <div class="profile-extra">
+          <button class="profile-menu-row" type="button" id="profileSettingsBtn"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
+          <button class="profile-menu-row" type="button" id="adminRegisterToggle"><i class="fa-solid fa-user-plus"></i><span>Apply as Creator</span></button>
+          <button class="profile-menu-row" type="button" id="profileMenuLibraryBtn"><i class="fa-solid fa-layer-group"></i><span>My app library</span></button>
+          <button class="profile-menu-row" type="button" id="profileMenuUploadBtn"><i class="fa-solid fa-cloud-arrow-up"></i><span>Upload app</span></button>
+        </div>
+        <form class="admin-request-form" id="adminRequestForm">
+          <label>Phone Number
+            <input id="adminRequestPhone" type="tel" placeholder="10 digit mobile number" maxlength="15" inputmode="tel">
+          </label>
+          <label>Message
+            <input id="adminRequestMessage" type="text" placeholder="App upload reason" maxlength="120">
+          </label>
+          <button class="primary-btn" type="submit" id="adminRequestBtn"><i class="fa-solid fa-paper-plane"></i> Send Request</button>
+        </form>
+        <div class="request-status-note" id="creatorRequestStatus"></div>
+        <div class="profile-extra">
+          <button class="profile-menu-row" type="button" id="storeLogoutBtn"><i class="fa-solid fa-right-from-bracket"></i><span>Sign out</span></button>
+        </div>
+      </div>
     </div>
   </header>
 
   <main class="container" id="storeHome">
+    <section class="creator-actions" id="creatorActions">
+      <strong id="creatorActionTitle">Creator tools</strong>
+      <button class="primary-btn" type="button" id="creatorUploadBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Upload App</button>
+      <button class="ghost-btn" type="button" id="creatorLibraryBtn"><i class="fa-solid fa-layer-group"></i> My Library</button>
+    </section>
     <section class="hero">
       <div class="hero-copy">
         <div>
@@ -163,7 +351,7 @@
 
     <section class="section-bar">
       <div class="section-row">
-        <div><h2>For You</h2><span id="appCount">Loading apps...</span></div>
+        <div><h2 id="sectionTitle">For You</h2><span id="appCount">Loading apps...</span></div>
         <span id="resultHint">Official download links</span>
       </div>
       <div class="tabs" id="categoryTabs" aria-label="App categories"></div>
@@ -185,52 +373,162 @@
   </main>
 
   <section class="detail-page" id="appDetailPage" aria-live="polite"></section>
+  <section class="settings-page" id="profileSettingsPage" aria-live="polite">
+    <div class="settings-shell">
+      <div class="settings-head">
+        <h2>Settings</h2>
+        <button class="ghost-btn" type="button" onclick="closeProfileSettings()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      </div>
+      <div class="settings-layout">
+        <nav class="settings-grid" id="settingsGrid" aria-label="Settings sections">
+          <button class="settings-card active" type="button" data-settings-section="profile" onclick="openSettingsSection('profile')"><i class="fa-solid fa-user"></i><strong>Profile</strong><span>Name, email and photo</span></button>
+          <button class="settings-card" type="button" data-settings-section="creator" onclick="openSettingsSection('creator')"><i class="fa-solid fa-cloud-arrow-up"></i><strong>Creator account</strong><span>Request status and upload access</span></button>
+          <button class="settings-card" type="button" data-settings-section="notifications" onclick="openSettingsSection('notifications')"><i class="fa-solid fa-bell"></i><strong>Notifications</strong><span>Coming soon</span></button>
+        </nav>
+        <div class="settings-content">
+          <section class="settings-section show" id="settingsOverviewSection">
+            <h3>General</h3>
+            <div class="settings-note">Settings section choose karein. Profile edit, creator status, aur notifications yahin manage honge.</div>
+          </section>
+          <section class="settings-section" id="settingsProfileSection">
+            <h3>Profile</h3>
+            <form class="profile-form" id="storeProfileForm">
+              <label>Name
+                <input id="profileNameInput" type="text" placeholder="Your name" maxlength="40">
+              </label>
+              <label>Email
+                <input id="profileEmailInput" type="email" disabled>
+              </label>
+              <label>Photo URL
+                <input id="profilePhotoInput" type="url" placeholder="https://...">
+              </label>
+              <label>Upload Photo
+                <input class="profile-file" id="profilePhotoFile" type="file" accept="image/*">
+              </label>
+              <div class="profile-message" id="profileMessage"></div>
+              <div class="profile-actions">
+                <button class="primary-btn" type="submit" id="profileSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                <button class="ghost-btn" type="button" onclick="closeProfileSettings()"><i class="fa-solid fa-xmark"></i> Cancel</button>
+              </div>
+            </form>
+          </section>
+          <section class="settings-section" id="settingsCreatorSection">
+            <h3>Creator account</h3>
+            <div class="settings-note" id="settingsCreatorStatus">Creator status loading...</div>
+            <div class="mini-stats" id="creatorDashboard"></div>
+          </section>
+          <section class="settings-section" id="settingsNotificationsSection">
+            <h3>Notifications</h3>
+            <div class="settings-note">Latest account and app updates.</div>
+            <div class="settings-list" id="notificationsList"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="creator-page" id="creatorPage" aria-live="polite"></section>
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button type="button" onclick="closeDetails(); closeCreatorPage(); closeProfileSettings();"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button type="button" onclick="document.getElementById('searchInput').focus()"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></button>
+    <button type="button" onclick="showCreatorLibrary()"><i class="fa-solid fa-layer-group"></i><span>My Apps</span></button>
+    <button type="button" onclick="openProfileSettings()"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+  </nav>
+  <div class="toast" id="storeToast"></div>
 
   <footer id="storeFooter">
     <span>Copyright 2026 Tech Source.</span>
     <span>Download only apps listed by official admin.</span>
   </footer>
 
-  <div class="download-panel" id="downloadPanel" role="status" aria-live="polite">
-    <div class="download-head">
-      <strong id="downloadTitle">Preparing download...</strong>
-      <span id="downloadPercent">0%</span>
-      <button class="download-close" type="button" onclick="downloadPanel.classList.remove('show')" aria-label="Hide download panel"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="download-track"><div class="download-fill" id="downloadFill"></div></div>
-    <p class="download-note" id="downloadNote">Download start ho raha hai.</p>
-  </div>
-
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
-      authDomain: "tech-source-bill.firebaseapp.com",
-      databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
-      projectId: "tech-source-bill",
-      storageBucket: "tech-source-bill.firebasestorage.app",
-      messagingSenderId: "690209240188",
-      appId: "1:690209240188:web:6e54de365e7f839634c5f9"
+      apiKey: "AIzaSyBbExHmHSMEt_Keq6wk4Y9p0Zlj4gDWS5s",
+      authDomain: "appstore-fc878.firebaseapp.com",
+      projectId: "appstore-fc878",
+      storageBucket: "appstore-fc878.firebasestorage.app",
+      messagingSenderId: "522720513773",
+      appId: "1:522720513773:web:0006ecaf7b1916807386e4",
+      measurementId: "G-29LMHBNVLN"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: "select_account" });
     const appsGrid = document.getElementById("appsGrid");
     const appCount = document.getElementById("appCount");
     const resultHint = document.getElementById("resultHint");
+    const sectionTitle = document.getElementById("sectionTitle");
     const searchInput = document.getElementById("searchInput");
+    const searchRecommendations = document.getElementById("searchRecommendations");
     const categoryTabs = document.getElementById("categoryTabs");
     const featuredPanel = document.getElementById("featuredPanel");
     const storeHome = document.getElementById("storeHome");
     const storeFooter = document.getElementById("storeFooter");
     const appDetailPage = document.getElementById("appDetailPage");
-    const downloadPanel = document.getElementById("downloadPanel");
-    const downloadTitle = document.getElementById("downloadTitle");
-    const downloadPercent = document.getElementById("downloadPercent");
-    const downloadFill = document.getElementById("downloadFill");
-    const downloadNote = document.getElementById("downloadNote");
+    const storeGoogleLoginBtn = document.getElementById("storeGoogleLoginBtn");
+    const storeUserChip = document.getElementById("storeUserChip");
+    const storeUserPhoto = document.getElementById("storeUserPhoto");
+    const storeUserName = document.getElementById("storeUserName");
+    const storeProfileMenu = document.getElementById("storeProfileMenu");
+    const profileMenuPhoto = document.getElementById("profileMenuPhoto");
+    const profileMenuName = document.getElementById("profileMenuName");
+    const profileMenuEmail = document.getElementById("profileMenuEmail");
+    const storeProfileForm = document.getElementById("storeProfileForm");
+    const profileNameInput = document.getElementById("profileNameInput");
+    const profileEmailInput = document.getElementById("profileEmailInput");
+    const profilePhotoInput = document.getElementById("profilePhotoInput");
+    const profilePhotoFile = document.getElementById("profilePhotoFile");
+    const profileMessage = document.getElementById("profileMessage");
+    const profileSaveBtn = document.getElementById("profileSaveBtn");
+    const profileManageBtn = document.getElementById("profileManageBtn");
+    const profileSettingsBtn = document.getElementById("profileSettingsBtn");
+    const profileMenuLibraryBtn = document.getElementById("profileMenuLibraryBtn");
+    const profileMenuUploadBtn = document.getElementById("profileMenuUploadBtn");
+    const profileSettingsPage = document.getElementById("profileSettingsPage");
+    const settingsGrid = document.getElementById("settingsGrid");
+    const settingsOverviewSection = document.getElementById("settingsOverviewSection");
+    const settingsProfileSection = document.getElementById("settingsProfileSection");
+    const settingsCreatorSection = document.getElementById("settingsCreatorSection");
+    const settingsNotificationsSection = document.getElementById("settingsNotificationsSection");
+    const settingsCreatorStatus = document.getElementById("settingsCreatorStatus");
+    const creatorDashboard = document.getElementById("creatorDashboard");
+    const notificationsList = document.getElementById("notificationsList");
+    const storeToast = document.getElementById("storeToast");
+    const storeLogoutBtn = document.getElementById("storeLogoutBtn");
+    const creatorActions = document.getElementById("creatorActions");
+    const creatorActionTitle = document.getElementById("creatorActionTitle");
+    const adminRegisterToggle = document.getElementById("adminRegisterToggle");
+    const adminRequestForm = document.getElementById("adminRequestForm");
+    const adminRequestPhone = document.getElementById("adminRequestPhone");
+    const adminRequestMessage = document.getElementById("adminRequestMessage");
+    const adminRequestBtn = document.getElementById("adminRequestBtn");
+    const creatorRequestStatus = document.getElementById("creatorRequestStatus");
+    const creatorUploadBtn = document.getElementById("creatorUploadBtn");
+    const creatorLibraryBtn = document.getElementById("creatorLibraryBtn");
+    const creatorPage = document.getElementById("creatorPage");
     const fallbackLogo = "https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg";
+    const CLOUDINARY_API = "https://api.cloudinary.com/v1_1/dsnuatuc8/image/upload";
+    const CLOUDINARY_UPLOAD_PRESET = "ml_default";
     let allApps = [];
     let activeCategory = "All";
+    let activeSearchTerm = "";
+    let searchResultsMode = false;
+    const appReviewCache = {};
+    const userRatingCache = {};
+    let selectedReviewRating = 0;
+    let currentUserProfile = null;
+    let currentCreatorRequest = null;
+    let notificationsCache = [];
+    let toastTimer = null;
+
+    function showToast(message) {
+      storeToast.textContent = message;
+      storeToast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => storeToast.classList.remove("show"), 2200);
+    }
 
     function htmlSafe(value) {
       const div = document.createElement("div");
@@ -284,22 +582,492 @@
       return apps.map((app) => ({ ...app, category: inferCategory(app) }));
     }
 
+    function isPublicApp(app) {
+      return app.active !== false && app.status !== "pending" && app.status !== "archived" && app.archived !== true;
+    }
+
+    function creatorStatusLabel(app) {
+      if (app.archived === true || app.status === "archived") return "Archived";
+      if (app.status === "rejected") return "Rejected";
+      if (app.status === "pending") return "Pending approval";
+      if (app.active === false) return "Hidden";
+      return "Live";
+    }
+
+    function renderCreatorDashboard() {
+      if (!auth.currentUser) return;
+      const mine = allApps.filter((app) => app.submittedBy === auth.currentUser.uid);
+      const live = mine.filter((app) => isPublicApp(app)).length;
+      const pending = mine.filter((app) => app.status === "pending").length;
+      const rejected = mine.filter((app) => app.status === "rejected").length;
+      creatorDashboard.innerHTML = `
+        <div class="mini-stat"><strong>${mine.length}</strong><span>Total apps</span></div>
+        <div class="mini-stat"><strong>${live}</strong><span>Live</span></div>
+        <div class="mini-stat"><strong>${pending}</strong><span>Pending</span></div>
+        <div class="mini-stat"><strong>${rejected}</strong><span>Rejected</span></div>`;
+    }
+
+    function renderNotifications() {
+      notificationsList.innerHTML = notificationsCache.length ? notificationsCache.map((item) => `
+        <div class="mini-row"><strong>${htmlSafe(item.title || "Update")}</strong><p>${htmlSafe(item.message || "")}</p></div>
+      `).join("") : `<div class="settings-note">No notifications yet.</div>`;
+    }
+
+    function loadNotifications(user) {
+      if (!user) {
+        notificationsCache = [];
+        renderNotifications();
+        return;
+      }
+      db.collection("users").doc(user.uid).collection("notifications").orderBy("createdAt", "desc").limit(20).onSnapshot((snapshot) => {
+        notificationsCache = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        renderNotifications();
+      }, () => {
+        notificationsList.innerHTML = `<div class="settings-note">Notifications load nahi ho raha.</div>`;
+      });
+    }
+
+    function publicApps() {
+      return allApps.filter(isPublicApp);
+    }
+
+    async function ensureStoreUserProfile(user) {
+      if (!user) return;
+      await db.collection("users").doc(user.uid).set({
+        name: user.displayName || user.email?.split("@")[0] || "User",
+        email: user.email || "",
+        photoUrl: user.photoURL || "",
+        updatedAt: new Date()
+      }, { merge: true });
+    }
+
+    function isCreatorApproved() {
+      return Boolean(currentUserProfile?.adminApproved || currentUserProfile?.role === "creator" || currentUserProfile?.role === "admin");
+    }
+
+    function updateCreatorButtons() {
+      const approved = Boolean(auth.currentUser && isCreatorApproved());
+      const requestStatus = currentCreatorRequest?.status || "";
+      creatorActions.classList.toggle("show", approved);
+      creatorActionTitle.textContent = "Admin tools";
+      creatorUploadBtn.style.display = approved ? "inline-flex" : "none";
+      creatorLibraryBtn.style.display = approved ? "inline-flex" : "none";
+      profileMenuUploadBtn.style.display = approved ? "grid" : "none";
+      profileMenuLibraryBtn.style.display = approved ? "grid" : "none";
+      adminRegisterToggle.style.display = auth.currentUser && !approved && requestStatus !== "pending" ? "grid" : "none";
+      if (!auth.currentUser || approved) adminRequestForm.classList.remove("show");
+      creatorRequestStatus.className = `request-status-note ${requestStatus || ""}`;
+      if (!auth.currentUser) {
+        creatorRequestStatus.textContent = "";
+        creatorRequestStatus.classList.remove("show");
+      } else if (approved) {
+        creatorRequestStatus.textContent = "Creator access approved. Upload tools are enabled.";
+        creatorRequestStatus.classList.add("show", "approved");
+      } else if (requestStatus === "pending") {
+        creatorRequestStatus.textContent = "Creator request pending. Admin approval ke baad upload tools milenge.";
+        creatorRequestStatus.classList.add("show");
+      } else if (requestStatus === "rejected") {
+        creatorRequestStatus.textContent = "Creator request rejected. Aap dobara apply kar sakte hain.";
+        creatorRequestStatus.classList.add("show");
+      } else {
+        creatorRequestStatus.textContent = "";
+        creatorRequestStatus.classList.remove("show");
+      }
+    }
+
+    function openProfileSettings() {
+      if (!auth.currentUser) return;
+      storeProfileMenu.classList.remove("show");
+      storeHome.classList.add("hidden");
+      appDetailPage.classList.remove("show");
+      creatorPage.classList.remove("show");
+      profileSettingsPage.classList.add("show");
+      storeFooter.classList.add("hidden");
+      fillProfileForm(auth.currentUser);
+      showSettingsHome();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeProfileSettings() {
+      profileSettingsPage.classList.remove("show");
+      storeHome.classList.remove("hidden");
+      storeFooter.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showSettingsHome() {
+      document.querySelectorAll(".settings-card").forEach((button) => button.classList.remove("active"));
+      settingsOverviewSection.classList.add("show");
+      settingsProfileSection.classList.remove("show");
+      settingsCreatorSection.classList.remove("show");
+      settingsNotificationsSection.classList.remove("show");
+      settingsCreatorStatus.textContent = isCreatorApproved()
+        ? "Creator access approved. Upload tools are enabled."
+        : currentCreatorRequest?.status
+          ? `Creator request status: ${currentCreatorRequest.status}`
+          : "Creator access abhi apply nahi kiya.";
+    }
+
+    function openSettingsSection(section) {
+      document.querySelectorAll(".settings-card").forEach((button) => button.classList.toggle("active", button.dataset.settingsSection === section));
+      settingsOverviewSection.classList.remove("show");
+      settingsProfileSection.classList.toggle("show", section === "profile");
+      settingsCreatorSection.classList.toggle("show", section === "creator");
+      settingsNotificationsSection.classList.toggle("show", section === "notifications");
+      if (section === "creator") {
+        settingsCreatorStatus.textContent = isCreatorApproved()
+          ? "Creator access approved. Upload tools are enabled."
+          : currentCreatorRequest?.status
+            ? `Creator request status: ${currentCreatorRequest.status}${currentCreatorRequest.note ? " - " + currentCreatorRequest.note : ""}`
+            : "Creator access abhi apply nahi kiya.";
+        renderCreatorDashboard();
+      }
+      if (section === "notifications") renderNotifications();
+    }
+
+    async function loadCurrentUserProfile(user) {
+      currentUserProfile = null;
+      currentCreatorRequest = null;
+      if (!user) {
+        updateCreatorButtons();
+        return;
+      }
+      const [profileSnap, requestSnap] = await Promise.all([
+        db.collection("users").doc(user.uid).get().catch(() => null),
+        db.collection("adminRequests").doc(user.uid).get().catch(() => null)
+      ]);
+      currentUserProfile = profileSnap?.exists ? profileSnap.data() : {};
+      currentCreatorRequest = requestSnap?.exists ? requestSnap.data() : null;
+      updateCreatorButtons();
+    }
+
+    async function handleStoreGoogleLogin() {
+      const result = await auth.signInWithPopup(googleProvider);
+      await ensureStoreUserProfile(result.user);
+      return result.user;
+    }
+
+    function setProfileMessage(message, type = "") {
+      profileMessage.textContent = message || "";
+      profileMessage.className = `profile-message ${type}`;
+    }
+
+    async function uploadProfilePhoto(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      formData.append("folder", "appstore_profiles");
+      const res = await fetch(CLOUDINARY_API, { method: "POST", body: formData });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.secure_url) throw new Error(data.error?.message || "Profile photo upload failed");
+      return data.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
+    }
+
+    function fillProfileForm(user) {
+      profileNameInput.value = user?.displayName || user?.email?.split("@")[0] || "";
+      profileEmailInput.value = user?.email || "";
+      profilePhotoInput.value = user?.photoURL || "";
+      profilePhotoFile.value = "";
+      setProfileMessage("");
+    }
+
+    async function saveStoreProfile(event) {
+      event.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+      const name = profileNameInput.value.trim() || user.email?.split("@")[0] || "User";
+      let photoUrl = profilePhotoInput.value.trim();
+      profileSaveBtn.disabled = true;
+      profileSaveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving`;
+      setProfileMessage("Saving profile...");
+      try {
+        const photoFile = profilePhotoFile.files[0];
+        if (photoFile) {
+          setProfileMessage("Uploading photo...");
+          photoUrl = await uploadProfilePhoto(photoFile);
+          profilePhotoInput.value = photoUrl;
+        }
+        await user.updateProfile({ displayName: name, photoURL: photoUrl || null });
+        await db.collection("users").doc(user.uid).set({
+          name,
+          email: user.email || "",
+          photoUrl: photoUrl || "",
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        await user.reload();
+        const freshUser = auth.currentUser;
+        renderStoreAuth(freshUser);
+        setProfileMessage("Profile updated.", "ok");
+        showToast("Profile updated");
+      } catch (error) {
+        setProfileMessage(error.message || "Profile update failed", "err");
+      } finally {
+        profileSaveBtn.disabled = false;
+        profileSaveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save`;
+      }
+    }
+
+    async function submitAdminRequest(event) {
+      event.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+      const phone = adminRequestPhone.value.trim();
+      const message = adminRequestMessage.value.trim();
+      if (phone.length < 8) {
+        setProfileMessage("Phone number sahi dalein.", "err");
+        return;
+      }
+      adminRequestBtn.disabled = true;
+      adminRequestBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending`;
+      try {
+        await db.collection("adminRequests").doc(user.uid).set({
+          userId: user.uid,
+          name: profileNameInput.value.trim() || user.displayName || "User",
+          email: user.email || "",
+          phone,
+          message,
+          status: "pending",
+          requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        currentCreatorRequest = { status: "pending", phone, message };
+        updateCreatorButtons();
+        setProfileMessage("Admin request sent. Approval ke baad upload button milega.", "ok");
+        showToast("Creator request sent");
+        adminRequestForm.classList.remove("show");
+      } catch (error) {
+        setProfileMessage(error.message || "Request send nahi hui", "err");
+      } finally {
+        adminRequestBtn.disabled = false;
+        adminRequestBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Request`;
+      }
+    }
+
+    async function uploadCreatorPreview(file) {
+      if (!file) return "";
+      return uploadProfilePhoto(file);
+    }
+
+    function showCreatorUpload(appId = "") {
+      if (!isCreatorApproved()) return;
+      const app = appId ? allApps.find((item) => item.id === appId && item.submittedBy === auth.currentUser?.uid) : null;
+      storeHome.classList.add("hidden");
+      appDetailPage.classList.remove("show");
+      profileSettingsPage.classList.remove("show");
+      storeFooter.classList.add("hidden");
+      creatorPage.classList.add("show");
+      creatorPage.innerHTML = `
+        <div class="creator-shell">
+          <div class="creator-head">
+            <h2>${app ? "Update App" : "Upload App"}</h2>
+            <button class="ghost-btn" type="button" onclick="closeCreatorPage()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+          </div>
+          <form class="creator-form" id="creatorAppForm">
+            <input type="hidden" id="creatorEditId" value="${htmlSafe(app?.id || "")}">
+            <label>App Name<input id="creatorAppName" required value="${htmlSafe(app?.name || "")}"></label>
+            <label>Version<input id="creatorAppVersion" value="${htmlSafe(app?.version || "")}" placeholder="v1.0.0"></label>
+            <label>Size<input id="creatorAppSize" value="${htmlSafe(app?.size || "")}" placeholder="15 MB"></label>
+            <label>Category<input id="creatorAppCategory" value="${htmlSafe(app?.category || "Apps")}"></label>
+            <label class="full">Download Link<input id="creatorDownloadUrl" type="url" value="${htmlSafe(app?.downloadUrl || "")}" placeholder="APK download link"></label>
+            <label class="full">Description<textarea id="creatorDescription">${htmlSafe(app?.description || "")}</textarea></label>
+            <label>Logo URL<input id="creatorLogoUrl" type="url" value="${htmlSafe(app?.logoUrl || "")}" placeholder="Logo image URL"></label>
+            <label>Upload Logo<input id="creatorLogoFile" type="file" accept="image/*"></label>
+            <label class="full">Preview Images<input id="creatorPreviewFiles" type="file" accept="image/*" multiple></label>
+            <textarea class="full" id="creatorPreviewUrls" placeholder="Preview URLs">${htmlSafe(Array.isArray(app?.previewImages) ? app.previewImages.join("\\n") : "")}</textarea>
+            <button class="primary-btn full" type="submit"><i class="fa-solid fa-cloud-arrow-up"></i> ${app ? "Update App" : "Upload App"}</button>
+          </form>
+        </div>`;
+      document.getElementById("creatorAppForm").addEventListener("submit", saveCreatorApp);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function saveCreatorApp(event) {
+      event.preventDefault();
+      if (!isCreatorApproved()) return;
+      const form = event.currentTarget;
+      const button = form.querySelector("button[type='submit']");
+      button.disabled = true;
+      button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving`;
+      try {
+        let logoUrl = document.getElementById("creatorLogoUrl").value.trim();
+        const logoFile = document.getElementById("creatorLogoFile").files[0];
+        if (logoFile) logoUrl = await uploadCreatorPreview(logoFile);
+        const previewUrls = document.getElementById("creatorPreviewUrls").value.split(/\r?\n|,/).map((item) => item.trim()).filter(Boolean);
+        const previewFiles = Array.from(document.getElementById("creatorPreviewFiles").files || []);
+        for (const file of previewFiles) previewUrls.push(await uploadCreatorPreview(file));
+        const payload = {
+          name: document.getElementById("creatorAppName").value.trim(),
+          version: document.getElementById("creatorAppVersion").value.trim(),
+          size: document.getElementById("creatorAppSize").value.trim(),
+          category: document.getElementById("creatorAppCategory").value.trim() || "Apps",
+          downloadUrl: document.getElementById("creatorDownloadUrl").value.trim(),
+          description: document.getElementById("creatorDescription").value.trim(),
+          logoUrl: logoUrl || fallbackLogo,
+          previewImages: previewUrls,
+          submittedBy: auth.currentUser.uid,
+          submittedByEmail: auth.currentUser.email || "",
+          active: false,
+          status: "pending",
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        const editId = document.getElementById("creatorEditId").value;
+        let savedRef;
+        if (editId) {
+          savedRef = db.collection("appStoreApps").doc(editId);
+          await savedRef.update(payload);
+        }
+        else {
+          payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          savedRef = await db.collection("appStoreApps").add(payload);
+        }
+        await savedRef.collection("versions").add({
+          version: payload.version || "Latest",
+          downloadUrl: payload.downloadUrl || "",
+          submittedBy: auth.currentUser.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+        showToast("App submitted for review");
+        showCreatorLibrary();
+      } catch (error) {
+        showToast(error.message || "App save nahi hua");
+        button.disabled = false;
+        button.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Upload App`;
+      }
+    }
+
+    function showCreatorLibrary() {
+      if (!isCreatorApproved()) return;
+      const apps = allApps.filter((app) => app.submittedBy === auth.currentUser?.uid);
+      storeHome.classList.add("hidden");
+      appDetailPage.classList.remove("show");
+      storeFooter.classList.add("hidden");
+      creatorPage.classList.add("show");
+      creatorPage.innerHTML = `
+        <div class="creator-shell">
+          <div class="creator-head">
+            <h2>My App Library</h2>
+            <div><button class="primary-btn" type="button" onclick="showCreatorUpload()"><i class="fa-solid fa-plus"></i> Upload App</button> <button class="ghost-btn" type="button" onclick="closeCreatorPage()"><i class="fa-solid fa-arrow-left"></i> Back</button></div>
+          </div>
+          <div class="creator-list">
+            ${apps.length ? apps.map((app) => `<article class="creator-card"><img src="${htmlSafe(app.logoUrl || fallbackLogo)}" onerror="this.src='${fallbackLogo}'" alt="${htmlSafe(app.name)}"><div><h3>${htmlSafe(app.name)}</h3><p>${htmlSafe(app.version || "Latest")} - ${htmlSafe(app.category || "Apps")} - ${htmlSafe(creatorStatusLabel(app))}${app.reviewNote ? " - " + htmlSafe(app.reviewNote) : ""}</p></div><div class="creator-card-actions"><button class="ghost-btn" type="button" onclick="showCreatorUpload('${htmlSafe(app.id)}')"><i class="fa-solid fa-pen"></i> Edit</button><button class="ghost-btn" type="button" onclick="deleteCreatorApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-box-archive"></i> Archive</button></div></article>`).join("") : `<div class="empty"><i class="fa-solid fa-box-open"></i><h3>No apps yet</h3><p>Upload App se first app add karein.</p></div>`}
+          </div>
+        </div>`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteCreatorApp(id) {
+      const app = allApps.find((item) => item.id === id);
+      if (!app || app.submittedBy !== auth.currentUser?.uid) return;
+      await db.collection("appStoreApps").doc(id).update({
+        active: false,
+        archived: true,
+        status: "archived",
+        archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast("App archived");
+      showCreatorLibrary();
+    }
+
+    function closeCreatorPage() {
+      creatorPage.classList.remove("show");
+      creatorPage.innerHTML = "";
+      profileSettingsPage.classList.remove("show");
+      storeHome.classList.remove("hidden");
+      storeFooter.classList.remove("hidden");
+    }
+
+    function renderStoreAuth(user) {
+      if (user) {
+        storeGoogleLoginBtn.style.display = "none";
+        storeUserChip.classList.add("show");
+        storeUserName.textContent = user.displayName || user.email || "User";
+        storeUserPhoto.src = user.photoURL || fallbackLogo;
+        profileMenuName.textContent = user.displayName || "User";
+        profileMenuEmail.textContent = user.email || "Signed in";
+        profileMenuPhoto.src = user.photoURL || fallbackLogo;
+        fillProfileForm(user);
+        updateCreatorButtons();
+        loadNotifications(user);
+      } else {
+        storeGoogleLoginBtn.style.display = "inline-flex";
+        storeUserChip.classList.remove("show");
+        storeProfileMenu.classList.remove("show");
+        storeUserName.textContent = "User";
+        storeUserPhoto.src = fallbackLogo;
+        profileMenuName.textContent = "User";
+        profileMenuEmail.textContent = "Signed out";
+        profileMenuPhoto.src = fallbackLogo;
+        fillProfileForm(null);
+        updateCreatorButtons();
+        loadNotifications(null);
+      }
+    }
+
+    function matchesSearch(app, query) {
+      return !query || `${app.name || ""} ${app.description || ""} ${app.version || ""} ${app.category || ""}`.toLowerCase().includes(query);
+    }
+
     function filteredApps() {
-      const query = searchInput.value.trim().toLowerCase();
-      return allApps.filter((app) => {
+      const query = activeSearchTerm.trim().toLowerCase();
+      return publicApps().filter((app) => {
         const categoryOk = activeCategory === "All" || app.category === activeCategory;
-        const searchOk = !query || `${app.name || ""} ${app.description || ""} ${app.version || ""} ${app.category || ""}`.toLowerCase().includes(query);
+        const searchOk = matchesSearch(app, query);
         return categoryOk && searchOk;
       });
     }
 
+    function relatedApps(query) {
+      const normalized = query.trim().toLowerCase();
+      if (!normalized) return [];
+      return publicApps().filter((app) => matchesSearch(app, normalized)).slice(0, 6);
+    }
+
+    function renderSearchRecommendations() {
+      const query = searchInput.value.trim();
+      const apps = relatedApps(query);
+      if (!query) {
+        searchRecommendations.classList.remove("show");
+        searchRecommendations.innerHTML = "";
+        return;
+      }
+      if (!apps.length) {
+        searchRecommendations.classList.add("show");
+        searchRecommendations.innerHTML = `<button class="search-item" type="button" onclick="applySearchFromInput()"><i class="fa-solid fa-magnifying-glass"></i><div><strong>No app found</strong><small>Enter dabakar full search dekhein</small></div><i class="fa-solid fa-arrow-right"></i></button>`;
+        return;
+      }
+      searchRecommendations.classList.add("show");
+      searchRecommendations.innerHTML = apps.map((app) => `
+        <button class="search-item" type="button" onclick="openAppDetails('${htmlSafe(app.id)}')">
+          <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
+          <div><strong>${htmlSafe(app.name)}</strong><small>${htmlSafe(app.category)} - ${htmlSafe(ratingText(app))}</small></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      `).join("");
+    }
+
+    function applySearch(query) {
+      activeSearchTerm = query.trim();
+      searchResultsMode = Boolean(activeSearchTerm);
+      activeCategory = "All";
+      searchRecommendations.classList.remove("show");
+      if (appDetailPage.classList.contains("show")) closeDetails();
+      renderApps();
+      document.querySelector(".section-bar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function applySearchFromInput() {
+      applySearch(searchInput.value);
+    }
+
     function renderTabs() {
-      const categories = ["All", ...Array.from(new Set(allApps.map((app) => app.category))).sort()];
+      const categories = ["All", ...Array.from(new Set(publicApps().map((app) => app.category))).sort()];
       categoryTabs.innerHTML = categories.map((category) => `<button class="tab ${category === activeCategory ? "active" : ""}" type="button" data-category="${htmlSafe(category)}">${htmlSafe(category)}</button>`).join("");
     }
 
     function renderFeatured(apps) {
-      const app = apps[0] || allApps[0];
+      const availableApps = publicApps();
+      const app = apps.find((item) => item.featured) || availableApps.find((item) => item.featured) || apps[0] || availableApps[0];
       if (!app) {
         featuredPanel.innerHTML = `<div class="featured-title"><img src="${fallbackLogo}" alt="Tech Source"><div><h2>No app available</h2><small>Official APK</small></div></div><p>Admin app add karega to featured listing yahan show hogi.</p><div class="featured-actions"><button class="primary-btn" type="button" disabled><i class="fa-solid fa-box-open"></i> No Apps</button></div>`;
         return;
@@ -307,7 +1075,7 @@
       featuredPanel.innerHTML = `
         <div class="featured-title">
           <img src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
-          <div><h2>${htmlSafe(app.name)}</h2><small>${htmlSafe(app.category)} · ${htmlSafe(appVersion(app))}</small></div>
+          <div><h2>${htmlSafe(app.name)}</h2><small>${htmlSafe(app.category)} - ${htmlSafe(appVersion(app))}</small></div>
         </div>
         <p>${htmlSafe(app.description || "Official Tech Source Android app download.")}</p>
         <div class="featured-actions">
@@ -318,16 +1086,20 @@
 
     function renderApps() {
       const apps = filteredApps();
-      appCount.textContent = allApps.length ? `${allApps.length} apps available` : "No apps available";
-      resultHint.textContent = apps.length === allApps.length ? "Official download links" : `${apps.length} result found`;
+      document.body.classList.toggle("search-results-mode", searchResultsMode);
+      sectionTitle.textContent = searchResultsMode ? "Search Results" : "For You";
+      appCount.textContent = searchResultsMode
+        ? activeSearchTerm ? `Search: ${activeSearchTerm}` : "Search results"
+        : publicApps().length ? `${publicApps().length} apps available` : "No apps available";
+      resultHint.textContent = searchResultsMode ? `${apps.length} app found` : apps.length === publicApps().length ? "Official download links" : `${apps.length} result found`;
       renderTabs();
       renderFeatured(apps);
-      if (!allApps.length) {
+      if (!publicApps().length) {
         appsGrid.innerHTML = `<div class="empty"><i class="fa-solid fa-box-open"></i><h3>No apps added yet</h3><p>Apps admin panel se add karne ke baad yahan dikhenge.</p></div>`;
         return;
       }
       if (!apps.length) {
-        appsGrid.innerHTML = `<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><h3>No matching app</h3><p>Search ya category change karke dekhein.</p></div>`;
+        appsGrid.innerHTML = `<div class="search-empty"><i class="fa-solid fa-magnifying-glass"></i><div><h3>No app found</h3><p>${activeSearchTerm ? `"${htmlSafe(activeSearchTerm)}" ke liye result nahi mila. Search text ya category change karein.` : "Search text change karke Enter dabayein."}</p></div></div>`;
         return;
       }
       appsGrid.innerHTML = apps.map((app) => `
@@ -346,131 +1118,293 @@
         </article>`).join("");
     }
 
-    function setDownloadProgress(percent, note) {
-      const safePercent = Math.max(0, Math.min(100, Math.round(percent)));
-      downloadPanel.classList.add("show");
-      downloadNote.classList.remove("warning");
-      downloadPercent.textContent = `${safePercent}%`;
-      downloadFill.style.width = `${safePercent}%`;
-      if (note) downloadNote.textContent = note;
-    }
-
-    function setDownloadFallback(note) {
-      downloadPanel.classList.add("show");
-      downloadNote.classList.add("warning");
-      downloadPercent.textContent = "Open";
-      downloadFill.style.width = "100%";
-      downloadNote.textContent = note;
-    }
-
-    function fileNameFor(app) {
-      try {
-        const url = new URL(app.downloadUrl);
-        const name = decodeURIComponent(url.pathname.split("/").filter(Boolean).pop() || "");
-        return name || `${plain(app.name).replace(/\s+/g, "-") || "tech-source-app"}.apk`;
-      } catch (error) {
-        return `${plain(app.name).replace(/\s+/g, "-") || "tech-source-app"}.apk`;
-      }
-    }
-
-    async function streamDownload(app) {
-      const response = await fetch(app.downloadUrl, { mode: "cors" });
-      if (!response.ok) throw new Error("Download request failed");
-      if (!response.body) throw new Error("Download progress not supported");
-      const total = Number(response.headers.get("content-length") || 0);
-      if (!total) throw new Error("Download size unavailable");
-      const reader = response.body.getReader();
-      const chunks = [];
-      let received = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        received += value.length;
-        setDownloadProgress((received / total) * 100, `${Math.round(received / 1024)} KB downloaded`);
-      }
-      const blob = new Blob(chunks);
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = fileNameFor(app);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
-      setDownloadProgress(100, "Download complete.");
-    }
-
     async function downloadApp(id) {
-      const app = allApps.find((item) => item.id === id);
+      const app = publicApps().find((item) => item.id === id);
       if (!app?.downloadUrl) return;
-      downloadTitle.textContent = `Downloading ${app.name || "app"}`;
-      setDownloadProgress(0, "Download prepare ho raha hai.");
-      try {
-        await streamDownload(app);
-      } catch (error) {
-        setDownloadFallback("Is link par browser exact percentage read nahi kar pa raha. Normal download open ho gaya hai.");
-        window.open(app.downloadUrl, "_blank", "noopener");
-      }
-    }
-
-    function ratingKey(id) {
-      return `tech_source_app_rating_${id}`;
+      window.open(app.downloadUrl, "_blank", "noopener");
     }
 
     function getUserRating(id) {
-      return Number(localStorage.getItem(ratingKey(id)) || 0);
+      const userId = auth.currentUser?.uid;
+      return userId ? Number(userRatingCache[`${id}_${userId}`] || 0) : 0;
+    }
+
+    async function loadUserRating(id) {
+      const user = auth.currentUser;
+      if (!user) return 0;
+      const key = `${id}_${user.uid}`;
+      if (Object.prototype.hasOwnProperty.call(userRatingCache, key)) return Number(userRatingCache[key] || 0);
+      const snap = await db.collection("appStoreApps").doc(id).collection("ratings").doc(user.uid).get();
+      const value = snap.exists ? Number(snap.data().rating || 0) : 0;
+      userRatingCache[key] = value;
+      return value;
     }
 
     async function rateApp(id, value) {
-      const previous = getUserRating(id);
-      const update = {
-        ratingTotal: firebase.firestore.FieldValue.increment(value - previous),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if (!previous) update.ratingCount = firebase.firestore.FieldValue.increment(1);
-      localStorage.setItem(ratingKey(id), String(value));
+      if (!auth.currentUser) {
+        try {
+          await handleStoreGoogleLogin();
+        } catch (error) {
+          showToast(error.message);
+          return;
+        }
+      }
+      const user = auth.currentUser;
+      const ratingRef = db.collection("appStoreApps").doc(id).collection("ratings").doc(user.uid);
       try {
-        await db.collection("appStoreApps").doc(id).update(update);
+        await db.runTransaction(async (transaction) => {
+          const snap = await transaction.get(ratingRef);
+          if (snap.exists) throw new Error("Aap is app ko pehle hi rate kar chuke hain.");
+          transaction.set(ratingRef, {
+            rating: value,
+            userId: user.uid,
+            userName: user.displayName || user.email || "User",
+            userEmail: user.email || "",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          transaction.update(db.collection("appStoreApps").doc(id), {
+            ratingTotal: firebase.firestore.FieldValue.increment(value),
+            ratingCount: firebase.firestore.FieldValue.increment(1),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        userRatingCache[`${id}_${user.uid}`] = value;
       } catch (error) {
-        alert("Rating save nahi hua. Firebase rules check karein.");
+        showToast(error.message || "Rating save nahi hua. Firebase rules check karein.");
+        return;
       }
       const current = allApps.find((item) => item.id === id);
       if (current) {
-        current.ratingTotal = Number(current.ratingTotal || 0) + value - previous;
-        current.ratingCount = Number(current.ratingCount || 0) + (previous ? 0 : 1);
+        current.ratingTotal = Number(current.ratingTotal || 0) + value;
+        current.ratingCount = Number(current.ratingCount || 0) + 1;
       }
       openAppDetails(id);
     }
 
+    function reviewKey(id) {
+      return `reviewText_${id}`;
+    }
+
+    function renderReviews(id) {
+      const reviews = appReviewCache[id] || [];
+      const list = document.getElementById("reviewsList");
+      if (!list) return;
+      renderReviewSummary(id);
+      if (!reviews.length) {
+        list.innerHTML = `<div class="empty"><i class="fa-solid fa-comments"></i><h3>No reviews yet</h3><p>Pehla review aap likh sakte hain.</p></div>`;
+        return;
+      }
+      list.innerHTML = reviews.map((review) => `
+        <article class="review-card">
+          <div class="review-head">
+            <div class="review-title">
+              <strong>${htmlSafe(review.userName || "User")}</strong>
+            </div>
+            <div class="review-tools">
+              <span>${Number(review.rating || 0) ? `${Number(review.rating)} star` : "Review"}</span>
+              ${auth.currentUser?.uid === review.userId ? `<div class="review-menu-wrap"><button class="review-more" type="button" aria-label="Review options" onclick="toggleReviewMenu('${htmlSafe(review.id)}', event)"><i class="fa-solid fa-ellipsis-vertical"></i></button><div class="review-actions" id="reviewMenu-${htmlSafe(review.id)}"><button type="button" onclick="startReviewEdit('${htmlSafe(id)}','${htmlSafe(review.id)}', event)"><i class="fa-solid fa-pen"></i> Edit</button><button type="button" onclick="deleteOwnReview('${htmlSafe(id)}','${htmlSafe(review.id)}')"><i class="fa-solid fa-trash"></i> Delete</button></div></div>` : ""}
+            </div>
+          </div>
+          <p id="reviewText-${htmlSafe(review.id)}">${htmlSafe(review.comment || "")}</p>
+          ${auth.currentUser?.uid === review.userId ? `<div class="review-edit" id="reviewEdit-${htmlSafe(review.id)}"><textarea id="reviewEditInput-${htmlSafe(review.id)}">${htmlSafe(review.comment || "")}</textarea><div class="review-edit-actions"><button type="button" onclick="editOwnReview('${htmlSafe(id)}','${htmlSafe(review.id)}')">Save</button><button type="button" onclick="cancelReviewEdit('${htmlSafe(review.id)}')">Cancel</button></div></div>` : ""}
+        </article>
+      `).join("");
+    }
+
+    function closeReviewMenus() {
+      document.querySelectorAll(".review-actions.show").forEach((menu) => menu.classList.remove("show"));
+    }
+
+    function toggleReviewMenu(reviewId, event) {
+      event?.stopPropagation();
+      const menu = document.getElementById(`reviewMenu-${reviewId}`);
+      if (!menu) return;
+      const wasOpen = menu.classList.contains("show");
+      closeReviewMenus();
+      menu.classList.toggle("show", !wasOpen);
+    }
+
+    function closeReviewEditors(exceptId = "") {
+      document.querySelectorAll(".review-edit.show").forEach((box) => {
+        if (box.id !== `reviewEdit-${exceptId}`) box.classList.remove("show");
+      });
+      document.querySelectorAll("[id^='reviewText-']").forEach((text) => {
+        if (text.id !== `reviewText-${exceptId}`) text.style.display = "";
+      });
+    }
+
+    function startReviewEdit(appId, reviewId, event) {
+      event?.stopPropagation();
+      const review = (appReviewCache[appId] || []).find((item) => item.id === reviewId);
+      if (!review || auth.currentUser?.uid !== review.userId) return;
+      closeReviewMenus();
+      closeReviewEditors(reviewId);
+      const text = document.getElementById(`reviewText-${reviewId}`);
+      const box = document.getElementById(`reviewEdit-${reviewId}`);
+      const input = document.getElementById(`reviewEditInput-${reviewId}`);
+      if (!box || !input) return;
+      input.value = review.comment || "";
+      if (text) text.style.display = "none";
+      box.classList.add("show");
+      input.focus();
+    }
+
+    function cancelReviewEdit(reviewId) {
+      const text = document.getElementById(`reviewText-${reviewId}`);
+      const box = document.getElementById(`reviewEdit-${reviewId}`);
+      if (text) text.style.display = "";
+      if (box) box.classList.remove("show");
+    }
+
+    function renderReviewSummary(id) {
+      const box = document.getElementById("ratingSummary");
+      if (!box) return;
+      const reviews = appReviewCache[id] || [];
+      const total = reviews.length || 0;
+      const counts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
+      reviews.forEach((review) => {
+        const rating = Math.max(1, Math.min(5, Number(review.rating || 0)));
+        if (rating) counts[rating] += 1;
+      });
+      box.innerHTML = [5,4,3,2,1].map((star) => {
+        const count = counts[star] || 0;
+        const pct = total ? Math.round((count / total) * 100) : 0;
+        return `<div class="rating-line"><span>${star} star</span><div class="rating-track"><div class="rating-fill" style="width:${pct}%"></div></div><span>${count}</span></div>`;
+      }).join("");
+    }
+
+    function loadReviews(id) {
+      db.collection("appStoreApps").doc(id).collection("reviews").orderBy("createdAt", "desc").limit(20).onSnapshot((snapshot) => {
+        appReviewCache[id] = snapshot.docs.map((doc) => ({ id: doc.id, ref: doc.ref, ...doc.data() }));
+        renderReviews(id);
+      }, () => {
+        const list = document.getElementById("reviewsList");
+        if (list) list.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><h3>Reviews load nahi ho raha</h3><p>Firebase rules check karein.</p></div>`;
+      });
+    }
+
+    async function submitReview(id) {
+      if (!auth.currentUser) {
+        try {
+          await handleStoreGoogleLogin();
+        } catch (error) {
+          showToast(error.message);
+          return;
+        }
+      }
+      const input = document.getElementById("reviewInput");
+      const comment = input?.value.trim() || "";
+      if (!selectedReviewRating) {
+        showToast("Review post karne ke liye star rating select karein.");
+        return;
+      }
+      if (comment.length < 3) {
+        showToast("Review thoda detail me likhein.");
+        return;
+      }
+      const user = auth.currentUser;
+      const rating = selectedReviewRating;
+      await db.collection("appStoreApps").doc(id).collection("reviews").add({
+        comment,
+        rating,
+        appId: id,
+        appName: allApps.find((item) => item.id === id)?.name || "",
+        userId: user.uid,
+        userName: user.displayName || user.email || "User",
+        userEmail: user.email || "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection("appStoreApps").doc(id).update({
+        ratingTotal: firebase.firestore.FieldValue.increment(rating),
+        ratingCount: firebase.firestore.FieldValue.increment(1),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const current = allApps.find((item) => item.id === id);
+      if (current) {
+        current.ratingTotal = Number(current.ratingTotal || 0) + rating;
+        current.ratingCount = Number(current.ratingCount || 0) + 1;
+      }
+      input.value = "";
+      selectedReviewRating = 0;
+      document.querySelectorAll(".review-stars .rate-star").forEach((button) => button.classList.remove("selected", "active"));
+    }
+
+    async function editOwnReview(appId, reviewId) {
+      const review = (appReviewCache[appId] || []).find((item) => item.id === reviewId);
+      if (!review || auth.currentUser?.uid !== review.userId) return;
+      const input = document.getElementById(`reviewEditInput-${reviewId}`);
+      const comment = (input?.value || "").trim();
+      if (comment.length < 3) {
+        showToast("Review thoda detail me likhein.");
+        return;
+      }
+      await review.ref.update({
+        comment,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      cancelReviewEdit(reviewId);
+    }
+
+    async function deleteOwnReview(appId, reviewId) {
+      const review = (appReviewCache[appId] || []).find((item) => item.id === reviewId);
+      if (!review || auth.currentUser?.uid !== review.userId) return;
+      closeReviewMenus();
+      const rating = Number(review.rating || 0);
+      await review.ref.delete();
+      if (rating) {
+        await db.collection("appStoreApps").doc(appId).update({
+          ratingTotal: firebase.firestore.FieldValue.increment(-rating),
+          ratingCount: firebase.firestore.FieldValue.increment(-1),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+        const current = allApps.find((item) => item.id === appId);
+        if (current) {
+          current.ratingTotal = Math.max(0, Number(current.ratingTotal || 0) - rating);
+          current.ratingCount = Math.max(0, Number(current.ratingCount || 0) - 1);
+        }
+      }
+    }
+
+    function setReviewStar(value) {
+      selectedReviewRating = value;
+      document.querySelectorAll(".review-stars .rate-star").forEach((button) => {
+        const star = Number(button.dataset.star || 0);
+        button.classList.toggle("selected", star <= value);
+        button.classList.toggle("active", star <= value);
+      });
+    }
+
     function shareApp(id) {
-      const app = allApps.find((item) => item.id === id);
+      const app = publicApps().find((item) => item.id === id);
       if (!app) return;
       const text = `${app.name}\nDownload from Tech Source Store:\n${location.origin}${location.pathname}#app=${encodeURIComponent(id)}`;
       if (navigator.share) navigator.share({ title: app.name, text }).catch(() => {});
       else {
         navigator.clipboard?.writeText(text);
-        alert("App link copied.");
+        showToast("App link copied.");
       }
     }
 
-    function openAppDetails(id) {
-      const app = allApps.find((item) => item.id === id);
+    async function openAppDetails(id) {
+      const app = publicApps().find((item) => item.id === id);
       if (!app) return;
       const screenshots = appScreenshots(app);
-      const suggestions = allApps.filter((item) => item.id !== app.id).slice(0, 6);
-      const userRating = getUserRating(app.id);
+      const suggestions = publicApps().filter((item) => item.id !== app.id).slice(0, 6);
+      selectedReviewRating = 0;
       storeHome.classList.add("hidden");
       storeFooter.classList.add("hidden");
       appDetailPage.classList.add("show");
+      profileSettingsPage.classList.remove("show");
+      creatorPage.classList.remove("show");
       appDetailPage.innerHTML = `
         <button class="ghost-btn" type="button" onclick="closeDetails()"><i class="fa-solid fa-arrow-left"></i> Back</button>
         <div class="detail-top">
           <img class="detail-logo" src="${htmlSafe(app.logoUrl || fallbackLogo)}" alt="${htmlSafe(app.name)}" onerror="this.src='${fallbackLogo}'">
-          <div class="detail-title"><h2>${htmlSafe(app.name)}</h2><p>${htmlSafe(app.category)} · ${htmlSafe(appVersion(app))}</p></div>
+          <div class="detail-title"><h2>${htmlSafe(app.name)}</h2><p>${htmlSafe(app.category)} - ${htmlSafe(appVersion(app))}</p></div>
           <div class="detail-actions">
             <button class="primary-btn" type="button" onclick="downloadApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-download"></i> Install</button>
             <button class="ghost-btn" type="button" onclick="shareApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-share-nodes"></i> Share</button>
+            <button class="ghost-btn" type="button" onclick="reportApp('${htmlSafe(app.id)}')"><i class="fa-solid fa-flag"></i> Report</button>
           </div>
         </div>
         <div class="detail-meta">
@@ -482,27 +1416,57 @@
           ${screenshots.length ? screenshots.map((src) => `<img src="${htmlSafe(src)}" alt="${htmlSafe(app.name)} preview" onerror="this.remove(); if(!document.querySelector('.screenshots img')) document.querySelector('.screenshots').innerHTML='<div class=&quot;empty&quot;><i class=&quot;fa-solid fa-image&quot;></i><h3>No preview photos</h3><p>Admin preview photo add karega to yahan show hoga.</p></div>';">`).join("") : `<div class="empty"><i class="fa-solid fa-image"></i><h3>No preview photos</h3><p>Admin preview photo add karega to yahan show hoga.</p></div>`}
         </div>
         <section class="detail-section"><h3>About this app</h3><p>${htmlSafe(app.description || "Download the latest official app from Tech Source.")}</p></section>
-        <section class="detail-section rating-box">
-          <div><h3>Rate this app</h3><p>${userRating ? `Your rating: ${userRating} star` : "Apna real rating dijiye."}</p></div>
-          <div class="rate-buttons">${[1,2,3,4,5].map((value) => `<button class="rate-star ${userRating >= value ? "active" : ""}" type="button" onclick="rateApp('${htmlSafe(app.id)}', ${value})"><i class="fa-solid fa-star"></i></button>`).join("")}</div>
+        ${app.whatsNew ? `<section class="detail-section"><h3>What's new</h3><p>${htmlSafe(app.whatsNew)}</p></section>` : ""}
+        <section class="detail-section">
+          <h3>User reviews</h3>
+          <p>App kaisa laga, star ke saath apna review share karein.</p>
+          <div class="rating-summary" id="ratingSummary"></div>
+          <div class="review-form">
+            <div class="review-stars">${[1,2,3,4,5].map((value) => `<button class="rate-star" data-star="${value}" type="button" onclick="setReviewStar(${value})"><i class="fa-solid fa-star"></i></button>`).join("")}</div>
+            <textarea id="reviewInput" placeholder="Write your review..."></textarea>
+            <button class="primary-btn" type="button" onclick="submitReview('${htmlSafe(app.id)}')"><i class="fa-solid fa-paper-plane"></i> Post review</button>
+          </div>
+          <div class="reviews-list" id="reviewsList">
+            <div class="empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading reviews...</p></div>
+          </div>
         </section>
         <section class="detail-section">
           <h3>More apps</h3>
           <div class="suggestions">
-            ${suggestions.length ? suggestions.map((item) => `<article class="suggest-card" onclick="openAppDetails('${htmlSafe(item.id)}')"><img src="${htmlSafe(item.logoUrl || fallbackLogo)}" alt="${htmlSafe(item.name)}" onerror="this.src='${fallbackLogo}'"><div><h4>${htmlSafe(item.name)}</h4><small>${htmlSafe(item.category)} · ${htmlSafe(ratingText(item))}</small></div></article>`).join("") : `<p>No other apps available.</p>`}
+            ${suggestions.length ? suggestions.map((item) => `<article class="suggest-card" onclick="openAppDetails('${htmlSafe(item.id)}')"><img src="${htmlSafe(item.logoUrl || fallbackLogo)}" alt="${htmlSafe(item.name)}" onerror="this.src='${fallbackLogo}'"><div><h4>${htmlSafe(item.name)}</h4><small>${htmlSafe(item.category)} - ${htmlSafe(ratingText(item))}</small></div></article>`).join("") : `<p>No other apps available.</p>`}
           </div>
         </section>`;
       history.replaceState(null, "", `#app=${encodeURIComponent(app.id)}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
+      loadReviews(app.id);
     }
 
     function closeDetails() {
       appDetailPage.classList.remove("show");
       appDetailPage.innerHTML = "";
+      profileSettingsPage.classList.remove("show");
       storeHome.classList.remove("hidden");
       storeFooter.classList.remove("hidden");
       history.replaceState(null, "", location.pathname);
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function reportApp(id) {
+      if (!auth.currentUser) {
+        try { await handleStoreGoogleLogin(); } catch (error) { showToast(error.message); return; }
+      }
+      const reason = prompt("Report reason");
+      if (!reason?.trim()) return;
+      await db.collection("appReports").add({
+        appId: id,
+        appName: allApps.find((item) => item.id === id)?.name || "",
+        reason: reason.trim(),
+        userId: auth.currentUser.uid,
+        userEmail: auth.currentUser.email || "",
+        status: "open",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast("Report sent");
     }
 
     categoryTabs.addEventListener("click", (event) => {
@@ -511,16 +1475,77 @@
       activeCategory = button.dataset.category;
       renderApps();
     });
-    searchInput.addEventListener("input", renderApps);
+    searchInput.addEventListener("input", () => {
+      renderSearchRecommendations();
+      if (!searchInput.value.trim() && activeSearchTerm) {
+        activeSearchTerm = "";
+        searchResultsMode = false;
+        renderApps();
+      }
+    });
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        applySearchFromInput();
+      }
+    });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".search-wrap")) searchRecommendations.classList.remove("show");
+      if (!event.target.closest(".top-actions") && !event.target.closest(".profile-menu")) storeProfileMenu.classList.remove("show");
+      if (!event.target.closest(".review-menu-wrap")) closeReviewMenus();
+    });
+    storeGoogleLoginBtn.addEventListener("click", async () => {
+      try {
+        await handleStoreGoogleLogin();
+      } catch (error) {
+        showToast(error.message);
+      }
+    });
+    storeUserChip.addEventListener("click", (event) => {
+      event.stopPropagation();
+      storeProfileMenu.classList.toggle("show");
+    });
+    profileManageBtn.addEventListener("click", openProfileSettings);
+    profileSettingsBtn.addEventListener("click", openProfileSettings);
+    profileMenuLibraryBtn.addEventListener("click", () => {
+      storeProfileMenu.classList.remove("show");
+      showCreatorLibrary();
+    });
+    profileMenuUploadBtn.addEventListener("click", () => {
+      storeProfileMenu.classList.remove("show");
+      showCreatorUpload();
+    });
+    adminRegisterToggle.addEventListener("click", () => adminRequestForm.classList.toggle("show"));
+    adminRequestForm.addEventListener("submit", submitAdminRequest);
+    creatorUploadBtn.addEventListener("click", () => showCreatorUpload());
+    creatorLibraryBtn.addEventListener("click", () => showCreatorLibrary());
+    profilePhotoFile.addEventListener("change", () => {
+      const file = profilePhotoFile.files[0];
+      if (!file) return;
+      const preview = URL.createObjectURL(file);
+      profileMenuPhoto.src = preview;
+      storeUserPhoto.src = preview;
+      setProfileMessage("Photo selected. Save dabakar update karein.");
+    });
+    storeProfileForm.addEventListener("submit", saveStoreProfile);
+    storeLogoutBtn.addEventListener("click", () => auth.signOut());
+    auth.onAuthStateChanged((user) => {
+      renderStoreAuth(user);
+      loadCurrentUserProfile(user);
+      if (appDetailPage.classList.contains("show")) {
+        const hashApp = new URLSearchParams(location.hash.replace(/^#/, "")).get("app");
+        if (hashApp) openAppDetails(hashApp);
+      }
+    });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && appDetailPage.classList.contains("show")) closeDetails();
     });
 
-    Object.assign(window, { openAppDetails, closeDetails, downloadApp, rateApp, shareApp });
+    Object.assign(window, { openAppDetails, closeDetails, downloadApp, rateApp, shareApp, submitReview, setReviewStar, startReviewEdit, cancelReviewEdit, editOwnReview, deleteOwnReview, toggleReviewMenu, handleStoreGoogleLogin, applySearchFromInput, showCreatorUpload, showCreatorLibrary, deleteCreatorApp, closeCreatorPage, closeProfileSettings, openProfileSettings, openSettingsSection, showSettingsHome, reportApp });
 
     db.collection("appStoreApps").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
-      allApps = decorateApps(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).filter((app) => app.active !== false));
-      if (!allApps.some((app) => app.category === activeCategory)) activeCategory = "All";
+      allApps = decorateApps(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      if (!publicApps().some((app) => app.category === activeCategory)) activeCategory = "All";
       renderApps();
       const hashApp = new URLSearchParams(location.hash.replace(/^#/, "")).get("app");
       if (hashApp) openAppDetails(hashApp);
