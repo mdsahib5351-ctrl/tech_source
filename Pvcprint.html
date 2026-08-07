@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Easy PVC Card Print Dashboard v2.0</title>
+    <meta
+      name="description"
+      content="Professional full-screen PVC card cropping and high-resolution A4 print generator."
+    />
+    <link rel="stylesheet" href="pvcstyles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script>
+  </head>
+  <body>
+    <!-- Main Dashboard Screen -->
+    <div class="app-screen" id="dashboardScreen">
+      <header class="app-header">
+        <a class="brand" href="#dashboard" aria-label="Easy PVC Card Print dashboard">
+          <span class="brand-mark">EP</span>
+          <span>Easy PVC Card Print</span>
+        </a>
+        <nav class="top-nav" aria-label="Primary">
+          <a class="active" href="#dashboard">Dashboard</a>
+          <a href="#" id="pvcNavTrigger">PVC Workflow</a>
+        </nav>
+      </header>
+
+      <main class="dashboard-main">
+        <section class="dashboard" id="dashboard">
+          <div class="dashboard-copy">
+            <p class="eyebrow">Print services</p>
+            <h1>Dashboard</h1>
+            <p>
+              Select a service below to launch the printing studio. PVC Card Print v2.0 is fully active; PAN and Aadhaar modules can be configured.
+            </p>
+          </div>
+
+          <div class="service-grid" aria-label="Available print services">
+            <button class="service-card active" type="button" id="launchPvcBtn">
+              <span class="service-icon">PVC</span>
+              <div class="service-info">
+                <strong>PVC Card Print</strong>
+                <small>Full-screen studio • Front & Back crop • 300 DPI A4</small>
+              </div>
+              <span class="badge">v2.0 Active</span>
+            </button>
+            <button class="service-card locked" type="button" disabled>
+              <span class="service-icon">PAN</span>
+              <div class="service-info">
+                <strong>PAN Card Print</strong>
+                <small>Coming soon</small>
+              </div>
+            </button>
+            <button class="service-card locked" type="button" disabled>
+              <span class="service-icon">UID</span>
+              <div class="service-info">
+                <strong>Aadhaar Print</strong>
+                <small>Coming soon</small>
+              </div>
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Full-screen PVC Studio Screen -->
+    <div class="app-screen is-hidden" id="studioScreen">
+      <header class="studio-header">
+        <button class="back-btn" id="btnBackToDashboard" type="button" aria-label="Back to dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span>Back to Dashboard</span>
+        </button>
+        <div class="studio-title">
+          <h2>PVC Card Print Studio</h2>
+          <span class="ratio-tag">Standard PVC (85.6 × 54 mm)</span>
+        </div>
+        <div class="keyboard-hint-badge">Shortcuts Active</div>
+      </header>
+
+      <div class="studio-body">
+        <nav class="progress-bar-container" aria-label="Progress steps">
+          <ul class="progress-steps">
+            <li class="step-item active" id="stepIndicator1">
+              <span class="step-num">1</span>
+              <div class="step-text">
+                <strong>Step 1</strong>
+                <small>Front Side</small>
+              </div>
+            </li>
+            <li class="step-divider"></li>
+            <li class="step-item" id="stepIndicator2">
+              <span class="step-num">2</span>
+              <div class="step-text">
+                <strong>Step 2</strong>
+                <small>Back Side</small>
+              </div>
+            </li>
+            <li class="step-divider"></li>
+            <li class="step-item" id="stepIndicator3">
+              <span class="step-num">3</span>
+              <div class="step-text">
+                <strong>Step 3</strong>
+                <small>A4 Preview & Download</small>
+              </div>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="studio-content">
+          <!-- Step 1: Choose Front -->
+          <section class="step-section" id="step1Section">
+            <div class="step-card hero-select-card">
+              <div class="card-icon-hero">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="3"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+              </div>
+              <h3>Select Front Side Document</h3>
+              <p>Upload a high-resolution PDF, JPG, or PNG image of the front side of your PVC card.</p>
+              
+              <label class="btn-primary-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Choose Front Side</span>
+                <input type="file" id="frontFileInput" accept="image/png,image/jpeg,application/pdf" hidden />
+              </label>
+            </div>
+          </section>
+
+          <!-- Step 2: Choose Back Options -->
+          <section class="step-section is-hidden" id="step2Section">
+            <div class="step-card">
+              <h3>Select Back Side Document</h3>
+              <p>Choose whether to use the same uploaded file as the front side or choose a separate image for the back side.</p>
+
+              <div class="dual-choice-grid">
+                <button class="choice-card" type="button" id="btnUseSameImage">
+                  <div class="choice-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"></path><path d="M4 20L21 3"></path><path d="M21 16v5h-5"></path><path d="M15 15l6 6"></path><path d="M4 4l5 5"></path></svg>
+                  </div>
+                  <strong>Use Same Image</strong>
+                  <span>Re-open cropper using the original uploaded front file</span>
+                </button>
+
+                <label class="choice-card">
+                  <div class="choice-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  </div>
+                  <strong>Choose Another Image</strong>
+                  <span>Browse and select a new PDF, JPG, or PNG file for back side</span>
+                  <input type="file" id="backFileInput" accept="image/png,image/jpeg,application/pdf" hidden />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- Previews & Extra Tool Controls Section -->
+          <section class="preview-workspace-section is-hidden" id="previewWorkspaceSection">
+            <div class="side-by-side-previews">
+              <!-- Front Preview Box -->
+              <div class="preview-card" id="frontPreviewCard">
+                <div class="preview-card-header">
+                  <h4>Front Side Preview</h4>
+                  <div class="card-mini-actions">
+                    <button class="icon-btn-text" id="btnReplaceFront" type="button" title="Replace Front Image">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"></path><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                      Replace
+                    </button>
+                    <button class="icon-btn-text" id="btnRecropFront" type="button" title="Re-crop Front">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
+                      Re-crop
+                    </button>
+                  </div>
+                </div>
+
+                <div class="canvas-display-frame">
+                  <canvas id="frontPreviewCanvas" width="428" height="270"></canvas>
+                </div>
+
+                <div class="transform-toolbar">
+                  <button class="tool-btn" type="button" data-action="rotate-left" data-side="front" title="Rotate Left 90°">↶ 90°</button>
+                  <button class="tool-btn" type="button" data-action="rotate-right" data-side="front" title="Rotate Right 90°">↷ 90°</button>
+                  <button class="tool-btn" type="button" data-action="flip-h" data-side="front" title="Flip Horizontal">↔ Flip</button>
+                  <button class="tool-btn" type="button" data-action="flip-v" data-side="front" title="Flip Vertical">↕ Flip</button>
+                </div>
+              </div>
+
+              <!-- Back Preview Box -->
+              <div class="preview-card" id="backPreviewCard">
+                <div class="preview-card-header">
+                  <h4>Back Side Preview</h4>
+                  <div class="card-mini-actions">
+                    <button class="icon-btn-text" id="btnReplaceBack" type="button" title="Replace Back Image" disabled>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"></path><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                      Replace
+                    </button>
+                    <button class="icon-btn-text" id="btnRecropBack" type="button" title="Re-crop Back" disabled>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
+                      Re-crop
+                    </button>
+                  </div>
+                </div>
+
+                <div class="canvas-display-frame">
+                  <canvas id="backPreviewCanvas" width="428" height="270"></canvas>
+                </div>
+
+                <div class="transform-toolbar">
+                  <button class="tool-btn" type="button" data-action="rotate-left" data-side="back" title="Rotate Left 90°" disabled>↶ 90°</button>
+                  <button class="tool-btn" type="button" data-action="rotate-right" data-side="back" title="Rotate Right 90°" disabled>↷ 90°</button>
+                  <button class="tool-btn" type="button" data-action="flip-h" data-side="back" title="Flip Horizontal" disabled>↔ Flip</button>
+                  <button class="tool-btn" type="button" data-action="flip-v" data-side="back" title="Flip Vertical" disabled>↕ Flip</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="a4-action-bar" id="a4ActionBar">
+              <button class="btn-primary-xl" id="btnPrepareA4" type="button" disabled>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Prepare 300 DPI A4 Print Layout</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Step 3: A4 Final Preview & Downloads -->
+          <section class="step-section is-hidden" id="step3Section">
+            <div class="a4-preview-card">
+              <div class="a4-preview-header">
+                <div>
+                  <h3>A4 Print Preview (300 DPI High Resolution)</h3>
+                  <p>Front and Back cards aligned perfectly at the top edge for easy folding and cutting.</p>
+                </div>
+                <div class="download-group">
+                  <button class="btn-download-png" id="btnDownloadPNG" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Download PNG</span>
+                  </button>
+                  <button class="btn-download-pdf" id="btnDownloadPDF" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Download PDF</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="a4-viewport">
+                <canvas id="a4Canvas" width="2480" height="3508"></canvas>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Full Screen Crop Modal -->
+    <div class="crop-modal-overlay is-hidden" id="cropModalOverlay" role="dialog" aria-modal="true">
+      <div class="crop-modal-container">
+        <header class="crop-modal-header">
+          <div class="modal-title-group">
+            <h3 id="cropModalTitle">Crop Front Side</h3>
+            <span class="crop-ratio-badge">Target Aspect Ratio: 85.6 × 54</span>
+          </div>
+          <div class="modal-top-actions">
+            <button class="btn-text-action" id="btnUndoCrop" type="button" title="Undo position change">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+              Undo
+            </button>
+            <button class="btn-text-action" id="btnResetCrop" type="button" title="Reset image scale and position">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+              Reset
+            </button>
+          </div>
+        </header>
+
+        <main class="crop-modal-body">
+          <div class="crop-canvas-stage" id="cropCanvasStage">
+            <canvas id="cropCanvas"></canvas>
+            <div class="gesture-hint">Drag image to Pan • Mouse wheel / Pinch to Zoom</div>
+          </div>
+        </main>
+
+        <footer class="crop-modal-footer">
+          <div class="crop-controls-toolbar">
+            <div class="zoom-controls">
+              <button class="zoom-btn" id="btnZoomOut" type="button" title="Zoom Out (-)">-</button>
+              <input type="range" id="zoomSlider" min="0.5" max="5" step="0.01" value="1" aria-label="Zoom scale slider" />
+              <button class="zoom-btn" id="btnZoomIn" type="button" title="Zoom In (+)">+</button>
+              <button class="control-chip-btn" id="btnFitImage" type="button">Fit Image</button>
+            </div>
+
+            <div class="crop-modal-buttons">
+              <button class="btn-secondary" id="btnCancelCrop" type="button">Cancel</button>
+              <button class="btn-success" id="btnApplyCrop" type="button">Use Crop</button>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Global Loading Screen Overlay -->
+    <div class="loading-overlay is-hidden" id="loadingOverlay">
+      <div class="spinner-box">
+        <div class="spinner"></div>
+        <p id="loadingText">Processing document...</p>
+      </div>
+    </div>
+
+    <script src="pvcscript.js"></script>
+  </body>
+  </html>
