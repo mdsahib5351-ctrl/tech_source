@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="Professional PVC Card, PAN, Aadhaar, Ayushman and Passport Photo Print Studio">
+  <title>Easy Card & Photo Studio Pro</title>
+
+  <!-- Keep existing stylesheet -->
+  <link rel="stylesheet" href="pvcstyle.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+
+<body>
+  <!-- =========================================================
+       APP LOADING OVERLAY
+       ========================================================= -->
+  <div id="loadingOverlay" class="loading-overlay is-hidden" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <p id="loadingText">Processing...</p>
+    <small id="loadingSubText">Please wait</small>
+  </div>
+
+  <!-- =========================================================
+       APP CONTAINER
+       ========================================================= -->
+  <div class="app-container">
+
+    <!-- =======================================================
+         DASHBOARD
+         ======================================================= -->
+
+    <section id="dashboardScreen" class="screen">
+      <header class="app-header pro-header">
+        <div class="brand-block">
+          <div class="brand-badge studio-logo">📸</div>
+          <div>
+            <h1>Easy Card &<br class="brand-break"> Photo Studio Pro</h1>
+            <p>Professional print & document studio</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="header-chip fast">⚡ Fast</span>
+          <span class="header-chip private">🔒 Private</span>
+          <span class="header-chip ready">✓ Print Ready</span>
+          <button type="button" class="header-circle" aria-label="Settings">⚙</button>
+          <button type="button" class="header-circle" aria-label="More options">⋮</button>
+        </div>
+      </header>
+
+      <section class="hero-card dashboard-hero">
+        <div class="hero-copy">
+          <span class="hero-kicker">PRINT STUDIO</span>
+          <h2>Welcome back! <span>👋</span></h2>
+          <p>Create, adjust and print your documents<br class="desktop-only"> in just a few simple steps.</p>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="printer-shape"><div class="printer-slot"></div><div class="paper-shape">▱</div></div>
+          <span class="hero-spark s1">✦</span><span class="hero-spark s2">◆</span>
+        </div>
+      </section>
+
+      <section class="dashboard-section quick-section">
+        <div class="section-heading pro-heading">
+          <div><span class="section-kicker">🚀 QUICK PRINT</span><h2>Start your most used tasks</h2></div>
+          <span class="section-link">View All ›</span>
+        </div>
+        <div class="quick-grid">
+          <button type="button" class="quick-card pvc-card" id="launchPvcBtn">
+            <span class="service-icon">▣</span>
+            <span class="quick-copy"><b>PVC Card</b><small>Front + Back</small><em>Create PVC cards for one or multiple people</em></span>
+            <strong class="round-arrow">→</strong>
+          </button>
+          <button type="button" class="quick-card passport-card" id="launchPassportBtn">
+            <span class="service-icon">▧</span>
+            <span class="quick-copy"><b>Passport Photo</b><small>Crop & Print</small><em>Create passport size photos with perfect size</em></span>
+            <strong class="round-arrow">→</strong>
+          </button>
+        </div>
+      </section>
+
+      <section class="dashboard-section">
+        <div class="section-heading pro-heading">
+          <div><span class="section-kicker">📁 DOCUMENT SERVICES</span><h2>Document Services</h2></div>
+          <span class="section-link">All Services ›</span>
+        </div>
+        <div class="service-grid">
+          <button type="button" class="service-card pan" id="launchPanBtn">
+            <span class="service-icon">▤</span><b>PAN Card</b><small>Crop PAN card front side</small><em>→</em>
+            <input type="file" id="panFileInput" accept=".pdf,.png,.jpg,.jpeg,image/png,image/jpeg,application/pdf" class="is-hidden">
+          </button>
+          <button type="button" class="service-card aadhaar" id="launchAadhaarBtn">
+            <span class="service-icon">◉</span><b>Aadhaar Card</b><small>Crop Aadhaar front & back</small><em>→</em>
+            <input type="file" id="aadhaarFileInput" accept=".pdf,.png,.jpg,.jpeg,image/png,image/jpeg,application/pdf" class="is-hidden">
+          </button>
+          <button type="button" class="service-card ayushman" id="launchAyushmanBtn">
+            <span class="service-icon">✚</span><b>Ayushman Card</b><small>Crop Ayushman card</small><em>→</em>
+            <input type="file" id="ayushmanFileInput" accept=".pdf,application/pdf" class="is-hidden">
+          </button>
+          <button type="button" class="service-card other" id="launchOtherBtn">
+            <span class="service-icon">⌗</span><b>Other Documents</b><small>More document cropping options</small><em>→</em>
+          </button>
+        </div>
+      </section>
+
+      <section class="dashboard-section recent-section">
+        <div class="section-heading pro-heading"><div><span class="section-kicker">◷ RECENT JOBS</span><h2>Recent Jobs</h2></div><button type="button" class="clear-recent">Clear All</button></div>
+        <div class="recent-jobs">
+          <div class="recent-job"><span class="job-icon purple">▣</span><div><b>PVC Card – 2 People</b><small>Today, 10:18 PM</small></div><span class="job-status">✓ Completed</span><button type="button">Open ›</button></div>
+          <div class="recent-job"><span class="job-icon green">▧</span><div><b>Passport Photo – 12 Copies</b><small>Today, 09:48 PM</small></div><span class="job-status">✓ Completed</span><button type="button">Open ›</button></div>
+          <div class="recent-job"><span class="job-icon lime">◉</span><div><b>Aadhaar Card</b><small>Today, 09:30 PM</small></div><span class="job-status">✓ Completed</span><button type="button">Open ›</button></div>
+          <div class="recent-job"><span class="job-icon orange">▤</span><div><b>PAN Card</b><small>Yesterday, 08:15 PM</small></div><span class="job-status">✓ Completed</span><button type="button">Open ›</button></div>
+        </div>
+      </section>
+
+      <section class="dashboard-section tools-section">
+        <div class="section-heading pro-heading"><div><span class="section-kicker">🔧 TOOLS</span><h2>Tools</h2></div></div>
+        <div class="tools-grid">
+          <div class="tool-tile violet"><span>⌗</span><b>Crop Studio</b><small>Advanced crop with precision</small><i>→</i></div>
+          <div class="tool-tile cyan"><span>▦</span><b>A4 Layout</b><small>View and manage A4 layouts</small><i>→</i></div>
+          <div class="tool-tile pink"><span>PDF</span><b>PDF Tools</b><small>Work with PDF documents</small><i>→</i></div>
+          <div class="tool-tile yellow"><span>⚙</span><b>Settings</b><small>App preferences and options</small><i>→</i></div>
+        </div>
+      </section>
+
+      <footer class="privacy-strip"><span>🛡</span><span>Your privacy is important to us. All processing is done locally on your device.</span><strong>✓ 100% Secure</strong></footer>
+    </section>
+
+<!-- =======================================================
+         STUDIO
+         ======================================================= -->
+    <section id="studioScreen" class="screen is-hidden">
+
+      <div class="studio-action-row">
+        <button id="btnBackToDashboard" class="btn btn-secondary back-compact" type="button" aria-label="Back">←</button>
+
+        <nav class="step-progress" aria-label="Studio progress">
+          <div id="stepIndicator1" class="step active"><span class="step-number">1</span><span>Upload</span></div>
+          <div id="stepIndicator2" class="step"><span class="step-number">2</span><span>Adjust</span></div>
+          <div id="stepIndicator3" class="step"><span class="step-number">3</span><span>Print</span></div>
+        </nav>
+
+        <div class="studio-title-mini" aria-hidden="true">
+          <span class="studio-kicker">PRINT STUDIO</span>
+          <strong id="studioTitleHeader">PVC Card Print Studio</strong>
+        </div>
+        <div class="studio-add-actions">
+          <button id="btnAddPvcPerson" class="add-person-top" type="button">＋ Add Person</button>
+          <button id="btnAddPassportPerson" class="add-person-top is-hidden" type="button">＋ Add Person</button>
+        </div>
+      </div>
+
+
+      <!-- =====================================================
+           STEP 1 — UPLOAD
+           ===================================================== -->
+      <div id="step1Section" class="step-content">
+
+        <!-- PVC / DOCUMENT UPLOAD -->
+        <div id="pvcUploadGrid" class="upload-grid">
+
+          <!-- FRONT -->
+          <article class="upload-card">
+            <div class="upload-card-header">
+              <div>
+                <span class="mini-label">SIDE 01</span>
+                <h3>Front Side</h3>
+              </div>
+              <span class="upload-state" id="frontUploadState">Waiting</span>
+            </div>
+
+            <div id="frontUploadPreviewContainer" class="preview-box drop-zone" data-drop-target="front">
+              <canvas id="frontUploadCanvas"
+                      width="600"
+                      height="378"
+                      class="is-hidden"></canvas>
+
+              <div id="frontUploadPlaceholder" class="placeholder-text">
+                <span class="placeholder-icon">＋</span>
+                <strong>No image uploaded</strong>
+                <small>JPG, PNG or PDF</small>
+              </div>
+            </div>
+
+            <label class="btn btn-primary file-label">
+              Upload Front Image
+              <input type="file"
+                     id="frontFileInput"
+                     accept="image/*,.pdf"
+                     class="is-hidden">
+            </label>
+
+          </article>
+
+
+          <!-- BACK -->
+          <article id="backSideUploadCard" class="upload-card">
+            <div class="upload-card-header">
+              <div>
+                <span class="mini-label">SIDE 02</span>
+                <h3>Back Side</h3>
+              </div>
+              <span class="upload-state" id="backUploadState">Waiting</span>
+            </div>
+
+            <div id="backUploadPreviewContainer" class="preview-box drop-zone" data-drop-target="back">
+              <canvas id="backUploadCanvas"
+                      width="600"
+                      height="378"
+                      class="is-hidden"></canvas>
+
+              <div id="backUploadPlaceholder" class="placeholder-text">
+                <span class="placeholder-icon">＋</span>
+                <strong>No image uploaded</strong>
+                <small>JPG, PNG or PDF</small>
+              </div>
+            </div>
+
+            <div class="back-action-row">
+              <label class="btn btn-primary file-label compact-file-btn">
+                Upload Back Image
+                <input type="file"
+                       id="backFileInput"
+                       accept="image/*,.pdf"
+                       class="is-hidden">
+              </label>
+              <button id="btnUseSameImage" class="btn btn-secondary same-image-btn" type="button">Same as Front</button>
+            </div>
+          </article>
+
+        </div>
+
+        <div id="pvcPeopleList" class="pvc-people-list"></div>
+
+
+        <!-- PASSPORT -->
+        <div id="passportUploadGrid" class="upload-grid is-hidden">
+
+          <article class="upload-card single-center passport-upload-card">
+
+            <div class="upload-card-header">
+              <div>
+                <span class="mini-label">PHOTO STUDIO</span>
+                <h3>Passport Photo</h3>
+              </div>
+            </div>
+
+            <div id="passportUploadPreviewContainer" class="preview-box passport-preview-box drop-zone" data-drop-target="passport">
+              <canvas id="passportUploadCanvas"
+                      width="400"
+                      height="500"
+                      class="is-hidden"></canvas>
+
+              <div id="passportUploadPlaceholder" class="placeholder-text">
+                <span class="placeholder-icon">＋</span>
+                <strong>No photo uploaded</strong>
+                <small>Choose a clear portrait image</small>
+              </div>
+            </div>
+
+            <label class="btn btn-primary file-label">
+              Select Passport Photo
+              <input type="file"
+                     id="passportFileInput"
+                     accept="image/*,.pdf"
+                     class="is-hidden">
+            </label>
+
+            <div class="passport-options mt-10">
+              <label for="passportQtySelect">Number of Copies</label>
+
+              <select id="passportQtySelect" class="form-control">
+                <option value="6">6 Photos</option>
+                <option value="12" selected>12 Photos</option>
+                <option value="18">18 Photos</option>
+                <option value="24">24 Photos</option>
+                <option value="30">30 Photos</option>
+                <option value="36">36 Photos</option>
+                <option value="48">48 Photos</option>
+              </select>
+            </div>
+
+          </article>
+
+          <div id="passportPeopleList" class="passport-people-list"></div>
+
+        </div>
+
+
+        <div class="actions-footer">
+          <button id="btnGoToStep2"
+                  class="btn btn-success"
+                  type="button"
+                  disabled>
+            Continue to Adjustment →
+          </button>
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           STEP 2 — PREVIEW
+           ===================================================== -->
+      <div id="previewWorkspaceSection" class="step-content is-hidden">
+        <div class="workspace-intro">
+          <div><span class="section-kicker">STEP 2</span><h2>Preview & Adjust</h2><p>Check every crop before placing it on A4.</p></div>
+          <span class="workspace-tip">↔ Drag & drop • Clean preview</span>
+        </div>
+        <div id="previewCardsList" class="preview-cards-list" aria-live="polite"></div>
+
+        <!-- Legacy workspace kept hidden for compatibility with existing JS handlers. -->
+        <div id="workspaceGrid" class="workspace-grid legacy-workspace-hidden" aria-hidden="true">
+          <article id="frontWorkspaceCard" class="workspace-card">
+            <div class="canvas-wrapper"><canvas id="frontPreviewCanvas" width="640" height="403"></canvas></div>
+            <button id="btnRecropFront" type="button" class="is-hidden">Re-crop</button>
+            <button id="btnReplaceFront" type="button" class="is-hidden">Replace</button>
+            <input type="file" id="replaceFrontInput" accept="image/*,.pdf" class="is-hidden">
+          </article>
+          <article id="backWorkspaceCard" class="workspace-card">
+            <div class="canvas-wrapper"><canvas id="backPreviewCanvas" width="640" height="403"></canvas></div>
+            <button id="btnRecropBack" type="button" class="is-hidden">Re-crop</button>
+            <button id="btnReplaceBack" type="button" class="is-hidden">Replace</button>
+            <input type="file" id="replaceBackInput" accept="image/*,.pdf" class="is-hidden">
+          </article>
+        </div>
+
+        <div class="step2-actions">
+          <button id="btnPrepareA4" class="btn btn-primary" type="button">Continue to A4 →</button>
+        </div>
+      </div>
+
+
+      <!-- =====================================================
+           STEP 3 — A4 PRINT
+           ===================================================== -->
+      <div id="step3Section" class="step-content is-hidden">
+        <div class="final-print-layout">
+          <div class="a4-preview-container">
+            <div class="a4-source-label"><span>A4 PAPER</span><small>Live final preview</small></div>
+            <div class="a4-scroll-wrapper">
+              <canvas id="a4Canvas"></canvas>
+            </div>
+            <button id="btnDownloadMenu" class="btn btn-primary final-download-main" type="button">↓ Download</button>
+
+            <!-- Legacy download controls remain in DOM for JS compatibility and are hidden. -->
+            <div class="download-actions legacy-download-actions" aria-hidden="true">
+              <button id="btnDownloadPNG" class="btn btn-primary" type="button">↓ PNG</button>
+              <button id="btnDownloadJPG" class="btn btn-secondary" type="button">↓ JPG</button>
+              <button id="btnDownloadPDF" class="btn btn-success" type="button">▣ PDF</button>
+              <button id="btnPrintA4" class="btn btn-dark" type="button">🖨 Print A4</button>
+            </div>
+          </div>
+
+          <div id="passportLayoutControls" class="layout-controls is-hidden">
+            <div class="layout-control-head">
+              <div><strong>Photo layout</strong><span>Adjust size, spacing and border. Preview updates instantly.</span></div>
+              <button type="button" id="btnResetPassportLayout" class="btn btn-secondary btn-small">Reset</button>
+            </div>
+            <div class="layout-control-grid">
+              <label class="range-card">
+                <span>Photo Size <b id="passportPhotoSizeValue">33 mm</b></span>
+                <input id="passportPhotoSize" type="range" min="25" max="38" step="0.5" value="33">
+                <small>Smaller ↔ Larger</small>
+              </label>
+              <label class="range-card">
+                <span>Horizontal Gap <b id="passportGapXValue">2 mm</b></span>
+                <input id="passportGapX" type="range" min="0" max="12" step="0.5" value="2">
+                <small>Space between photos</small>
+              </label>
+              <label class="range-card">
+                <span>Vertical Gap <b id="passportGapYValue">8 mm</b></span>
+                <input id="passportGapY" type="range" min="0" max="30" step="0.5" value="8">
+                <small>Space between rows</small>
+              </label>
+              <label class="range-card">
+                <span>Black Border <b id="passportBorderValue">0 mm</b></span>
+                <input id="passportBorder" type="range" min="0" max="2" step="0.1" value="0">
+                <small>0 = no border • black line</small>
+              </label>
+            </div>
+            <div class="layout-live-note"><span>●</span> <strong id="passportLayoutSummary">6 photos per row</strong><span>•</span><span>Live A4 layout</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="downloadMenuOverlay" class="download-menu-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="downloadMenuTitle">
+        <div class="download-menu-card">
+          <div class="download-menu-head">
+            <div><span>DOWNLOAD</span><h3 id="downloadMenuTitle">Choose format</h3></div>
+            <button id="btnCloseDownloadMenu" type="button" aria-label="Close">×</button>
+          </div>
+          <div class="download-menu-grid">
+            <button id="btnMenuPNG" type="button" class="download-choice"><b>PNG</b><small>High quality image</small></button>
+            <button id="btnMenuJPG" type="button" class="download-choice"><b>JPG</b><small>Compressed image</small></button>
+            <button id="btnMenuPDF" type="button" class="download-choice"><b>PDF</b><small>Print-ready document</small></button>
+            <button id="btnMenuPrint" type="button" class="download-choice"><b>Print A4</b><small>Open print dialog</small></button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         SMART DETECT MODAL
+         ======================================================= -->
+    <div id="smartDetectModal"
+         class="smart-detect-modal is-hidden"
+         aria-hidden="true">
+
+      <div class="smart-detect-modal-card">
+
+        <header class="smart-detect-modal-header">
+          <div>
+            <span class="section-kicker">SMART DETECT</span>
+            <h3 id="smartDetectTitle">Card Detection</h3>
+          </div>
+
+          <button id="btnCloseSmartDetect"
+                  class="btn-close"
+                  type="button"
+                  aria-label="Close">
+            &times;
+          </button>
+        </header>
+
+
+        <div class="smart-detect-stage">
+          <canvas id="smartDetectCanvas"></canvas>
+        </div>
+
+
+        <div class="smart-detect-result">
+
+          <div class="detection-status">
+            <span class="detection-status-icon">✓</span>
+
+            <div>
+              <strong id="smartDetectStatus">
+                Card detected
+              </strong>
+
+              <small id="smartDetectMessage">
+                Review the detected boundaries before applying.
+              </small>
+            </div>
+          </div>
+
+
+          <div class="detection-confidence">
+            <span>Detection confidence</span>
+            <strong id="smartDetectConfidence">--</strong>
+          </div>
+
+        </div>
+
+
+        <div class="smart-detect-actions">
+
+          <button id="btnSmartDetectManual"
+                  class="btn btn-secondary"
+                  type="button">
+            Adjust Manually
+          </button>
+
+          <button id="btnSmartDetectApply"
+                  class="btn btn-success"
+                  type="button">
+            Use Detected Crop
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- =======================================================
+         ADVANCED CROP MODAL
+         Existing IDs preserved for current script.js
+         ======================================================= -->
+    <div id="cropModalOverlay"
+         class="crop-modal-overlay is-hidden"
+         aria-hidden="true">
+
+      <div class="crop-modal-container">
+
+        <header class="crop-modal-header">
+
+          <div>
+            <span class="section-kicker">IMAGE EDITOR</span>
+            <h3 id="cropModalTitle">Crop Image</h3>
+          </div>
+
+          <button id="btnCancelCrop"
+                  class="btn-close"
+                  type="button"
+                  aria-label="Close Crop Editor">
+            &times;
+          </button>
+
+        </header>
+
+
+        <!-- Crop Stage -->
+        <div class="crop-stage-container"
+             id="cropCanvasStage">
+
+          <canvas id="cropCanvas"></canvas>
+
+          <div class="crop-stage-hint">
+            Drag image • Pinch/scroll to zoom • Adjust crop
+          </div>
+
+        </div>
+
+
+        <!-- Passport crop ratio controls: shown only for passport photo mode -->
+        <div id="passportCropRatioControls" class="crop-ratio-controls is-hidden" aria-label="Passport crop ratio">
+          <button id="btnPassportFixedRatio" class="btn btn-nano ratio-btn active" type="button">33:45 Fixed</button>
+          <button id="btnPassportFreeCrop" class="btn btn-nano ratio-btn" type="button">Free Crop</button>
+        </div>
+
+        <!-- Zoom -->
+        <div class="crop-controls-panel crop-zoom-only">
+          <div class="control-row">
+            <label for="zoomSlider">Zoom:</label>
+            <button id="btnZoomOut" class="btn btn-nano" type="button">−</button>
+            <input type="range" id="zoomSlider" min="0.1" max="6" value="1" step="0.01">
+            <button id="btnZoomIn" class="btn btn-nano" type="button">+</button>
+            <button id="btnFitImage" class="btn btn-nano" type="button">Fit</button>
+          </div>
+        </div>
+
+        <footer class="crop-modal-footer">
+
+          <button id="btnResetCrop"
+                  class="btn btn-secondary"
+                  type="button">
+            Reset All
+          </button>
+
+          <button id="btnApplyCrop"
+                  class="btn btn-success"
+                  type="button">
+            Apply Crop
+          </button>
+
+        </footer>
+
+      </div>
+    </div>
+
+
+    <!-- =======================================================
+         PAN DETECTION CONFIRMATION MODAL
+         ======================================================= -->
+    <div id="panDetectModal"
+         class="smart-detect-modal is-hidden"
+         aria-hidden="true">
+
+      <div class="smart-detect-modal-card pan-detect-card">
+
+        <header class="smart-detect-modal-header">
+          <div>
+            <span class="section-kicker">e-PAN</span>
+            <h3>PAN Front & Back Detected</h3>
+          </div>
+
+          <button id="btnClosePanDetect"
+                  class="btn-close"
+                  type="button"
+                  aria-label="Close">
+            &times;
+          </button>
+        </header>
+
+
+        <div class="pan-detect-original">
+          <canvas id="panDetectCanvas"></canvas>
+        </div>
+
+
+        <div class="pan-detect-previews">
+
+          <div class="pan-detect-preview">
+            <span>FRONT</span>
+            <canvas id="panFrontDetectPreview"></canvas>
+          </div>
+
+          <div class="pan-detect-preview">
+            <span>BACK</span>
+            <canvas id="panBackDetectPreview"></canvas>
+          </div>
+
+        </div>
+
+
+        <div class="detection-status">
+          <span class="detection-status-icon">✓</span>
+
+          <div>
+            <strong id="panDetectStatus">
+              Front and Back detected
+            </strong>
+
+            <small id="panDetectMessage">
+              Confirm the detected card areas before continuing.
+            </small>
+          </div>
+        </div>
+
+
+        <div class="smart-detect-actions">
+
+          <button id="btnPanManualCrop"
+                  class="btn btn-secondary"
+                  type="button">
+            Adjust Manually
+          </button>
+
+          <button id="btnPanApplyDetection"
+                  class="btn btn-success"
+                  type="button">
+            Confirm Front & Back
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- =======================================================
+         CONFIRMATION / TOAST
+         ======================================================= -->
+    <div id="appToast"
+         class="app-toast is-hidden"
+         role="alert"
+         aria-live="assertive">
+      <span id="appToastIcon">✓</span>
+      <span id="appToastMessage">Done</span>
+    </div>
+
+  </div>
+  <script src="pvcscript.js"></script>
+</body>
+</html>
