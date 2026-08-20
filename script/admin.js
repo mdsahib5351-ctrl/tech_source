@@ -495,9 +495,13 @@ Bill No: *${billNo}*
 Due Amount: *Rs. ${dueAmount}*
 Last Date: *${formattedDate}*
 
-Priya ${customerName},
-Yeh reminder hai ki bill ki pending amount Rs. ${dueAmount} abhi unpaid hai. Kripya ${formattedDate} se pehle payment kar dein.
+_Priya_ *${customerName}*,
+_यह एक अनुस्मारक है कि ऊपर उल्लिखित बिल की बकाया राशि_ *${dueAmount}* _अभी तक भुगतान नहीं हुई है। कृपया सुनिश्चित करें कि भुगतान निर्धारित तिथि_ *${formattedDate}* _से पहले कर दिया जाए, ताकि सेवा में कोई रुकावट न आए।_
 
+Dear  *${costumerName}*,
+_This is a reminder that the above-mentioned bill has a pending amount_ *${dueAmount}*. _Please ensure that the payment is made before the due date_ *{formattedDate}* _to avoid any service disruption._
+
+_आप भुगतान इस लिंक पर क्लिक करके आसानी से कर सकते हैं_ */* _You can make the payment by clicking here:_ *✓*
 Pay Now:
 https://mdsahib5351-ctrl.github.io/TECH-SOURCE-/billview.html?id=${docId}
 
