@@ -495,7 +495,7 @@ Bill No: *${billNo}*
 Due Amount: *Rs. ${dueAmount}*
 Last Date: *${formattedDate}*
 
-_Priya_ *${customerName}*,
+_प्रिय_ *${customerName}*,
 _यह एक अनुस्मारक है कि ऊपर उल्लिखित बिल की बकाया राशि_ *${dueAmount}* _अभी तक भुगतान नहीं हुई है। कृपया सुनिश्चित करें कि भुगतान निर्धारित तिथि_ *${formattedDate}* _से पहले कर दिया जाए, ताकि सेवा में कोई रुकावट न आए।_
 
 Dear  *${customerName}*,
