@@ -1,690 +1,591 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Payment | Tech Source</title>
-<link rel="icon" href="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg">
-
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TECH SOURCE — Payment Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <style>
-:root{
-  --bg:#f4f6f8;
-  --surface:#ffffff;
-  --ink:#151922;
-  --muted:#647084;
-  --line:#dfe4ea;
-  --brand:#111827;
-  --accent:#0f766e;
-  --accent-soft:#dff7f3;
-  --danger:#b42318;
-  --shadow:0 24px 70px rgba(18, 28, 45, .13);
-  --radius:8px;
+:root{--bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#64748b;--line:#e6eaf0;--blue:#2563eb;--blue2:#1d4ed8;--green:#16a34a;--red:#dc2626;--amber:#d97706;--shadow:0 16px 45px rgba(15,23,42,.08);--r:20px}*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#f7f9fc,#eef3ff);font-family:Inter,system-ui;color:var(--text)}button,input,select{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:var(--shadow)}.brand{display:flex;align-items:center;gap:12px;margin-bottom:26px}.brand-logo{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}.brand b{display:block;font-size:18px}.brand span{font-size:11px;color:var(--muted);letter-spacing:1px}.login h1{margin:0 0 7px}.login p{color:var(--muted);margin:0 0 22px}.field{display:grid;gap:7px;margin:13px 0}.field label{font-size:12px;font-weight:700;color:#475569}.field input,.field select{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:13px;outline:0;background:#fff}.field input:focus,.field select:focus{border-color:#93c5fd;box-shadow:0 0 0 4px #dbeafe}.btn{padding:12px 16px;border-radius:13px;font-weight:700}.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.soft{background:#eef4ff;color:#1d4ed8}.danger{background:#fee2e2;color:#b91c1c}.success{background:#dcfce7;color:#15803d}.ghost{background:#f1f5f9;color:#334155}.app{min-height:100vh;display:flex}.side{width:245px;background:#0f172a;color:#cbd5e1;padding:20px 14px;position:fixed;inset:0 auto 0 0;z-index:20}.side .brand{padding:5px 8px 24px}.side .brand b{color:#fff}.nav{display:grid;gap:7px}.nav button{background:transparent;color:#cbd5e1;text-align:left;padding:13px 14px;border-radius:13px;font-weight:600}.nav button.active,.nav button:hover{background:#1e293b;color:#fff}.nav button span{float:right;background:#ef4444;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px}.side-foot{position:absolute;bottom:18px;left:14px;right:14px}.main{margin-left:245px;width:calc(100% - 245px);padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:20px}.top h1{font-size:25px;margin:0}.top small{color:var(--muted)}.menu{display:none}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 8px 25px rgba(15,23,42,.04)}.stat small{color:var(--muted);display:block}.stat b{font-size:26px;display:block;margin-top:5px}.stat .ico{font-size:21px;margin-bottom:12px}.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 28px rgba(15,23,42,.04);margin-top:16px;overflow:hidden}.panel-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}.panel-head h2,.panel-head h3{margin:0}.toolbar{display:flex;gap:10px;flex-wrap:wrap}.toolbar input,.toolbar select{padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff}.toolbar input{min-width:250px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:780px}.table th,.table td{padding:13px 15px;border-bottom:1px solid #edf0f4;text-align:left;font-size:13px;vertical-align:middle}.table th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#64748b;background:#fafbfc}.table tr:last-child td{border-bottom:0}.person{display:flex;gap:10px;align-items:center}.avatar{width:40px;height:40px;border-radius:12px;object-fit:cover;background:#e2e8f0}.person b{display:block}.person small{color:var(--muted)}.badge{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:10px;font-weight:800;text-transform:uppercase}.pending{background:#fff7ed;color:#c2410c}.paid{background:#dcfce7;color:#15803d}.rejected{background:#fee2e2;color:#b91c1c}.expired{background:#e2e8f0;color:#475569}.submitted{background:#dbeafe;color:#1d4ed8}.linkbox{display:flex;gap:7px}.linkbox input{min-width:240px}.section{display:none}.section.active{display:block}.empty{padding:45px;text-align:center;color:var(--muted)}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.modal{position:fixed;inset:0;background:rgba(15,23,42,.58);backdrop-filter:blur(8px);display:grid;place-items:center;padding:18px;z-index:80}.modal-card{width:min(620px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:25px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.25)}.modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0}.close{width:38px;height:38px;border-radius:50%;background:#f1f5f9;font-size:20px}.radio-row{display:flex;gap:9px;flex-wrap:wrap}.radio{border:1px solid var(--line);padding:11px 13px;border-radius:12px}.radio:has(input:checked){border-color:#60a5fa;background:#eff6ff}.radio input{margin-right:6px}.link-result{background:#eff6ff;border:1px solid #bfdbfe;padding:15px;border-radius:15px;margin-top:12px}.link-result code{display:block;word-break:break-all;margin:8px 0;color:#1e40af}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.detail{display:grid;grid-template-columns:1fr 1fr;gap:10px}.detail div{background:#f8fafc;border:1px solid #edf0f4;border-radius:13px;padding:11px}.detail span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.detail b{display:block;margin-top:3px}.qr{display:grid;place-items:center;background:#fff;padding:14px;border-radius:18px;border:1px solid var(--line);width:max-content;margin:15px auto}.customer-page{min-height:100vh;padding:22px;display:grid;place-items:center;background:radial-gradient(circle at top,#e8f0ff 0,#f7f9fc 45%,#eef2f7 100%)}.pay-card{width:min(520px,100%);background:#fff;border:1px solid #e5eaf1;border-radius:30px;box-shadow:0 25px 80px rgba(15,23,42,.12);padding:20px}.pay-brand{text-align:center;padding:8px 0 15px}.pay-brand .brand-logo{margin:auto}.customer{display:flex;align-items:center;gap:12px;background:#f8fafc;border:1px solid var(--line);padding:12px;border-radius:18px}.customer img{width:55px;height:55px;border-radius:16px;object-fit:cover}.amount{text-align:center;padding:20px 8px}.amount small{color:var(--muted)}.amount b{display:block;font-size:38px;margin-top:3px}.upi-card{background:#f8fafc;border-radius:18px;padding:16px;text-align:center}.upi-card b{font-size:17px}.pay-card .btn{width:100%;margin-top:10px}.pay-status{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}.success-screen{text-align:center;padding:25px 5px}.check{width:90px;height:90px;border-radius:50%;background:#dcfce7;color:#16a34a;display:grid;place-items:center;margin:8px auto 18px;font-size:45px;animation:pop .6s ease}.success-screen h1{margin:0 0 8px}.success-screen p{color:var(--muted);line-height:1.6}.receipt-mini{background:#f8fafc;border-radius:17px;padding:14px;text-align:left;margin:18px 0}.receipt-mini div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #dbe1e8;font-size:12px}.receipt-mini div:last-child{border:0}@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes spin{to{transform:rotate(360deg)}}.processing{width:55px;height:55px;border:5px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite;margin:25px auto}.countdown{font-variant-numeric:tabular-nums;font-weight:800;color:#dc2626}.hint{font-size:11px;color:var(--muted)}.settings-box{padding:20px}.toast{position:fixed;right:18px;bottom:18px;z-index:100;background:#0f172a;color:#fff;padding:13px 16px;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.muted{color:var(--muted)}
+@media(max-width:900px){.side{transform:translateX(-100%);transition:.25s}.side.open{transform:none}.main{margin-left:0;width:100%;padding:15px}.menu{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:20px}.top{align-items:center}.cards{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.top h1{font-size:21px}.toolbar input{min-width:180px;width:100%}.toolbar{width:100%}.detail{grid-template-columns:1fr}.linkbox{flex-direction:column}.linkbox input{min-width:0;width:100%}}
+@media(max-width:520px){.cards{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat b{font-size:22px}.panel-head{align-items:flex-start;flex-direction:column}.customer-page{padding:10px}.pay-card{border-radius:24px}.amount b{font-size:34px}}
+
+/* Premium colorful admin refresh */
+:root{--bg:#eef4ff;--card:#ffffff;--text:#10213d;--muted:#66758f;--line:#dfe7f3;--blue:#2563eb;--blue2:#1d4ed8;--green:#16a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;--cyan:#0891b2;--shadow:0 18px 55px rgba(30,64,175,.10);--r:22px}
+body{background:radial-gradient(circle at 0 0,#dbeafe 0,#eef4ff 30%,#f7faff 62%,#edf2ff 100%)}
+.main{background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(239,246,255,.35));min-height:100vh}
+.top{padding:8px 4px 18px}.top h1{letter-spacing:-.5px}.top>div:first-child{background:rgba(255,255,255,.72);border:1px solid rgba(148,163,184,.18);padding:8px 12px;border-radius:18px;box-shadow:0 8px 25px rgba(30,64,175,.05)}
+.stat{position:relative;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;border-color:#dce7f7;background:linear-gradient(145deg,#fff,#f7faff)}
+.stat:hover{transform:translateY(-3px);box-shadow:0 16px 35px rgba(30,64,175,.13)}.stat:after{content:'';position:absolute;right:-25px;top:-30px;width:90px;height:90px;border-radius:50%;background:rgba(37,99,235,.08)}
+.stat:nth-child(2):after,.stat:nth-child(7):after{background:rgba(217,119,6,.10)}.stat:nth-child(3):after,.stat:nth-child(4):after{background:rgba(22,163,74,.10)}.stat:nth-child(6):after{background:rgba(220,38,38,.09)}
+.stat .ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#eaf2ff;color:#2563eb;font-weight:800}.stat:nth-child(2) .ico,.stat:nth-child(7) .ico{background:#fff4df;color:#d97706}.stat:nth-child(3) .ico,.stat:nth-child(4) .ico{background:#e9faef;color:#16a34a}.stat:nth-child(6) .ico{background:#ffeded;color:#dc2626}
+.panel{border-color:#dce6f4;box-shadow:0 12px 35px rgba(30,64,175,.07);background:rgba(255,255,255,.94)}
+.panel-head{background:linear-gradient(90deg,#f8fbff,#f2f7ff)}
+.panel-head input{padding:12px 15px;border:1px solid #d5dfed;border-radius:13px;background:#fff;outline:none;min-width:250px}.panel-head input:focus{border-color:#60a5fa;box-shadow:0 0 0 4px #dbeafe}
+.table th{background:#f1f6ff;color:#52647e}.table td{border-bottom-color:#e9eff7}.table tr:hover td{background:#f8fbff}
+.btn{box-shadow:0 4px 12px rgba(15,23,42,.04)}.soft{background:#eaf2ff}.success{background:#e8f8ed}.danger{background:#ffeded}
+.section:before{content:'';display:block;height:5px;width:75px;border-radius:99px;background:linear-gradient(90deg,#2563eb,#7c3aed);margin:0 0 12px 3px}
+.nav button.active{background:linear-gradient(135deg,#2563eb,#4f46e5);box-shadow:0 8px 20px rgba(37,99,235,.25)}
+.nav button:hover{background:#1e3a6b}.side{background:linear-gradient(180deg,#0b1730,#111f3d 65%,#0b1730)}
+.history-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.history-tools input{flex:1;min-width:220px}
+.history-count{padding:8px 11px;border-radius:999px;background:#eaf2ff;color:#1d4ed8;font-size:11px;font-weight:800;white-space:nowrap}
+.quick-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.quick-nav .qcard{border:1px solid #dce6f4;border-radius:18px;padding:16px;background:linear-gradient(145deg,#fff,#f5f8ff);cursor:pointer;transition:.2s}.quick-nav .qcard:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(30,64,175,.1)}.qcard b{display:block;margin-top:8px}.qcard span{font-size:11px;color:var(--muted)}
+@media(max-width:900px){.quick-nav{grid-template-columns:repeat(2,1fr)}.panel-head input{width:100%;min-width:0}}
+
+/* Mobile-first premium refresh */
+.history-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.history-count{font-size:11px;font-weight:800;color:#3157a6;background:#edf4ff;border:1px solid #d6e5ff;padding:9px 11px;border-radius:12px;white-space:nowrap}.history-tools input,.searchbox{height:42px;min-width:260px;border:1px solid #d7e2f0!important;border-radius:14px!important;padding:0 14px!important;background:#fff!important;box-shadow:0 5px 18px rgba(37,99,235,.06);outline:none}.history-tools input:focus,.searchbox:focus{border-color:#7aa7ff!important;box-shadow:0 0 0 4px #e5efff}.panel{background:linear-gradient(180deg,#fff,#fbfdff)}.stat{cursor:pointer;transition:.2s transform,.2s box-shadow}.stat:hover{transform:translateY(-2px);box-shadow:0 14px 35px rgba(37,99,235,.12)}.actions .btn{min-height:38px}.link-action-btn{width:42px;height:38px;border-radius:12px;background:#edf4ff;color:#2455b5;font-size:18px;font-weight:900}.link-modal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.link-modal-grid .btn{min-height:48px}.danger-outline{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}.confirm-note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:12px;line-height:1.5}.customer-page{padding:12px;background:radial-gradient(circle at 15% 0,#dbeafe 0,#eef4ff 35%,#f8fbff 70%,#eaf0ff 100%)}.pay-card{overflow:hidden;padding:0;border-radius:30px}.pay-brand{padding:24px 20px 18px;background:linear-gradient(135deg,#0f3b8f,#2563eb 58%,#4f46e5);color:#fff}.pay-brand .hint{color:#dbeafe}.pay-brand .brand-logo{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22)}.pay-body{padding:16px}.pay-trust{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:0 0 14px}.trust-chip{font-size:10px;font-weight:800;color:#2563eb;background:#eef5ff;border:1px solid #dbe7ff;border-radius:99px;padding:7px 10px}.customer.hero-customer{background:linear-gradient(135deg,#f8fbff,#eef5ff);border-color:#dce8f8}.customer.hero-customer img{width:64px;height:64px;border-radius:18px}.amount.hero-amount{margin:14px 0;background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:1px solid #dbe7ff;border-radius:22px;padding:18px}.amount.hero-amount b{font-size:42px;color:#153e86}.upi-card{background:linear-gradient(180deg,#f8fbff,#eef5ff);border:1px solid #dbe7ff;padding:18px;border-radius:22px}.upi-title{font-weight:800;font-size:14px}.pay-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0}.pay-step{background:#f8fafc;border:1px solid #e6edf6;border-radius:14px;padding:10px;text-align:center;font-size:10px;color:#52627a}.pay-step b{display:block;font-size:18px;color:#2563eb;margin-bottom:4px}.pay-cta{height:54px!important;border-radius:16px!important;font-size:15px!important;box-shadow:0 12px 25px rgba(37,99,235,.22)}.success-photo{width:86px;height:86px;border-radius:24px;object-fit:cover;display:block;margin:0 auto 12px;border:4px solid #fff;box-shadow:0 12px 35px rgba(15,23,42,.13)}.success-avatar{width:86px;height:86px;border-radius:24px;display:grid;place-items:center;margin:0 auto 12px;background:#e0edff;color:#2563eb;font-size:30px;font-weight:900}.success-top{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #bbf7d0;border-radius:22px;padding:20px 14px;margin-bottom:14px}.success-top h1{color:#166534}.success-note{background:#f8fafc;border-radius:16px;padding:13px;font-size:12px;color:#52627a;line-height:1.55}.payment-footer{text-align:center;color:#8290a5;font-size:10px;padding:12px 4px 4px}
+@media(max-width:600px){.history-tools{width:100%}.history-tools input{min-width:0;flex:1;width:100%}.history-tools .btn{flex:0 0 auto}.link-modal-grid{grid-template-columns:1fr}.customer-page{padding:8px}.pay-card{border-radius:24px}.pay-body{padding:13px}.pay-brand{padding:20px 15px 15px}.amount.hero-amount b{font-size:36px}.pay-steps{grid-template-columns:1fr 1fr 1fr}.table{min-width:850px}}
+
+@media(max-width:600px){.panel-head .toolbar{display:grid;grid-template-columns:1fr;width:100%}.panel-head .toolbar input,.panel-head .toolbar select{width:100%;min-width:0}.history-tools{display:grid;grid-template-columns:1fr auto;width:100%}.history-tools .history-count{grid-column:1/-1}.history-tools input{width:100%;min-width:0}.history-tools .btn{width:100%}.link-action-btn{width:44px;height:44px;border-radius:14px}.modal-card{padding:17px;border-radius:22px}.link-modal-grid{gap:8px}.link-modal-grid .btn{min-height:50px}.customer-page{min-height:100svh}.pay-card{width:100%;max-width:520px}.pay-brand h2{font-size:23px}.qr{padding:10px}.pay-steps .pay-step{padding:9px 4px}.success-top{padding:17px 10px}}
+
+.btn.loading{opacity:.78;pointer-events:none}.btn-loader{display:inline-flex;align-items:center;justify-content:center;gap:8px}.mini-spin{width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}.upload-state{display:flex;align-items:center;gap:8px;font-size:11px;color:#2563eb;margin-top:8px}.crop-modal-card{width:min(680px,100%);padding:16px}.crop-area{background:#0f172a;border-radius:18px;padding:10px;max-height:58vh;overflow:hidden}.crop-image{display:block;max-width:100%;max-height:55vh;margin:auto}.crop-actions{display:flex;gap:8px;margin-top:12px}.crop-actions .btn{flex:1}.custom-expiry{display:none;margin-top:9px}.custom-expiry.show{display:block}.custom-expiry input{padding:12px 14px;border:1px solid #d7e2f0;border-radius:13px;width:100%;outline:0}.photo-preview-chip{display:flex;align-items:center;gap:10px;margin-top:9px;padding:8px 10px;border-radius:13px;background:#f0f7ff;border:1px solid #dbeafe;font-size:11px}.photo-preview-chip img{width:34px;height:34px;border-radius:9px;object-fit:cover}.details-photo{width:76px;height:76px;border-radius:20px;object-fit:cover;box-shadow:0 8px 20px rgba(15,23,42,.12)}
+@media(max-width:600px){.crop-modal-card{padding:12px}.crop-area{max-height:52vh}.crop-image{max-height:50vh}.crop-actions .btn{padding:11px 8px;font-size:12px}}
+
+/* Compact customer payment layout */
+.customer-page{padding:8px}.pay-card{max-height:calc(100svh - 16px);overflow:auto;scrollbar-width:none}.pay-card::-webkit-scrollbar{display:none}.pay-brand{padding:14px 14px 11px}.pay-brand .brand-logo{width:40px;height:40px;border-radius:12px}.pay-brand h2{font-size:20px;margin:6px 0 1px!important}.pay-brand .hint{font-size:9px}.pay-body{padding:10px}.pay-trust{gap:5px;margin-bottom:8px}.trust-chip{padding:5px 7px;font-size:8px}.customer.hero-customer{padding:8px;border-radius:14px}.customer.hero-customer img,.customer.hero-customer .success-avatar{width:48px!important;height:48px!important;border-radius:13px!important}.customer.hero-customer b{font-size:14px}.customer.hero-customer .hint{font-size:9px}.customer.hero-customer small{font-size:9px}.detail{gap:6px}.detail div{padding:8px;border-radius:10px}.detail span{font-size:8px}.detail b{font-size:11px}.amount.hero-amount{margin:8px 0;padding:10px;border-radius:14px}.amount.hero-amount small{font-size:9px}.amount.hero-amount b{font-size:28px}.amount.hero-amount .hint{font-size:9px}.upi-card{padding:10px;border-radius:15px}.upi-title{font-size:11px}.qr{padding:6px;margin:8px auto}.qr canvas,.qr img{width:150px!important;height:150px!important}.upi-card>b{font-size:12px}.upi-card .hint{font-size:9px}.upi-card .btn{padding:8px;margin-top:5px;font-size:10px}.pay-steps{margin:8px 0;gap:5px}.pay-step{padding:6px 3px;font-size:8px!important;border-radius:9px}.pay-step b{font-size:13px;margin-bottom:2px}.field{gap:4px;margin:7px 0}.field label{font-size:9px}.field input{padding:9px 10px;border-radius:10px;font-size:12px}.pay-cta{height:44px!important;border-radius:12px!important;font-size:12px!important;margin-top:5px!important}.success-note{padding:8px;font-size:9px;line-height:1.4;border-radius:11px}.payment-footer{font-size:8px;padding:7px 2px 1px}.success-top{padding:10px 8px;margin-bottom:8px;border-radius:15px}.success-photo,.success-avatar{width:62px;height:62px;border-radius:18px}.success-top .check{width:48px;height:48px;font-size:24px;margin:4px auto 8px}.success-screen h1{font-size:20px}.success-screen p{font-size:10px;line-height:1.35}.receipt-mini{padding:8px;margin:8px 0;border-radius:12px}.receipt-mini div{padding:4px 0;font-size:9px}.processing{width:38px;height:38px;border-width:4px;margin:18px auto}
+
+/* vNext payment manager upgrades */
+.stat{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}.stat:hover{transform:translateY(-2px);box-shadow:0 14px 35px rgba(37,99,235,.12)}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.edit-photo{display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:15px}.edit-photo img{width:54px;height:54px;border-radius:14px;object-fit:cover}.edit-photo input{font-size:12px}
+.timeline{display:grid;gap:10px;margin-top:14px}.timeline-item{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start}.timeline-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#dbeafe;color:#1d4ed8;font-weight:800;font-size:12px}.timeline-item.paid .timeline-dot{background:#dcfce7;color:#15803d}.timeline-item.rejected .timeline-dot{background:#fee2e2;color:#b91c1c}.timeline-box{padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:#f8fafc}.timeline-box b{display:block;font-size:13px}.timeline-box small{color:var(--muted)}
+.amount-mismatch{background:#fff7ed!important;border-color:#fed7aa!important;color:#9a3412}.analytics-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.mini-stat{padding:14px;border-radius:16px;background:linear-gradient(135deg,#eff6ff,#f8faff);border:1px solid #dbeafe}.mini-stat small{color:#64748b}.mini-stat b{display:block;font-size:20px;margin-top:4px}
+.customer-payment-live{font-size:11px;color:#16a34a;font-weight:700;margin-top:5px}.customer-payment-live:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:5px;box-shadow:0 0 0 4px #dcfce7}
+@media(max-width:600px){.edit-grid{grid-template-columns:1fr}.analytics-strip{grid-template-columns:1fr 1fr}.modal-card{padding:16px;border-radius:21px}.customer-page{padding:8px}.pay-card{padding:14px}.pay-brand{padding:3px 0 9px}.pay-brand .brand-logo{width:42px;height:42px;border-radius:13px}.pay-brand h2{font-size:19px!important;margin:6px 0 2px!important}.pay-body{font-size:12px}.hero-customer{padding:9px!important}.hero-customer img{width:48px!important;height:48px!important}.hero-amount{padding:11px 5px!important}.hero-amount b{font-size:29px!important}.upi-card{padding:10px!important}.upi-card .qr{margin:8px auto;padding:9px}.upi-card .qr img{width:155px!important;height:155px!important}.pay-steps{gap:5px!important}.pay-step{padding:7px!important;font-size:10px!important}.pay-card .field{margin:8px 0}.pay-card .field input{padding:10px 11px}.pay-card .btn{padding:10px 12px;margin-top:7px}.success-top{padding-top:3px!important}.success-photo{width:62px!important;height:62px!important}.success-top .check{width:58px!important;height:58px!important;font-size:30px!important;margin:6px auto 9px!important}.success-screen h1{font-size:20px}.success-screen p{margin:6px 0;line-height:1.35}.receipt-mini{margin:10px 0;padding:9px}.receipt-mini div{padding:5px 0;font-size:11px}.success-note{padding:8px!important;font-size:11px!important}.payment-footer{padding-top:8px!important;font-size:9px!important}}
+
+/* =========================================================
+   FINAL VISUAL SYSTEM — screenshot-matched compact payment UI
+   Keeps all existing JS/data behaviour intact.
+   ========================================================= */
+.customer-page{padding:4px 10px;min-height:100svh;place-items:start center;background:linear-gradient(180deg,#f4f9ff 0%,#f9fbff 48%,#eef5ff 100%)}
+.pay-card{width:min(950px,100%);max-width:950px;max-height:none;overflow:visible;border-radius:18px;background:transparent;box-shadow:none;border:0}
+.pay-brand{position:relative;text-align:left;min-height:126px;padding:20px 42px 18px 154px;border-radius:18px;background:linear-gradient(120deg,#0b3d91 0%,#075bd4 48%,#158ee9 100%);overflow:hidden;box-shadow:0 7px 18px rgba(21,91,190,.18)}
+.pay-brand:after{content:'';position:absolute;right:-40px;top:-70px;width:420px;height:220px;border:1px solid rgba(255,255,255,.13);border-radius:50%;transform:rotate(-18deg)}
+.pay-brand:before{content:'✓';position:absolute;right:116px;top:43px;width:44px;height:44px;border:2px solid rgba(255,255,255,.3);border-radius:13px;color:#fff;display:grid;place-items:center;font-weight:900;font-size:22px;background:rgba(255,255,255,.08)}
+.pay-brand .brand-logo{position:absolute;left:40px;top:21px;width:82px;height:82px;border-radius:20px;background:linear-gradient(145deg,#0f6ee8,#1687ef);border:3px solid #7de1ff;box-shadow:0 6px 18px rgba(0,0,0,.16);font-size:31px}
+.pay-brand h2{font-size:36px;letter-spacing:.2px;margin:5px 0 3px!important;position:relative;z-index:2}
+.pay-brand .hint{font-size:16px;color:#e9f5ff;position:relative;z-index:2}
+.pay-brand .hint:after{content:'   •   100% Secure';font-weight:700;position:absolute;left:650px;top:-18px;white-space:nowrap;color:#eaf7ff;font-size:15px}
+.pay-body{padding:10px 2px 0}
+.pay-trust{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin:4px 4px 12px;position:relative}
+.pay-trust:before,.pay-trust:after{content:'';position:absolute;top:50%;width:1px;height:34px;background:#cbd8e8}.pay-trust:before{left:33.33%}.pay-trust:after{left:66.66%}
+.trust-chip{height:54px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:30px;background:linear-gradient(180deg,#f2fff9,#e9f8f3);border:1px solid #d0eee3;color:#173c4d;font-size:16px;box-shadow:0 3px 10px rgba(28,96,75,.04)}
+.trust-chip i{font-style:normal;width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#16a765;color:#fff;font-size:19px;box-shadow:inset 0 0 0 5px #e8fff4}
+.payment-customer{min-height:132px;padding:14px 22px!important;border-radius:20px!important;background:linear-gradient(115deg,#f6fbff,#edf5ff)!important;border:1px solid #cbdced!important;box-shadow:0 3px 12px rgba(40,91,155,.05)}
+.payment-customer img,.payment-avatar{width:108px!important;height:108px!important;border-radius:20px!important;flex:0 0 auto;object-fit:cover}
+.customer-main{min-width:0}.customer-main>b{font-size:26px;line-height:1.05;color:#0c2c60;display:block;max-width:650px}.phone-line{font-size:18px;color:#173f74;margin:9px 0 6px}.phone-line span{margin-left:8px;color:#506782}.type-pill{display:inline-flex;padding:5px 14px;border-radius:20px;background:#dceeff;color:#1760b5;font-weight:800;font-size:14px}.customer-arrow{margin-left:auto;font-size:45px;color:#1d4c81;line-height:1}
+.payment-detail{grid-template-columns:1fr 1fr!important;gap:0!important;margin-top:12px!important;border:1px solid #cbdced;border-radius:19px;overflow:hidden;background:#f8fbff}.payment-detail div{border:0!important;border-radius:0!important;padding:13px 30px!important;background:transparent!important}.payment-detail div+div{border-left:1px solid #b8c9de!important}.payment-detail span{font-size:13px;color:#596d87}.payment-detail b{font-size:20px;color:#12366d;margin-top:4px!important}
+.payment-amount{display:flex;align-items:center;justify-content:center;gap:22px;margin:12px 0!important;min-height:126px;border-radius:20px!important;padding:12px!important;background:linear-gradient(120deg,#e8fff7,#effffb,#e7faf5)!important;border:1px solid #9cdec7!important;position:relative;overflow:hidden}.payment-amount:after{content:'';position:absolute;right:-15px;bottom:-55px;width:170px;height:150px;border-radius:50%;background:rgba(72,205,164,.11)}.rupee-icon{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:#12a66b;color:#fff;font-size:42px;font-weight:800;box-shadow:inset 0 0 0 9px #bff4df}.payment-amount small{font-size:16px;color:#27624f;font-weight:700}.payment-amount b{font-size:53px;line-height:1;color:#008451;margin:2px 0!important}.payment-amount .hint{font-size:16px}
+.payment-upi{margin:12px 0!important;padding:14px 20px 15px!important;border-radius:20px!important;background:linear-gradient(120deg,#f5faff,#f0f7ff)!important;border:1px solid #c9dceb!important}.payment-upi .upi-title{font-size:21px;color:#103c78;display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:8px}.upi-title .line{height:2px;width:55px;background:#9bc6e8}.payment-upi .qr{margin:0 auto 10px!important;padding:8px!important;border-radius:14px!important;border:2px solid #34b883!important;background:#fff;cursor:zoom-in;transition:transform .32s cubic-bezier(.2,.8,.2,1),box-shadow .32s;transform-origin:center;position:relative;z-index:2}.payment-upi .qr canvas,.payment-upi .qr img{width:225px!important;height:225px!important;display:block}.payment-upi .qr:hover{box-shadow:0 8px 25px rgba(17,87,160,.13)}
+.upi-id-row{width:min(510px,100%);height:61px;margin:auto;border:1px solid #c9dceb;border-radius:31px;background:#edf7ff;display:flex;align-items:center;gap:12px;padding:6px 8px 6px 13px}.upi-mark{width:35px;height:35px;border-radius:10px;background:#fff;display:grid;place-items:center;color:#ff8c00;font-size:24px}.upi-id-row>div:nth-child(2){flex:1;text-align:left}.upi-id-row span{display:block;color:#48708f;font-size:10px}.upi-id-row b{font-size:16px;color:#174f8e}.copy-upi{height:44px;padding:0 18px;border:1px solid #c5dcef;border-radius:23px;background:#fff;color:#135bb2;font-weight:800}
+.pay-steps{display:grid;grid-template-columns:1fr 22px 1fr 22px 1fr;gap:4px;align-items:center;margin:12px 0!important;padding:12px 18px;border:1px solid #d0dfef;border-radius:19px;background:#f6faff}.pay-steps em{font-style:normal;font-size:28px;color:#3e78ba;text-align:center}.pay-step{background:transparent!important;border:0!important;padding:0!important;display:grid;grid-template-columns:auto 1fr;text-align:left;column-gap:9px;align-items:center;color:#173d70}.pay-step b{grid-row:1/3;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#2674df;color:#fff;font-size:17px;margin:0!important}.pay-step strong{font-size:15px;align-self:end}.pay-step span{font-size:10px;color:#7790aa;align-self:start}.payment-form{border:1px solid #d0dfef;border-radius:19px;padding:11px 17px 10px;background:#f8fbff}.payment-form .field{margin:0!important}.payment-form .field label{font-size:14px;color:#193c6d}.payment-form .field label small{font-size:11px;color:#7588a1;font-weight:600;margin-left:4px}.utr-wrap{height:48px;display:flex;align-items:center;border:1px solid #cbdced;background:#fff;border-radius:11px;margin-top:5px}.utr-wrap>span{padding:0 13px;color:#557596}.utr-wrap input{border:0!important;box-shadow:none!important;height:100%;flex:1;font-size:14px}.payment-form .pay-status{min-height:18px;margin:4px 0!important;text-align:left}.pay-cta{height:58px!important;border-radius:30px!important;background:linear-gradient(90deg,#09a968,#08b96f)!important;box-shadow:0 9px 22px rgba(9,169,104,.22)!important;font-size:16px!important;letter-spacing:.2px}.pay-cta span{font-size:23px;margin-right:8px}.pay-cta b{float:right;font-size:26px;line-height:15px}.payment-note{display:flex;gap:12px;align-items:center;margin-top:8px!important;padding:9px 16px!important;border-radius:12px!important;background:#eef7ff!important;border:1px solid #deebf7;color:#607a96!important;font-size:11px!important;line-height:1.35!important}.payment-note>span{font-size:28px;color:#2469ba}.payment-footer{padding:8px 4px 2px!important;font-size:10px!important;color:#7b8da4!important;display:flex;align-items:center;justify-content:center;gap:12px}.payment-footer span{width:55px;height:1px;background:#cbd7e5}
+.qr-zoomed{position:fixed!important;left:50%;top:50%;margin:0!important;transform:translate(-50%,-50%) scale(1)!important;z-index:9999!important;width:min(78vw,480px)!important;height:min(78vw,480px)!important;padding:18px!important;border-radius:22px!important;background:#fff!important;box-shadow:0 30px 100px rgba(0,0,0,.42)!important;cursor:zoom-out!important;border:4px solid #35ba8a!important;animation:qrZoomIn .32s cubic-bezier(.2,.8,.2,1)}.qr-zoomed canvas,.qr-zoomed img{width:100%!important;height:100%!important}.qr-viewing:after{content:'';position:fixed;inset:0;background:rgba(6,23,45,.66);backdrop-filter:blur(5px);z-index:9998;animation:qrFade .25s ease}.qr-viewing{overflow:hidden}@keyframes qrZoomIn{from{opacity:.6;transform:translate(-50%,-50%) scale(.55)!important}to{opacity:1;transform:translate(-50%,-50%) scale(1)!important}}@keyframes qrFade{from{opacity:0}to{opacity:1}}
+/* Admin: convert dense tables into compact app-like cards on phones, while keeping desktop columns. */
+@media(max-width:700px){
+ body{font-size:13px}.main{padding:9px}.top{padding:3px 2px 9px;margin-bottom:5px}.top h1{font-size:19px}.top small{font-size:9px}.top .btn{padding:9px 10px;font-size:11px}.cards{gap:7px}.stat{padding:11px;border-radius:15px}.stat .ico{width:30px;height:30px;font-size:16px;margin-bottom:7px}.stat b{font-size:19px}.stat small{font-size:9px}.stat .hint{font-size:8px}.panel{margin-top:9px;border-radius:16px}.panel-head{padding:11px 12px;gap:8px}.panel-head h3{font-size:14px}.panel-head .hint{font-size:9px}.toolbar{gap:6px}.toolbar input,.toolbar select{height:38px;padding:8px 10px;font-size:11px}.table-wrap{overflow:visible}.table{min-width:0!important;width:100%}.table thead{display:none}.table tbody{display:grid;gap:7px;padding:7px}.table tr{display:grid;grid-template-columns:1fr auto;gap:0 8px;background:#fff;border:1px solid #dce7f4;border-radius:15px;box-shadow:0 4px 14px rgba(30,64,175,.055);overflow:hidden;padding:0}.table td{display:none;border:0!important;padding:0!important;background:transparent!important}.table td:nth-child(1),.table td:last-child{display:flex}.table td:nth-child(1){grid-column:1/2;grid-row:1;padding:11px 4px 11px 11px!important}.table td:last-child{grid-column:2;grid-row:1;align-items:center;padding:10px 8px!important}.table td:nth-child(1) .person{width:100%}.table td:nth-child(1) .avatar{width:45px;height:45px;border-radius:13px}.table td:nth-child(1) .person b{font-size:12px;line-height:1.15}.table td:nth-child(1) .person small{font-size:9px}.table td:last-child .btn{padding:8px 9px;font-size:10px}.table td:last-child .link-action-btn{width:38px;height:38px}.table td:last-child .actions{margin:0}.table tr:after{content:'ACK / ID  •  Application  •  Mobile  •  Created  •  Payment  •  Status';grid-column:1/-1;display:block;padding:8px 11px;border-top:1px solid #e5edf7;color:#72859d;font-size:8px;letter-spacing:.2px}.table tr td:nth-child(2){display:none}.history-tools{display:grid;grid-template-columns:1fr auto;width:100%}.history-tools input{min-width:0!important;height:38px!important}.history-count{grid-column:1/-1;padding:6px 9px;font-size:9px}.quick-nav{gap:7px;margin-top:9px}.quick-nav .qcard{padding:11px;border-radius:14px}.qcard b{font-size:11px}.qcard span{font-size:8px}
+ .customer-page{padding:4px 7px}.pay-card{width:100%;border-radius:13px}.pay-brand{min-height:82px;padding:10px 12px 9px 92px;border-radius:13px}.pay-brand .brand-logo{left:16px;top:11px;width:62px;height:62px;border-radius:15px;font-size:24px}.pay-brand h2{font-size:22px!important;margin:3px 0 1px!important}.pay-brand .hint{font-size:9px;white-space:nowrap}.pay-brand .hint:after{left:245px;top:-10px;font-size:8px}.pay-brand:before{right:17px;top:26px;width:25px;height:25px;font-size:13px;border-radius:8px}.payment-layout{padding:5px 1px 0}.pay-trust{gap:5px;margin:2px 2px 6px}.trust-chip{height:34px;font-size:9px;gap:4px}.trust-chip i{width:19px;height:19px;font-size:12px;box-shadow:inset 0 0 0 3px #e8fff4}.payment-customer{min-height:83px;padding:7px 9px!important;border-radius:13px!important}.payment-customer img,.payment-avatar{width:65px!important;height:65px!important;border-radius:13px!important}.customer-main>b{font-size:15px}.phone-line{font-size:10px;margin:3px 0}.phone-line span{margin-left:4px}.type-pill{font-size:8px;padding:3px 8px}.customer-arrow{font-size:29px}.payment-detail{margin-top:6px!important;border-radius:13px}.payment-detail div{padding:8px 12px!important}.payment-detail span{font-size:8px}.payment-detail b{font-size:11px;margin-top:2px!important}.payment-amount{min-height:76px;margin:6px 0!important;border-radius:13px!important;gap:10px}.rupee-icon{width:48px;height:48px;font-size:25px;box-shadow:inset 0 0 0 5px #bff4df}.payment-amount small{font-size:9px}.payment-amount b{font-size:29px}.payment-amount .hint{font-size:8px}.payment-upi{margin:6px 0!important;padding:7px 8px 8px!important;border-radius:13px!important}.payment-upi .upi-title{font-size:12px;gap:8px;margin-bottom:4px}.upi-title .line{width:30px}.payment-upi .qr{padding:4px!important;margin:0 auto 5px!important;border-radius:10px!important}.payment-upi .qr canvas,.payment-upi .qr img{width:142px!important;height:142px!important}.upi-id-row{height:42px;border-radius:23px;gap:6px;padding:4px 5px 4px 7px}.upi-mark{width:27px;height:27px;border-radius:7px;font-size:17px}.upi-id-row span{font-size:7px}.upi-id-row b{font-size:10px}.copy-upi{height:31px;padding:0 10px;font-size:9px;border-radius:17px}.pay-steps{margin:6px 0!important;padding:7px 6px;border-radius:13px;grid-template-columns:1fr 10px 1fr 10px 1fr}.pay-steps em{font-size:18px}.pay-step{column-gap:5px}.pay-step b{width:25px;height:25px;font-size:11px}.pay-step strong{font-size:9px}.pay-step span{font-size:6px}.payment-form{border-radius:13px;padding:7px 8px 6px}.payment-form .field label{font-size:9px}.payment-form .field label small{font-size:7px}.utr-wrap{height:37px;margin-top:3px;border-radius:9px}.utr-wrap>span{padding:0 9px;font-size:11px}.utr-wrap input{font-size:10px}.payment-form .pay-status{min-height:13px;font-size:8px;margin:2px 0!important}.pay-cta{height:39px!important;border-radius:21px!important;font-size:10px!important}.pay-cta span{font-size:15px}.pay-cta b{font-size:19px}.payment-note{gap:6px;padding:6px 8px!important;font-size:7px!important}.payment-note>span{font-size:18px}.payment-footer{font-size:7px!important;padding:4px 1px 1px!important;gap:7px}.payment-footer span{width:30px}.qr-zoomed{width:min(88vw,400px)!important;height:min(88vw,400px)!important;padding:12px!important;border-radius:17px!important}
+}
+@media(min-width:701px){.table tbody tr{height:72px}.table td{padding:10px 13px}.section{max-width:1500px}.main{padding:18px 22px}}
+
+/* Final mobile application/link/request cards: retain every data point, no horizontal scrolling. */
+@media(max-width:700px){
+ .table tbody{padding:6px;gap:8px}
+ .table tr{grid-template-columns:minmax(0,1fr) auto;position:relative;padding:0 9px 9px}
+ .table td{font-size:10px!important;color:#314b6b;min-width:0}
+ .table td:nth-child(1){grid-column:1;grid-row:1;padding:9px 0 7px!important;display:flex}
+ .table td:nth-child(1) .person{gap:8px}
+ .table td:nth-child(1) .person b{font-size:11px}
+ .table td:nth-child(1) .person small{font-size:8px}
+ .table td:nth-child(2){display:block;grid-column:1;grid-row:2;padding:5px 5px 4px 0!important;border-top:1px solid #edf2f8!important}
+ .table td:nth-child(3){display:block;grid-column:2;grid-row:2;padding:5px 0 4px 5px!important;border-top:1px solid #edf2f8!important}
+ .table td:nth-child(4){display:block;grid-column:1;grid-row:3;padding:4px 5px 4px 0!important}
+ .table td:nth-child(5){display:block;grid-column:2;grid-row:3;padding:4px 0 4px 5px!important}
+ .table td:nth-child(6){display:block;grid-column:1;grid-row:4;padding:4px 5px 4px 0!important}
+ .table td:nth-child(7){display:block;grid-column:2;grid-row:4;padding:4px 0 4px 5px!important}
+ .table td:last-child{grid-column:2;grid-row:1;display:flex;justify-content:flex-end;align-items:center;padding:8px 0 0!important;border:0!important}
+ .table td:nth-child(2):before{content:'ACK / ID';}
+ .table td:nth-child(3):before{content:'APPLICATION';}
+ .table td:nth-child(4):before{content:'MOBILE';}
+ .table td:nth-child(5):before{content:'CREATED';}
+ .table td:nth-child(6):before{content:'PAYMENT';}
+ .table td:nth-child(7):before{content:'STATUS / UTR';}
+ .table td:nth-child(2):before,.table td:nth-child(3):before,.table td:nth-child(4):before,.table td:nth-child(5):before,.table td:nth-child(6):before,.table td:nth-child(7):before{display:block;color:#8a9bb0;font-size:7px;font-weight:800;letter-spacing:.05em;margin-bottom:2px}
+ .table tr:after{display:none!important}
+ /* Links and requests have seven columns too; action remains the last cell. */
+ .table td:last-child .actions{display:flex;justify-content:flex-end}
+ .table td:last-child .btn{white-space:nowrap}
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:"Segoe UI", Arial, sans-serif;
-}
-
-body{
-  min-height:100vh;
-  background:
-    linear-gradient(120deg, rgba(15,118,110,.08), transparent 35%),
-    linear-gradient(300deg, rgba(17,24,39,.08), transparent 42%),
-    var(--bg);
-  color:var(--ink);
-}
-
-.topbar{
-  height:68px;
-  background:rgba(255,255,255,.92);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(14px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 24px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:800;
-  letter-spacing:.2px;
-}
-
-.brand img{
-  width:38px;
-  height:38px;
-  border-radius:8px;
-  object-fit:cover;
-}
-
-.page{
-  width:min(1120px, 100%);
-  margin:0 auto;
-  padding:38px 24px;
-}
-
-.payment-shell{
-  display:grid;
-  grid-template-columns:minmax(0, 1fr) 420px;
-  gap:28px;
-  align-items:start;
-}
-
-.summary{
-  min-height:560px;
-  border-radius:var(--radius);
-  background:#111827;
-  color:#fff;
-  padding:34px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  overflow:hidden;
-  position:relative;
-  box-shadow:var(--shadow);
-}
-
-.summary::after{
-  content:"";
-  position:absolute;
-  inset:auto -80px -120px auto;
-  width:300px;
-  height:300px;
-  border-radius:50%;
-  background:rgba(20,184,166,.18);
-}
-
-.summary-content{
-  position:relative;
-  z-index:1;
-}
-
-.secure-label{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  min-height:32px;
-  padding:0 12px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  color:#d6fbf5;
-  font-size:13px;
-  font-weight:700;
-}
-
-.secure-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#2dd4bf;
-}
-
-h1{
-  max-width:640px;
-  margin-top:28px;
-  font-size:42px;
-  line-height:1.08;
-  letter-spacing:0;
-}
-
-.summary-text{
-  max-width:560px;
-  margin-top:16px;
-  color:#cbd5e1;
-  font-size:16px;
-  line-height:1.65;
-}
-
-.info-grid{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:12px;
-  margin-top:34px;
-}
-
-.info-item{
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:var(--radius);
-  padding:16px;
-  background:rgba(255,255,255,.06);
-}
-
-.info-label{
-  color:#94a3b8;
-  font-size:12px;
-  text-transform:uppercase;
-  font-weight:800;
-}
-
-.info-value{
-  margin-top:8px;
-  font-size:15px;
-  font-weight:800;
-  overflow-wrap:anywhere;
-}
-
-.card{
-  background:var(--surface);
-  padding:24px;
-  border-radius:var(--radius);
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-}
-
-.card-header{
-  display:flex;
-  justify-content:space-between;
-  gap:18px;
-  align-items:flex-start;
-  margin-bottom:18px;
-}
-
-h2{
-  font-size:22px;
-  line-height:1.2;
-}
-
-.ack{
-  margin-top:7px;
-  font-size:13px;
-  color:var(--muted);
-  overflow-wrap:anywhere;
-}
-
-.badge{
-  flex:0 0 auto;
-  min-height:30px;
-  padding:7px 10px;
-  border-radius:999px;
-  background:var(--accent-soft);
-  color:#075e57;
-  font-size:12px;
-  font-weight:800;
-}
-
-.amount-box{
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:18px;
-  margin:18px 0;
-  background:#fafbfc;
-}
-
-.amount-label{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-.amount{
-  margin-top:6px;
-  font-size:36px;
-  line-height:1;
-  font-weight:900;
-}
-
-.btn{
-  width:100%;
-  min-height:46px;
-  padding:0 14px;
-  margin-top:10px;
-  border:0;
-  border-radius:6px;
-  font-size:15px;
-  font-weight:800;
-  cursor:pointer;
-  transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;
-}
-
-.btn:hover{
-  opacity:.9;
-  transform:translateY(-1px);
-}
-
-.btn:disabled{
-  cursor:not-allowed;
-  opacity:.62;
-  transform:none;
-}
-
-.pay,
-.done{
-  background:var(--brand);
-  color:#fff;
-  box-shadow:0 10px 24px rgba(17, 24, 39, .18);
-}
-
-.copy{
-  background:#eef2f6;
-  color:#172033;
-}
-
-.upi-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:16px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  background:#fff;
-}
-
-.upi-row span{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-.upi-row b{
-  display:block;
-  margin-top:4px;
-  font-size:14px;
-  overflow-wrap:anywhere;
-}
-
-.qr-wrap{
-  display:flex;
-  justify-content:center;
-  margin:18px 0;
-}
-
-#qr{
-  width:178px;
-  height:178px;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  background:#fff;
-}
-
-.form-field{
-  margin-top:12px;
-}
-
-label{
-  display:block;
-  margin-bottom:7px;
-  font-size:13px;
-  font-weight:800;
-  color:#344054;
-}
-
-input{
-  width:100%;
-  min-height:44px;
-  padding:10px 12px;
-  border:1px solid #cfd6df;
-  border-radius:6px;
-  background:#fff;
-  color:var(--ink);
-  font-size:14px;
-  outline:none;
-}
-
-input:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(15,118,110,.13);
-}
-
-input[type="file"]{
-  padding:9px;
-}
-
-.status{
-  margin-top:15px;
-  padding:11px 12px;
-  text-align:center;
-  border-radius:6px;
-  background:#f2f4f7;
-  color:#344054;
-  font-size:14px;
-  font-weight:800;
-}
-
-.success{
-  background:#dff7e8;
-  color:#146c2e;
-}
-
-.error{
-  background:#fee4e2;
-  color:var(--danger);
-}
-
-.note{
-  font-size:12px;
-  line-height:1.55;
-  color:var(--muted);
-  margin-top:12px;
-  text-align:center;
-}
-
-@media (max-width: 820px){
-  body{
-    background:var(--bg);
-  }
-
-  .topbar{
-    height:60px;
-    justify-content:flex-start;
-  }
-
-  .brand{
-    font-size:15px;
-  }
-
-  .brand img{
-    width:34px;
-    height:34px;
-  }
-
-  .page{
-    padding:16px;
-  }
-
-  .payment-shell{
-    display:block;
-  }
-
-  .summary{
-    min-height:auto;
-    padding:20px;
-    margin-bottom:14px;
-  }
-
-  .secure-label{
-    min-height:28px;
-    font-size:12px;
-  }
-
-  h1{
-    margin-top:18px;
-    font-size:26px;
-    line-height:1.15;
-  }
-
-  .summary-text{
-    margin-top:10px;
-    font-size:14px;
-    line-height:1.5;
-  }
-
-  .info-grid{
-    grid-template-columns:1fr;
-    margin-top:18px;
-  }
-
-  .info-item{
-    padding:12px;
-  }
-
-  .card{
-    padding:18px;
-    box-shadow:none;
-  }
-
-  .card-header{
-    align-items:flex-start;
-  }
-
-  h2{
-    font-size:20px;
-  }
-
-  .amount{
-    font-size:32px;
-  }
-
-  #qr{
-    width:164px;
-    height:164px;
-  }
-}
-
-@media (max-width: 390px){
-  .card-header{
-    display:block;
-  }
-
-  .badge{
-    display:inline-block;
-    margin-top:10px;
-  }
-
-  .upi-row{
-    display:block;
-  }
-}
+/* Final customer media interactions */
+.customer-photo-zoom{cursor:zoom-in;transition:transform .18s ease,box-shadow .18s ease}.customer-photo-zoom:active{transform:scale(.96)}
+.pay-cta{position:relative;overflow:hidden;background:linear-gradient(135deg,#06a86b,#08c878 52%,#059669)!important;border:1px solid #00a968!important;box-shadow:0 10px 26px rgba(5,150,105,.30),0 0 0 3px rgba(16,185,129,.10);font-weight:900!important;letter-spacing:.2px}.pay-cta:before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.20) 45%,transparent 70%);transform:translateX(-120%);animation:payShine 3.2s ease-in-out infinite}.pay-cta>*{position:relative;z-index:1}.pay-cta.is-submitting{background:#0b9e68!important;box-shadow:0 7px 18px rgba(5,150,105,.22)!important}
+@keyframes payShine{0%,55%{transform:translateX(-120%)}75%,100%{transform:translateX(120%)}}
+.media-lightbox{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;background:rgba(8,24,45,.72);backdrop-filter:blur(9px);opacity:0;transition:opacity .24s ease}.media-lightbox.is-open{opacity:1}.media-lightbox-card{transform-origin:center;transform:scale(.38);opacity:.25;transition:transform .42s cubic-bezier(.16,1,.3,1),opacity .28s ease;width:min(92vw,520px);max-height:90vh;overflow:auto;scrollbar-width:none}.media-lightbox-card::-webkit-scrollbar{display:none}.media-lightbox.is-open .media-lightbox-card{transform:scale(1);opacity:1}
+.qr-lightbox-card{background:linear-gradient(180deg,#f5faff,#edf6ff);border:1px solid #c7dcec;border-radius:24px;padding:18px 16px 14px;box-shadow:0 30px 90px rgba(0,0,0,.32)}.zoom-qr-wrap{width:max-content;margin:0 auto;border:3px solid #34b883;border-radius:18px;padding:7px;background:transparent;box-shadow:0 12px 35px rgba(20,80,100,.12)}.zoom-qr-image{display:block;width:min(76vw,370px);height:min(76vw,370px);image-rendering:auto}.media-lightbox-hint{text-align:center;color:#647d98;font-size:11px;margin-top:9px}
+.customer-photo-card{background:#fff;border-radius:25px;padding:14px;box-shadow:0 30px 90px rgba(0,0,0,.32);border:1px solid #d8e3ef}.customer-photo-large-wrap{display:grid;place-items:center;background:#f3f7fb;border-radius:18px;padding:8px;overflow:hidden}.customer-photo-large{display:block;width:auto;height:auto;max-width:100%;max-height:58vh;object-fit:contain;border-radius:13px}.photo-detail-head{display:flex;justify-content:space-between;align-items:end;gap:10px;padding:13px 4px 9px}.photo-detail-head strong{font-size:18px;color:#123e70}.photo-detail-head span{font-size:10px;color:#71859b}.photo-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.photo-details-grid div{background:#f6f9fc;border:1px solid #e3ebf3;border-radius:12px;padding:9px}.photo-details-grid span{display:block;color:#71859b;font-size:7px;font-weight:800;letter-spacing:.06em}.photo-details-grid b{display:block;color:#163e6b;font-size:11px;margin-top:3px;word-break:break-word}
+@media(max-width:600px){.qr-lightbox-card{width:94vw;padding:14px 9px 10px;border-radius:20px}.zoom-qr-wrap{padding:6px;border-width:2px;border-radius:15px}.zoom-qr-image{width:min(78vw,340px);height:min(78vw,340px)}.customer-photo-card{width:92vw;padding:10px;border-radius:20px}.customer-photo-large-wrap{padding:5px;border-radius:14px}.customer-photo-large{max-height:55vh;border-radius:10px}.photo-detail-head{padding:10px 2px 7px}.photo-detail-head strong{font-size:15px}.photo-details-grid div{padding:7px}.photo-details-grid b{font-size:9px}.media-lightbox-hint{font-size:9px;margin-top:7px}}
 </style>
-</head>
+<style>
+/* =========================================================
+   FINAL COMPACT PAYMENT POLISH + TRUE QR ZOOM
+   ========================================================= */
+.customer-page{padding:3px 8px}
+.pay-brand{min-height:104px;padding:14px 38px 13px 126px;border-radius:16px}
+.pay-brand .brand-logo{left:30px;top:17px;width:70px;height:70px;border-radius:18px;font-size:27px}
+.pay-brand h2{font-size:31px!important;margin:4px 0 2px!important}
+.pay-brand .hint{font-size:13px}
+.pay-body{padding-top:7px}
+.pay-trust{margin:3px 3px 8px;gap:12px}
+.trust-chip{height:45px;font-size:13px}
+.trust-chip i{width:27px;height:27px;font-size:16px}
+.payment-customer{min-height:108px;padding:10px 18px!important}
+.payment-customer img,.payment-avatar{width:86px!important;height:86px!important;border-radius:17px!important}
+.customer-main>b{font-size:22px}
+.phone-line{font-size:15px;margin:6px 0 4px}
+.type-pill{font-size:12px;padding:4px 11px}
+.customer-arrow{font-size:37px}
+.payment-detail{margin-top:8px!important}
+.payment-detail div{padding:10px 22px!important}
+.payment-detail span{font-size:11px}
+.payment-detail b{font-size:17px}
+.payment-amount{min-height:94px;margin:8px 0!important;gap:16px;padding:9px!important}
+.rupee-icon{width:61px;height:61px;font-size:33px;box-shadow:inset 0 0 0 7px #bff4df}
+.payment-amount small{font-size:13px}
+.payment-amount b{font-size:41px}
+.payment-amount .hint{font-size:12px}
+.payment-upi{margin:8px 0!important;padding:10px 15px 11px!important}
+.payment-upi .upi-title{font-size:17px;gap:14px;margin-bottom:5px}
+.upi-title .line{width:42px}
+.payment-upi .qr-zone{min-height:174px;display:grid;place-items:center}
+.payment-upi .qr{padding:5px!important;margin:0 auto 6px!important;border-radius:12px!important}
+.payment-upi .qr canvas,.payment-upi .qr img{width:165px!important;height:165px!important}
+.upi-id-row{height:51px}
+.upi-id-row b{font-size:14px}
+.copy-upi{height:38px}
+.pay-steps{margin:8px 0!important;padding:9px 13px}
+.payment-form{padding:9px 14px 8px}
+.utr-wrap{height:43px}
+.pay-cta{height:50px!important;font-size:14px!important}
+.payment-note{padding:7px 12px!important;font-size:10px!important}
 
+/* QR lightbox: no second white QR box; the payment panel itself visually enlarges. */
+.qr-lightbox{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:rgba(10,29,55,.68);backdrop-filter:blur(7px);opacity:0;transition:opacity .22s ease}
+.qr-lightbox.is-open{opacity:1}
+.qr-lightbox-content{width:min(92vw,520px);padding:18px 14px 16px;border-radius:20px;background:linear-gradient(120deg,#f5faff,#f0f7ff);transform-origin:center;transform:translate3d(0,0,0) scale(.42);opacity:.25;transition:transform .34s cubic-bezier(.16,1,.3,1),opacity .24s ease;box-shadow:0 22px 70px rgba(0,0,0,.28);border:1px solid #c9dceb}
+.qr-lightbox.is-open .qr-lightbox-content{transform:scale(1);opacity:1}
+.qr-lightbox-title{display:flex;align-items:center;justify-content:center;gap:16px;color:#103c78;font-weight:800;font-size:clamp(17px,4.5vw,25px);line-height:1.1;text-align:center;margin-bottom:10px}
+.qr-lightbox-title .line{display:block;width:clamp(28px,8vw,55px);height:2px;background:#9bc6e8;flex:0 0 auto}
+.qr-lightbox-qr{width:max-content;margin:auto;padding:7px;border:3px solid #34b883;border-radius:16px;background:transparent;display:grid;place-items:center}
+.qr-lightbox-qr canvas,.qr-lightbox-qr img{display:block;width:min(68vw,360px)!important;height:min(68vw,360px)!important}
+.qr-lightbox-hint{text-align:center;color:#66809c;font-size:11px;margin-top:9px}
+.qr-viewing{overflow:hidden}
+
+/* Submit loader lives exactly where the QR was. */
+.payment-submit-loader{min-height:174px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#164777;gap:7px}
+.submit-ring{position:relative;width:64px;height:64px;border-radius:50%;border:4px solid #cfe4f5;border-top-color:#11a86d;border-right-color:#2d78dc;animation:paymentRingSpin .8s linear infinite;display:grid;place-items:center;margin-bottom:2px}
+.submit-ring:after{content:'₹';width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#e9fff6;color:#07905d;font-weight:900;font-size:18px}
+.submit-ring span{display:none}
+.payment-submit-loader strong{font-size:15px;color:#123e70}
+.payment-submit-loader small{font-size:11px;color:#7188a0}
+.pay-cta.is-submitting{opacity:.88;pointer-events:none}
+.submit-btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;vertical-align:-2px;margin-right:7px;animation:paymentRingSpin .65s linear infinite}
+@keyframes paymentRingSpin{to{transform:rotate(360deg)}}
+
+@media(max-width:700px){
+ .customer-page{padding:3px 6px}
+ .pay-brand{min-height:74px;padding:8px 10px 7px 78px;border-radius:12px}
+ .pay-brand .brand-logo{left:12px;top:9px;width:56px;height:56px;border-radius:14px;font-size:22px}
+ .pay-brand h2{font-size:19px!important;margin:2px 0 0!important}
+ .pay-brand .hint{font-size:8px}
+ .pay-brand .hint:after{display:none}
+ .pay-brand:before{right:12px;top:24px;width:22px;height:22px;font-size:11px}
+ .payment-layout{padding-top:3px}
+ .pay-trust{gap:4px;margin:2px 1px 5px}
+ .trust-chip{height:31px;font-size:8px;gap:3px}
+ .trust-chip i{width:17px;height:17px;font-size:10px;box-shadow:inset 0 0 0 2px #e8fff4}
+ .payment-customer{min-height:72px;padding:5px 7px!important}
+ .payment-customer img,.payment-avatar{width:56px!important;height:56px!important;border-radius:11px!important}
+ .customer-main>b{font-size:13px}
+ .phone-line{font-size:9px;margin:2px 0 3px}
+ .type-pill{font-size:7px;padding:2px 7px}
+ .customer-arrow{font-size:25px}
+ .payment-detail{margin-top:4px!important}
+ .payment-detail div{padding:6px 9px!important}
+ .payment-detail span{font-size:7px}
+ .payment-detail b{font-size:10px}
+ .payment-amount{min-height:65px;margin:4px 0!important;gap:8px}
+ .rupee-icon{width:43px;height:43px;font-size:22px;box-shadow:inset 0 0 0 4px #bff4df}
+ .payment-amount small{font-size:8px}
+ .payment-amount b{font-size:25px}
+ .payment-amount .hint{font-size:7px}
+ .payment-upi{margin:4px 0!important;padding:6px 7px 7px!important}
+ .payment-upi .upi-title{font-size:11px;gap:7px;margin-bottom:3px}
+ .upi-title .line{width:27px}
+ .payment-upi .qr-zone{min-height:145px}
+ .payment-upi .qr{padding:3px!important;margin:0 auto 4px!important;border-radius:8px!important}
+ .payment-upi .qr canvas,.payment-upi .qr img{width:132px!important;height:132px!important}
+ .upi-id-row{height:37px;gap:5px;padding:3px 4px 3px 6px}
+ .upi-mark{width:24px;height:24px;font-size:14px}
+ .upi-id-row span{font-size:6px}
+ .upi-id-row b{font-size:9px}
+ .copy-upi{height:29px;padding:0 8px;font-size:8px}
+ .pay-steps{margin:4px 0!important;padding:6px 5px;border-radius:11px}
+ .pay-step b{width:23px;height:23px;font-size:10px}
+ .pay-step strong{font-size:8px}
+ .pay-step span{font-size:5.5px}
+ .pay-steps em{font-size:16px}
+ .payment-form{padding:6px 7px 5px;border-radius:11px}
+ .payment-form .field label{font-size:8px}
+ .payment-form .field label small{font-size:6px}
+ .utr-wrap{height:34px;margin-top:2px}
+ .utr-wrap>span{padding:0 7px;font-size:9px}
+ .utr-wrap input{font-size:9px}
+ .payment-form .pay-status{min-height:11px;font-size:7px}
+ .pay-cta{height:36px!important;font-size:9px!important}
+ .pay-cta span{font-size:13px}.pay-cta b{font-size:17px}
+ .payment-note{padding:5px 7px!important;font-size:6.5px!important}
+ .payment-note>span{font-size:16px}
+ .payment-footer{font-size:6.5px!important;padding:3px 1px 0!important}
+ .payment-footer span{width:25px}
+ .payment-submit-loader{min-height:145px}
+ .submit-ring{width:52px;height:52px}
+ .submit-ring:after{width:28px;height:28px;font-size:15px}
+ .payment-submit-loader strong{font-size:12px}
+ .payment-submit-loader small{font-size:8px}
+ .qr-lightbox-content{width:92vw;padding:14px 9px 11px;border-radius:17px}
+ .qr-lightbox-title{font-size:15px;gap:8px;margin-bottom:7px}
+ .qr-lightbox-qr{padding:5px;border-width:2px;border-radius:12px}
+ .qr-lightbox-qr canvas,.qr-lightbox-qr img{width:min(76vw,330px)!important;height:min(76vw,330px)!important}
+ .qr-lightbox-hint{font-size:8px;margin-top:6px}
+}
+</style></head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <img src="https://i.ibb.co/TBzgsbMS/TS-logo-with-vibrant-gradients.jpg" alt="Tech Source logo">
-    <span>Tech Source Payment</span>
-  </div>
-</header>
+<div id="root"></div><div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyDm3NcIjnLestNntscRXbeChvEwwqxkg8E",authDomain:"zoprint-c4891.firebaseapp.com",databaseURL:"https://zoprint-c4891-default-rtdb.firebaseio.com",projectId:"zoprint-c4891",storageBucket:"zoprint-c4891.firebasestorage.app",messagingSenderId:"944996490044",appId:"1:944996490044:web:ccfc3cfacc4acd04d45c39",measurementId:"G-CVWYCKMN01"};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore(),auth=firebase.auth(),FS=firebase.firestore.FieldValue;
+const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const textValue=v=>{if(v&&typeof v==='object'&&'value' in v)return String(v.value??'');return String(v??'')};
+const money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>e.classList.remove('show'),2600)}
+function date(v){if(!v)return '—';const d=v.toDate?v.toDate():new Date(v);return isNaN(d)?'—':d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}
+function status(v){let s=String(v||'pending').toLowerCase();let c=s.includes('paid')?'paid':s.includes('reject')?'rejected':s.includes('expire')?'expired':s.includes('submit')?'submitted':'pending';return `<span class="badge ${c}">${esc(v||'pending')}</span>`}
+function nameOf(a){return String(a.name||[a.firstName,a.middleName,a.lastName].filter(Boolean).join(' ')||'Customer').trim()}
+function typeOf(a){return String(a.applicationType||a.serviceType||'New PAN')}
+function photoOf(a){return String(a.photo||a.photoUrl||a.photoURL||'')}
+function phoneOf(a){return String(a.phone||a.mobile||'')}
+function ackOf(a){return String(a.ackNo||a.acknowledgementNo||a.acknowledgement||'')}
+function waNumber(n){n=String(n||'').replace(/\D/g,'');return n.length===10?'91'+n:n}
+function baseUrl(){return location.origin+location.pathname}
+function linkUrl(id){return baseUrl()+'?pay='+encodeURIComponent(id)}
+function randId(prefix){return prefix+'-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,8).toUpperCase()}
 
-<main class="page">
-  <section class="payment-shell">
-    <aside class="summary" aria-label="Payment summary">
-      <div class="summary-content">
-        <div class="secure-label"><span class="secure-dot"></span> Secure UPI Payment</div>
-        <h1>Complete your PAN payment safely.</h1>
-        <p class="summary-text">Pay the exact amount using UPI, then submit your transaction ID and payment screenshot for verification.</p>
-      </div>
+let historySearchTerm='',admin=null,apps=[],links=[],attempts=[],settings={businessName:'TECH SOURCE',upiId:'9661905351-3@axl',whatsapp:'9661905351'};let unsub=[];let activeSection='dashboard';
+const q=new URLSearchParams(location.search),payId=q.get('pay');
 
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Service</div>
-          <div class="info-value">PAN Payment</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Amount</div>
-          <div class="info-value">INR 190</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Status</div>
-          <div class="info-value">Verification Pending</div>
-        </div>
-      </div>
-    </aside>
+function loginView(msg=''){root.innerHTML=`<div class="login"><div class="login-card"><div class="brand"><div class="brand-logo">TS</div><div><b>TECH SOURCE</b><span>PAYMENT CENTER</span></div></div><h1>Admin Login</h1><p>Only authorized administrators can access the payment management panel.</p><form id="loginForm"><div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="username"></div><div class="field"><label>Password</label><input id="loginPass" type="password" required autocomplete="current-password"></div><button class="btn primary" style="width:100%">Secure Login</button><div id="loginMsg" class="hint" style="margin-top:10px;color:#dc2626">${esc(msg)}</div></form></div></div>`;$('#loginForm').onsubmit=async e=>{e.preventDefault();$('#loginMsg').textContent='Checking access…';try{await auth.signInWithEmailAndPassword($('#loginEmail').value.trim(),$('#loginPass').value)}catch(x){$('#loginMsg').textContent=x.message.replace('Firebase:','').trim()}}}
+function isAdminUser(u){return db.collection('users').doc(u.uid).get().then(s=>{const d=s.exists?s.data():{};return d.role==='admin'||d.isAdmin===true||d.admin===true})}
 
-    <section class="card" aria-label="Payment form">
-      <div class="card-header">
-        <div>
-          <h2>PAN Payment</h2>
-          <p class="ack" id="ackText">Ack No: Loading</p>
-        </div>
-        <div class="badge">UPI</div>
-      </div>
+function shell(){root.innerHTML=`<aside class="side" id="side"><div class="brand"><div class="brand-logo">TS</div><div><b>TECH SOURCE</b><span>PAYMENT CENTER</span></div></div><nav class="nav"><button data-sec="dashboard">▦ Dashboard <span id="navPending">0</span></button><button data-sec="history">▤ Application History</button><button data-sec="links">↗ Payment Links</button><button data-sec="manual">＋ Manual Create Link</button><button data-sec="requests">◷ Pending Requests <span id="navReq">0</span></button><button data-sec="settings">⚙ Settings</button></nav><div class="side-foot"><button id="logout" class="btn ghost" style="width:100%">Logout</button></div></aside><main class="main"><header class="top"><div style="display:flex;gap:10px;align-items:center"><button id="menu" class="menu">☰</button><div><h1 id="title">Dashboard</h1><small id="updated">Live Firebase data</small></div></div><button id="refresh" class="btn ghost">↻ Refresh</button></header><section id="dashboard" class="section active"></section><section id="history" class="section"></section><section id="links" class="section"></section><section id="manual" class="section"></section><section id="requests" class="section"></section><section id="settings" class="section"></section></main>`;document.querySelectorAll('[data-sec]').forEach(b=>b.onclick=()=>go(b.dataset.sec));$('#menu').onclick=()=>$('#side').classList.toggle('open');$('#logout').onclick=()=>auth.signOut();$('#refresh').onclick=()=>loadData(true);}
+function go(id){activeSection=id;document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+id).classList.add('active');document.querySelectorAll('[data-sec]').forEach(x=>x.classList.toggle('active',x.dataset.sec===id));$('#title').textContent={dashboard:'Dashboard',history:'Application History',links:'Payment Links',manual:'Manual Create Link',requests:'Pending Requests',settings:'Settings'}[id];$('#side').classList.remove('open');renderAll()}
 
-      <div class="amount-box">
-        <div class="amount-label">Payable Amount</div>
-        <div class="amount">&#8377;190</div>
-      </div>
-
-      <button class="btn pay" id="payBtn" type="button" onclick="payNow()">Pay via UPI</button>
-
-      <div class="upi-row">
-        <div>
-          <span>UPI ID</span>
-          <b id="upi">7781826687@ybl</b>
-        </div>
-      </div>
-      <button class="btn copy" type="button" onclick="copyUPI()">Copy UPI ID</button>
-
-      <div class="qr-wrap">
-        <img id="qr" alt="UPI payment QR code">
-      </div>
-
-      <div class="form-field">
-        <label for="txnId">Transaction ID</label>
-        <input type="text" id="txnId" placeholder="Enter UPI transaction ID" autocomplete="off">
-      </div>
-
-      <div class="form-field">
-        <label for="screenshot">Payment Screenshot</label>
-        <input type="file" id="screenshot" accept="image/*">
-      </div>
-
-      <button class="btn done" id="submitBtn" type="button" onclick="submitPayment()">Submit Payment</button>
-
-      <div id="status" class="status">Status: Pending</div>
-
-      <div class="note">After payment, enter the transaction ID and upload the screenshot.</div>
-    </section>
-  </section>
-</main>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDZ-NvSzXJrH8YyvI5GWVWRtZnSNe0NAxU",
-  authDomain: "tech-source-bill.firebaseapp.com",
-  databaseURL: "https://tech-source-bill-default-rtdb.firebaseio.com",
-  projectId: "tech-source-bill",
-  storageBucket: "tech-source-bill.firebasestorage.app",
-  messagingSenderId: "690209240188",
-  appId: "1:690209240188:web:6e54de365e7f839634c5f9"
-};
-
-const UPI_ID = "7781826687@ybl";
-const PAYEE_NAME = "TechSource";
-const AMOUNT = "190";
-const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
-const params = new URLSearchParams(window.location.search);
-const ack = (params.get("ack") || "").trim();
-const statusBox = document.getElementById("status");
-const submitBtn = document.getElementById("submitBtn");
-const payBtn = document.getElementById("payBtn");
-
-document.getElementById("ackText").innerText = ack ? "Ack No: " + ack : "Ack No: Not Available";
-
-function setStatus(message, type = "") {
-  statusBox.innerText = message;
-  statusBox.className = "status";
-  if (type) statusBox.classList.add(type);
+async function loadSettings(){try{const s=await db.collection('serviceSettings').doc('pan').get();if(s.exists){const d=s.data();settings={...settings,businessName:d.businessName||settings.businessName,upiId:d.upiId||settings.upiId,whatsapp:d.whatsapp||settings.whatsapp}}}catch(e){}}
+async function getApplicationsCompat(){
+  // Read the complete legacy collection without orderBy/where. Older records
+  // may not contain createdAt, userId, email, or other newer fields.
+  const s=await db.collection('applications').get();
+  console.info('Legacy applications loaded:', s.size);
+  return s.docs;
+}
+function sortDocsNewest(docs){
+  const value=d=>{const x=d.data()||{};const t=x.createdAt||x.updatedAt||x.date||x.submittedAt||x.appliedAt||0;if(t&&typeof t.toDate==='function')return t.toDate().getTime();if(t&&t.seconds)return Number(t.seconds)*1000;const n=Date.parse(String(t));return Number.isFinite(n)?n:0};
+  return [...docs].sort((a,b)=>value(b)-value(a));
+}
+async function loadData(force=false){
+  await loadSettings();
+  const [adocs,ls,ats]=await Promise.all([
+    getApplicationsCompat(),
+    db.collection('customerPaymentRequests').orderBy('createdAt','desc').get().catch(()=>({docs:[]})),
+    db.collection('paymentAttempts').orderBy('createdAt','desc').limit(1000).get().catch(()=>({docs:[]}))
+  ]);
+  apps=sortDocsNewest(adocs).map(d=>({id:d.id,...d.data()}));
+  links=ls.docs.map(d=>({id:d.id,...d.data()}));
+  attempts=ats.docs.map(d=>({id:d.id,...d.data()}));
+  $('#updated').textContent='Updated '+new Date().toLocaleTimeString('en-IN');
+  renderAll();
 }
 
-function buildUpiLink() {
-  const upiParams = new URLSearchParams({
-    pa: UPI_ID,
-    pn: PAYEE_NAME,
-    am: AMOUNT,
-    cu: "INR",
-    tn: `PAN-${ack || "NA"}`
-  });
-  return `upi://pay?${upiParams.toString()}`;
+function subscribe(){
+  unsub.forEach(f=>f&&f());unsub=[];
+  // Do not use orderBy(createdAt) for the old applications collection: legacy records can lack that field.
+  unsub.push(db.collection('applications').onSnapshot(s=>{apps=sortDocsNewest(s.docs).map(d=>({id:d.id,...d.data()}));renderAll()},e=>{console.error('Applications listener:',e);toast('Applications load failed: '+(e.message||e))}));
+  unsub.push(db.collection('customerPaymentRequests').orderBy('createdAt','desc').onSnapshot(s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},()=>{}));
+  unsub.push(db.collection('paymentAttempts').orderBy('createdAt','desc').limit(1000).onSnapshot(s=>{attempts=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},()=>{}));
+}
+function renderAll(){if(!admin)return;renderDashboard();renderHistory();renderLinks();renderManual();renderRequests();renderSettings();document.querySelectorAll('[data-sec]').forEach(x=>x.classList.toggle('active',x.dataset.sec===activeSection));const p=links.filter(x=>!['paid'].includes(String(x.status||'').toLowerCase())&&(!x.expiresAt||new Date(x.expiresAt).getTime()>Date.now())).length;const r=attempts.filter(x=>String(x.status).toLowerCase()==='verification_pending').length;$('#navPending').textContent=p;$('#navReq').textContent=r}
+function toDateObj(v){if(!v)return null;try{const d=v.toDate?v.toDate():new Date(v.seconds?Number(v.seconds)*1000:v);return isNaN(d.getTime())?null:d}catch(e){return null}}
+function currentAttempt(l){return attempts.find(a=>a.id===l.currentAttemptId)||attempts.filter(a=>a.linkId===l.id).sort((a,b)=>(toDateObj(b.createdAt)?.getTime()||0)-(toDateObj(a.createdAt)?.getTime()||0))[0]}
+function renderDashboard(){
+ const paid=attempts.filter(a=>String(a.status||'').toLowerCase()==='paid');
+ const pending=attempts.filter(a=>['verification_pending','customer_marked_paid','submitted'].includes(String(a.status||'').toLowerCase()));
+ const rejected=attempts.filter(a=>String(a.status||'').toLowerCase()==='rejected');
+ const created=links.length, expired=links.filter(l=>isExpired(l)).length;
+ const now=new Date(), today=now.toDateString(), month=now.getMonth(), year=now.getFullYear();
+ const verifiedAmount=paid.reduce((n,a)=>n+Number(a.amount||0),0);
+ const todayPaid=paid.filter(a=>{const d=toDateObj(a.verifiedAt||a.createdAt);return d&&d.toDateString()===today});
+ const monthPaid=paid.filter(a=>{const d=toDateObj(a.verifiedAt||a.createdAt);return d&&d.getMonth()===month&&d.getFullYear()===year});
+ const todayAmt=todayPaid.reduce((n,a)=>n+Number(a.amount||0),0),monthAmt=monthPaid.reduce((n,a)=>n+Number(a.amount||0),0);
+const statTarget=target=>target==='paidlinks'?"window.linkFilter='complete';go('links')":target==='alllinks'?"window.linkFilter='all';go('links')":`go('${target}')`;
+ const stat=(icon,label,value,target)=>`<div class="stat" onclick="${statTarget(target)}"><div class="ico">${icon}</div><small>${label}</small><b>${value}</b><div class="hint" style="margin-top:6px">Tap to open →</div></div>`;
+ $('#dashboard').innerHTML=`<div class="cards">
+ ${stat('↗','Payment Links Created',created,'links')}${stat('◷','Payment Pending',pending.length,'requests')}${stat('✓','Successfully Paid',paid.length,'paidlinks')}${stat('₹','Verified Collection',money(verifiedAmount),'requests')}
+ ${stat('⌛','Active Links',Math.max(0,created-expired),'links')}${stat('×','Expired Links',expired,'links')}${stat('!','Pending Amount',money(pending.reduce((n,a)=>n+Number(a.amount||0),0)),'requests')}${stat('☀','Today Verified',money(todayAmt),'paidlinks')}
+ </div>
+ <div class="analytics-strip"><div class="mini-stat"><small>Today Payments</small><b>${todayPaid.length}</b></div><div class="mini-stat"><small>Today Collection</small><b>${money(todayAmt)}</b></div><div class="mini-stat"><small>This Month</small><b>${money(monthAmt)}</b></div><div class="mini-stat"><small>Rejected Attempts</small><b>${rejected.length}</b></div></div>
+ <div class="quick-nav">
+   <div class="qcard" onclick="go('history')"><span>📄</span><b>Application History</b><span>${apps.length} old PAN applications</span></div>
+   <div class="qcard" onclick="go('links')"><span>🔗</span><b>Payment Links</b><span>${links.length} links created</span></div>
+   <div class="qcard" onclick="go('requests')"><span>🔔</span><b>Pending Requests</b><span>${pending.length} waiting for review</span></div>
+   <div class="qcard" onclick="go('manual')"><span>＋</span><b>Manual Create Link</b><span>Create a payment link directly</span></div>
+ </div>
+ <div class="grid2"><div class="panel"><div class="panel-head"><h3>Latest Payment Requests</h3><button class="btn soft" onclick="go('requests')">View all →</button></div>${pending.slice(0,7).map(a=>attemptRow(a)).join('')||'<div class="empty">No pending payment requests.</div>'}</div><div class="panel"><div class="panel-head"><h3>Recently Created Links</h3><button class="btn soft" onclick="go('links')">View all →</button></div>${links.slice(0,7).map(l=>linkRow(l)).join('')||'<div class="empty">No payment links yet.</div>'}</div></div>`;
+}
+function attemptRow(a){return `<div style="padding:13px 18px;border-bottom:1px solid #edf0f4;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b>${esc(a.name||'Customer')}</b><div class="hint">${esc(a.ackNo||a.applicationId||'Manual')} • ${money(a.amount)} • ${date(a.createdAt)}</div></div>${status(a.status)}</div>`}
+function linkRow(l){return `<div style="padding:13px 18px;border-bottom:1px solid #edf0f4;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b>${esc(l.name||'Customer')}</b><div class="hint">${esc(l.applicationType||'Manual')} • ${money(l.amount)} • ${isExpired(l)?'Expired':countdownText(l)}</div></div><button class="btn soft" onclick="openLink('${l.id}')">Open</button></div>`}
+function isExpired(l){return !!l.expiresAt&&new Date(l.expiresAt).getTime()<=Date.now()}
+function countdownText(l){if(!l.expiresAt)return 'No expiry';const sec=Math.max(0,Math.floor((new Date(l.expiresAt).getTime()-Date.now())/1000));return sec+'s left'}
+
+function renderHistory(){
+  const term=textValue(historySearchTerm).trim().toLowerCase();
+  const list=apps.filter(a=>!term||[ackOf(a),nameOf(a),phoneOf(a),typeOf(a),a.status,a.paymentStatus,a.applicationId,a.id].some(v=>String(v??'').toLowerCase().includes(term)));
+  $('#history').innerHTML=`<div class="panel">
+    <div class="panel-head">
+      <div><h3>Old PAN Application History</h3><div class="hint">All records from the existing <b>applications</b> collection — pending, completed, rejected, paid and every other status.</div></div>
+      <div class="history-tools"><span class="history-count">${list.length} / ${apps.length} Applications</span><input id="histSearch" placeholder="🔎  Search name, mobile, ACK or status" value="${esc(textValue(term))}"><button class="btn soft" onclick="historySearchTerm='';renderHistory()">✕ Clear</button></div>
+    </div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Applicant</th><th>ACK</th><th>Application</th><th>Mobile</th><th>Created</th><th>Payment</th><th>Action</th></tr></thead><tbody>
+    ${list.map(a=>`<tr><td><div class="person">${photoOf(a)?`<img class="avatar" src="${esc(photoOf(a))}">`:'<div class="avatar"></div>'}<div><b>${esc(nameOf(a))}</b><small>${esc(a.dob||'')}</small></div></div></td><td><b>${esc(ackOf(a)||'—')}</b></td><td>${esc(typeOf(a))}<small style="display:block;color:#94a3b8">${esc(a.status||'pending')}</small></td><td>${esc(phoneOf(a)||'—')}</td><td>${date(a.createdAt||a.updatedAt||a.date||a.submittedAt||a.appliedAt)}</td><td>${status(a.paymentStatus||'pending')}</td><td>${String(a.paymentStatus||'').toLowerCase()==='paid'?`<button class="btn soft" onclick="viewApplicationPayment('${a.id}')">View Details</button>`:`<button class="btn primary" onclick="openCreateForApp('${a.id}')">Create Payment Link</button>`}</td></tr>`).join('')||'<tr><td colspan="7" class="empty"><b>No matching applications.</b><br><span class="hint">All records from Firestore <b>applications</b> are loaded here.</span></td></tr>'}
+    </tbody></table></div></div>`;
+  $('#histSearch').oninput=e=>{historySearchTerm=textValue(e.target);renderHistory()};
+}
+function renderLinks(){let term=textValue(window.linkSearch).trim(),filter=textValue(window.linkFilter||'pending');let list=links.filter(l=>{const t=[l.name,l.phone,l.ackNo,l.applicationId,l.id].join(' ').toLowerCase();let ok=!term||t.includes(term.toLowerCase());let s=String(l.status||'pending').toLowerCase();if(filter==='pending')ok=ok&&!['paid','expired'].includes(s)&&!isExpired(l);if(filter==='complete')ok=ok&&(s==='paid');if(filter==='expired')ok=ok||(s==='expired'||isExpired(l));return ok});list.sort((a,b)=>{const pa=a.status==='paid',pb=b.status==='paid';return pa-pb||new Date(b.createdAt||0)-new Date(a.createdAt||0)});$('#links').innerHTML=`<div class="panel"><div class="panel-head"><div><h3>Payment Links</h3><div class="hint">Pending/active links stay above completed links.</div></div><div class="toolbar"><button class="btn primary" onclick="go('manual')">＋ New Link</button><input id="linkSearch" placeholder="Name / Number / ACK" value="${esc(textValue(term))}"><select id="linkFilter"><option value="pending" ${filter==='pending'?'selected':''}>Pending / Active</option><option value="complete" ${filter==='complete'?'selected':''}>Complete</option><option value="expired" ${filter==='expired'?'selected':''}>Expired</option><option value="all" ${filter==='all'?'selected':''}>All</option></select></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Customer</th><th>ACK / ID</th><th>Amount</th><th>UTR</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead><tbody>${list.map(l=>{const at=currentAttempt(l);return `<tr><td><div class="person">${l.photo?`<img class="avatar" src="${esc(l.photo)}">`:'<div class="avatar"></div>'}<div><b>${esc(l.name||'Customer')}</b><small>${esc(l.phone||'')}</small></div></div></td><td>${esc(l.ackNo||l.applicationId||'Manual')}<small style="display:block;color:#94a3b8">${esc(l.id)}</small></td><td><b>${money(l.amount)}</b></td><td>${esc(at?.utr||'—')}</td><td>${l.expiresAt?`<span class="countdown" data-exp="${esc(l.expiresAt)}"></span>`:'No expiry'}</td><td>${status(isExpired(l)&&String(at?.status||l.status||'pending').toLowerCase()!=='paid'?'expired':(at?.status||l.status||'pending'))}</td><td><div class="actions"><button class="link-action-btn" aria-label="Payment link actions" title="More actions" onclick="openLinkActions('${l.id}')">⋮</button></div></td></tr>`}).join('')||'<tr><td colspan="7" class="empty">No payment links found.</td></tr>'}</tbody></table></div></div>`;$('#linkSearch').oninput=e=>{window.linkSearch=textValue(e.target);renderLinks()};$('#linkFilter').onchange=e=>{window.linkFilter=textValue(e.target);renderLinks()};tickCountdowns()}
+function tickCountdowns(){clearInterval(window._cd);window._cd=setInterval(()=>document.querySelectorAll('[data-exp]').forEach(e=>{const s=Math.max(0,Math.floor((new Date(e.dataset.exp).getTime()-Date.now())/1000));e.textContent=s<=0?'Expired':s+'s left'}),1000)}
+
+function renderManual(){window.manualPhotoFile=null;if(!window.manualReady){window.manualReady=true}$('#manual').innerHTML=`<div class="panel"><div class="panel-head"><div><h3>Manual Create Payment Link</h3><div class="hint">Create a link even when there is no PAN application record.</div></div></div><div class="settings-box"><div class="grid2"><div><div class="field"><label>Customer Name</label><input id="mName" placeholder="Customer name"></div><div class="field"><label>Mobile Number</label><input id="mPhone" inputmode="numeric" placeholder="10 digit mobile"></div><div class="field"><label>ACK / Application ID (optional)</label><input id="mAck" placeholder="ACK or application ID"></div></div><div><div class="field"><label>Application Type</label><input id="mType" value="PAN Service"></div><div class="field"><label>Amount</label><input id="mAmount" type="number" min="1" placeholder="Enter amount"></div><div class="field"><label>Customer Photo (optional)</label><input id="mPhoto" type="file" accept="image/jpeg,image/png,image/webp"><div id="mPhotoState"></div></div></div></div><div class="field"><label>UTR</label><div class="radio-row"><label class="radio"><input type="radio" name="mUtr" value="required" checked> Required</label><label class="radio"><input type="radio" name="mUtr" value="optional"> Optional</label><label class="radio"><input type="radio" name="mUtr" value="none"> Not needed</label></div></div><div class="field"><label>Link Expiry</label><select id="mExpiry"><option value="0">No expiry</option><option value="60">1 minute</option><option value="300">5 minutes</option><option value="600">10 minutes</option><option value="1800">30 minutes</option><option value="3600">1 hour</option><option value="86400">24 hours</option><option value="custom">Custom minutes…</option></select><div id="mCustomExpiry" class="custom-expiry"><input id="mExpiryMinutes" type="number" min="1" step="1" placeholder="Enter expiry minutes, e.g. 45"></div></div><div class="actions"><button class="btn primary" id="mCreate">Create Payment Link</button><button class="btn soft" onclick="go('history')">← Application History</button><button class="btn ghost" onclick="go('links')">View Links →</button></div><div id="mResult"></div></div></div>`;$('#mExpiry').onchange=()=>$('#mCustomExpiry').classList.toggle('show',$('#mExpiry').value==='custom');$('#mPhoto').onchange=async()=>{const f=$('#mPhoto').files[0];if(!f)return;$('#mPhotoState').innerHTML='<div class="upload-state"><i class="mini-spin"></i> Opening crop…</div>';const picked=await chooseManualPhoto(f);window.manualPhotoFile=picked||null;$('#mPhotoState').innerHTML=picked?'<div class="photo-preview-chip"><span>✓ Photo ready for upload</span></div>':'<div class="hint">Photo selection cancelled.</div>'};$('#mCreate').onclick=createManualLink}
+let photoCropper=null,photoCropResolve=null,photoCropReject=null;
+function openPhotoCrop(file,onDone){
+ const url=URL.createObjectURL(file);$('#photoCropModal')?.remove();
+ const d=document.createElement('div');d.id='photoCropModal';d.className='modal';d.innerHTML=`<div class="modal-card crop-modal-card"><div class="modal-head"><div><h2>Crop Customer Photo</h2><div class="hint">Crop karke Upload karein, ya Skip karke original photo use karein.</div></div><button class="close" id="cropClose2">×</button></div><div class="crop-area"><img id="cropImage2" class="crop-image" src="${url}" alt="Crop photo"></div><div id="cropUploadState"></div><div class="crop-actions"><button class="btn ghost" id="cropSkip2">Skip</button><button class="btn primary" id="cropDo2">Crop & Use Photo</button></div></div>`;document.body.appendChild(d);
+ const img=$('#cropImage2');photoCropper=new Cropper(img,{viewMode:1,dragMode:'move',autoCropArea:.9,background:false,responsive:true});
+ const close=()=>{photoCropper?.destroy();photoCropper=null;URL.revokeObjectURL(url);d.remove()};
+ $('#cropClose2').onclick=()=>{close();onDone(null,true)};
+ $('#cropSkip2').onclick=()=>{close();onDone(file,false)};
+ $('#cropDo2').onclick=()=>{const state=$('#cropUploadState');state.innerHTML='<div class="upload-state"><i class="mini-spin"></i> Preparing cropped photo…</div>';$('#cropDo2').disabled=true;photoCropper.getCroppedCanvas({maxWidth:1200,maxHeight:1200,imageSmoothingQuality:'high'}).toBlob(blob=>{if(!blob){state.innerHTML='<div class="upload-state" style="color:#dc2626">Crop failed</div>';$('#cropDo2').disabled=false;return}const cropped=new File([blob],file.name.replace(/\.[^.]+$/,'')+'_cropped.jpg',{type:'image/jpeg'});close();onDone(cropped,false)},'image/jpeg',.9)};
+ d.onclick=e=>{if(e.target===d){close();onDone(null,true)}};
+}
+function chooseManualPhoto(file){return new Promise(resolve=>openPhotoCrop(file,(f,cancelled)=>resolve(cancelled?null:f)))}
+async function uploadPhoto(file){if(!file)return '';const fd=new FormData();fd.append('file',file);fd.append('upload_preset','ml_default');fd.append('folder','payment_customers');const r=await fetch('https://api.cloudinary.com/v1_1/dsnuatuc8/image/upload',{method:'POST',body:fd});const d=await r.json();if(!r.ok||!d.secure_url)throw new Error(d.error?.message||'Photo upload failed');return d.secure_url}
+async function createManualLink(){
+ const name=$('#mName').value.trim(),phone=$('#mPhone').value.trim(),ack=$('#mAck').value.trim(),type=$('#mType').value.trim()||'PAN Service',amount=Number($('#mAmount').value),utr=document.querySelector('input[name="mUtr"]:checked').value;
+ let exp=Number($('#mExpiry').value);if($('#mExpiry').value==='custom'){const mins=Number($('#mExpiryMinutes').value);if(!Number.isFinite(mins)||mins<=0)return toast('Valid expiry minutes enter karein');exp=Math.round(mins*60)}
+ if(!name||!phone||!amount||amount<=0)return toast('Name, mobile aur amount required hai');
+ const btn=$('#mCreate');btn.disabled=true;btn.classList.add('loading');btn.innerHTML='<span class="btn-loader"><i class="mini-spin"></i> Creating link…</span>';
+ try{
+   let photo='';const file=window.manualPhotoFile||null;
+   if(file){$('#mPhotoState').innerHTML='<div class="upload-state"><i class="mini-spin"></i> Uploading photo…</div>';photo=await uploadPhoto(file);$('#mPhotoState').innerHTML='<div class="photo-preview-chip"><img src="'+esc(photo)+'"><span>Photo uploaded successfully</span></div>';}
+   const id=randId('PAY');const data={linkId:id,name,phone,ackNo:ack,applicationId:ack||'',applicationType:type,amount:Math.round(amount),utrMode:utr,utrRequired:utr==='required',photo,status:'pending',source:'manual',createdAt:FS.serverTimestamp(),expiresAt:exp?new Date(Date.now()+exp*1000).toISOString():null,createdBy:admin.uid,createdByEmail:admin.email};await db.collection('customerPaymentRequests').doc(id).set(data);const url=linkUrl(id);$('#mResult').innerHTML=linkResult(url,id);toast('Payment link created');
+ }catch(e){toast(e.message||String(e))}finally{btn.disabled=false;btn.classList.remove('loading');btn.innerHTML='Create Payment Link'}
+}
+function linkResult(url,id){return `<div class="link-result"><b>Payment link ready</b><code id="newLink">${esc(url)}</code><div class="actions"><button class="btn soft" onclick="copyText('${esc(url)}')">Copy Link</button><button class="btn success" onclick="shareLink('${id}')">Send WhatsApp</button><button class="btn ghost" onclick="openLink('${id}')">Open</button></div></div>`}
+
+function openCreateForApp(id){const a=apps.find(x=>x.id===id);if(!a)return;showCreateModal({applicationId:a.id,ackNo:ackOf(a),name:nameOf(a),phone:phoneOf(a),photo:photoOf(a),applicationType:typeOf(a),email:a.email||'',defaultAmount:Number(a.paymentAmount||190)})}
+function showCreateModal(data){$('#modal')?.remove();const d=document.createElement('div');d.id='modal';d.className='modal';d.innerHTML=`<div class="modal-card"><div class="modal-head"><div><h2>Create Payment Link</h2><div class="hint">${esc(data.applicationType||'PAN Service')} • ${esc(data.ackNo||data.applicationId||'')}</div></div><button class="close" onclick="closeModal()">×</button></div><div class="customer" style="margin-top:15px">${data.photo?`<img src="${esc(data.photo)}">`:''}<div><b>${esc(data.name||'Customer')}</b><div class="hint">${esc(data.phone||'')}</div></div></div><div class="field"><label>Amount</label><input id="cAmount" type="number" value="${Number(data.defaultAmount||0)||''}" min="1"></div><div class="field"><label>UTR</label><div class="radio-row"><label class="radio"><input type="radio" name="cUtr" value="required" checked> Required</label><label class="radio"><input type="radio" name="cUtr" value="optional"> Optional</label><label class="radio"><input type="radio" name="cUtr" value="none"> Not needed</label></div></div><div class="field"><label>Link Expiry</label><select id="cExpiry"><option value="0">No expiry</option><option value="60">1 minute</option><option value="300">5 minutes</option><option value="600">10 minutes</option><option value="1800">30 minutes</option><option value="3600">1 hour</option><option value="86400">24 hours</option><option value="custom">Custom minutes…</option></select><div id="cCustomExpiry" class="custom-expiry"><input id="cExpiryMinutes" type="number" min="1" step="1" placeholder="Enter expiry minutes, e.g. 45"></div></div><button class="btn primary" id="cCreate" style="width:100%">Create Payment Link</button><div id="cResult"></div></div>`;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)closeModal()};$('#cExpiry').onchange=()=>$('#cCustomExpiry').classList.toggle('show',$('#cExpiry').value==='custom');$('#cCreate').onclick=()=>createAppLink(data)}
+function closeModal(){$('#modal')?.remove()}
+async function createAppLink(data){
+ const amount=Number($('#cAmount').value),utr=document.querySelector('input[name="cUtr"]:checked').value;
+ let exp=Number($('#cExpiry').value); if($('#cExpiry').value==='custom'){const mins=Number($('#cExpiryMinutes').value);if(!Number.isFinite(mins)||mins<=0)return toast('Valid expiry minutes enter karein');exp=Math.round(mins*60)}
+ if(!amount||amount<=0)return toast('Valid amount enter karein');
+ const btn=$('#cCreate');btn.disabled=true;btn.classList.add('loading');btn.innerHTML='<span class="btn-loader"><i class="mini-spin"></i> Creating link…</span>';
+ try{const id=randId('PAY');await db.collection('customerPaymentRequests').doc(id).set({linkId:id,...data,amount:Math.round(amount),utrMode:utr,utrRequired:utr==='required',status:'pending',paymentStatus:'pending',source:'application',createdAt:FS.serverTimestamp(),expiresAt:exp?new Date(Date.now()+exp*1000).toISOString():null,createdBy:admin.uid,createdByEmail:admin.email});if(data.applicationId)await db.collection('applications').doc(data.applicationId).update({customerPaymentRequestId:id,customerPaymentAmount:Math.round(amount),customerPaymentStatus:'pending',paymentStatus:'pending'}).catch(()=>{});$('#cResult').innerHTML=linkResult(linkUrl(id),id);toast('Payment link created');}
+ catch(e){toast(e.message||String(e))}finally{btn.disabled=false;btn.classList.remove('loading');btn.innerHTML='Create Payment Link'}
+}
+function closeLinkActions(){document.getElementById('linkActionModal')?.remove()}
+function openLinkActions(id){const l=links.find(x=>x.id===id);if(!l)return;const at=currentAttempt(l);const d=document.createElement('div');d.id='linkActionModal';d.className='modal';d.innerHTML=`<div class="modal-card"><div class="modal-head"><div><h2>Payment Link Actions</h2><div class="hint">${esc(l.name||'Customer')} • ${money(l.amount)}</div></div><button class="close" onclick="closeLinkActions()">×</button></div><div class="detail" style="margin-top:15px"><div><span>ACK / ID</span><b>${esc(l.ackNo||l.applicationId||l.id)}</b></div><div><span>Status</span><b>${esc(at?.status||l.status||'pending')}</b></div></div><div class="link-modal-grid"><button class="btn primary" onclick="closeLinkActions();openLink('${l.id}')">↗ Open Link</button><button class="btn soft" onclick="closeLinkActions();copyLink('${l.id}')">▣ Copy Link</button><button class="btn soft" onclick="openEditLink('${l.id}')">✎ Edit Link</button><button class="btn success" onclick="closeLinkActions();shareLink('${l.id}')">◉ WhatsApp</button>${at?.status==='rejected'?`<button class="btn soft" onclick="closeLinkActions();remind('${l.id}')">↻ Remind</button>`:''}<button class="btn danger-outline" onclick="confirmDeleteLink('${l.id}')">⌫ Delete Link</button></div><div class="hint" style="margin-top:14px">Deleting removes this payment link and its related payment attempts from Firestore.</div></div>`;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)closeLinkActions()}}
+function confirmDeleteLink(id){const l=links.find(x=>x.id===id);if(!l)return;closeLinkActions();const d=document.createElement('div');d.id='deleteLinkModal';d.className='modal';d.innerHTML=`<div class="modal-card"><div class="modal-head"><div><h2>Delete Payment Link?</h2><div class="hint">This action cannot be undone.</div></div><button class="close" onclick="document.getElementById('deleteLinkModal')?.remove()">×</button></div><div class="customer" style="margin-top:15px">${l.photo?`<img src="${esc(l.photo)}">`:''}<div><b>${esc(l.name||'Customer')}</b><div class="hint">${esc(l.ackNo||l.applicationId||l.id)} • ${money(l.amount)}</div></div></div><div class="confirm-note" style="margin-top:14px">To confirm deletion, type <b>DELETE</b> below. Related payment attempts will also be removed.</div><div class="field"><input id="deleteLinkConfirm" autocomplete="off" placeholder="Type DELETE"></div><div class="actions"><button class="btn ghost" style="flex:1" onclick="document.getElementById('deleteLinkModal')?.remove()">Cancel</button><button class="btn danger" style="flex:1" onclick="deletePaymentLink('${l.id}')">Delete Permanently</button></div></div>`;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.remove()}}
+async function deletePaymentLink(id){const input=$('#deleteLinkConfirm');if(!input||input.value.trim().toUpperCase()!=='DELETE')return toast('Please type DELETE to confirm');const l=links.find(x=>x.id===id);if(!l)return;try{const refs=[db.collection('customerPaymentRequests').doc(id)];const a=await db.collection('paymentAttempts').where('linkId','==',id).get();a.forEach(x=>refs.push(x.ref));const unique=[...new Map(refs.map(r=>[r.path,r])).values()];for(let i=0;i<unique.length;i+=450){const b=db.batch();unique.slice(i,i+450).forEach(r=>b.delete(r));await b.commit()}if(l.applicationId){await db.collection('applications').doc(l.applicationId).update({customerPaymentRequestId:FS.delete(),customerPaymentStatus:FS.delete()}).catch(()=>{})}document.getElementById('deleteLinkModal')?.remove();toast('Payment link deleted');await loadData(true)}catch(e){toast(e.message||'Delete failed')}}
+window.openLinkActions=openLinkActions;window.confirmDeleteLink=confirmDeleteLink;window.deletePaymentLink=deletePaymentLink;
+function closeEditLinkModal(){document.getElementById('editLinkModal')?.remove()}
+function openEditLink(id){
+ const l=links.find(x=>x.id===id);if(!l)return;
+ closeLinkActions();
+ const expVal=l.expiresAt?Math.max(1,Math.ceil((new Date(l.expiresAt).getTime()-Date.now())/60000)):0;
+ const d=document.createElement('div');d.id='editLinkModal';d.className='modal';
+ d.innerHTML=`<div class="modal-card"><div class="modal-head"><div><h2>Edit Payment Link</h2><div class="hint">Update the complete payment link details.</div></div><button class="close" onclick="closeEditLinkModal()">×</button></div>
+ <div class="edit-grid" style="margin-top:14px"><div class="field"><label>Customer Name</label><input id="eName" value="${esc(l.name||'')}"></div><div class="field"><label>Mobile Number</label><input id="ePhone" value="${esc(l.phone||'')}" inputmode="numeric"></div><div class="field"><label>ACK / Application ID</label><input id="eAck" value="${esc(l.ackNo||l.applicationId||'')}"></div><div class="field"><label>Application Type</label><input id="eType" value="${esc(l.applicationType||'PAN Service')}"></div><div class="field"><label>Amount</label><input id="eAmount" type="number" min="1" value="${Number(l.amount||0)}"></div><div class="field"><label>UTR Mode</label><select id="eUtr"><option value="required" ${l.utrMode==='required'?'selected':''}>Required</option><option value="optional" ${l.utrMode==='optional'?'selected':''}>Optional</option><option value="none" ${l.utrMode==='none'?'selected':''}>Not needed</option></select></div></div>
+ <div class="field"><label>Expiry</label><select id="eExpiry"><option value="0">No expiry</option><option value="1">1 minute</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="1440">24 hours</option><option value="custom">Custom minutes…</option></select><input id="eExpiryMinutes" type="number" min="1" placeholder="Custom expiry in minutes" style="display:none;margin-top:7px"></div>
+ <div class="edit-photo">${l.photo?`<img src="${esc(l.photo)}" id="ePhotoPreview">`:'<div class="avatar">—</div>'}<div style="flex:1"><b>Customer Photo</b><div class="hint">Optional: replace the photo</div><input id="ePhoto" type="file" accept="image/jpeg,image/png,image/webp"></div></div>
+ <div id="ePhotoState" class="hint" style="margin-top:8px"></div><div class="actions"><button class="btn ghost" style="flex:1" onclick="closeEditLinkModal()">Cancel</button><button class="btn primary" id="eSave" style="flex:1">Save Changes</button></div></div>`;
+ document.body.appendChild(d);
+ const existingExpiry=expVal;const sel=$('#eExpiry');
+ if(!l.expiresAt)sel.value='0';else if([1,5,10,30,60,1440].includes(existingExpiry))sel.value=String(existingExpiry);else{sel.value='custom';$('#eExpiryMinutes').style.display='block';$('#eExpiryMinutes').value=existingExpiry}
+ sel.onchange=()=>$('#eExpiryMinutes').style.display=sel.value==='custom'?'block':'none';
+ $('#ePhoto').onchange=async()=>{const f=$('#ePhoto').files[0];if(!f)return;$('#ePhotoState').innerHTML='<i class="mini-spin"></i> Opening crop…';const picked=await chooseManualPhoto(f);window.editPhotoFile=picked||null;$('#ePhotoState').innerHTML=picked?'✓ New photo ready':'Photo cancelled';};
+ $('#eSave').onclick=()=>saveEditedLink(l.id);
+ d.onclick=e=>{if(e.target===d)closeEditLinkModal()};
+}
+async function saveEditedLink(id){
+ const l=links.find(x=>x.id===id);if(!l)return;
+ const name=$('#eName').value.trim(),phone=$('#ePhone').value.trim(),ack=$('#eAck').value.trim(),type=$('#eType').value.trim()||'PAN Service',amount=Number($('#eAmount').value),utr=$('#eUtr').value;
+ if(!name||!phone||!Number.isFinite(amount)||amount<=0)return toast('Name, mobile aur valid amount required hai');
+ let expiresAt=null;const ev=$('#eExpiry').value;if(ev==='custom'){const mins=Number($('#eExpiryMinutes').value);if(!Number.isFinite(mins)||mins<=0)return toast('Valid expiry minutes enter karein');expiresAt=new Date(Date.now()+Math.round(mins)*60000).toISOString()}else if(ev!=='0'){expiresAt=new Date(Date.now()+Number(ev)*60000).toISOString()}
+ const active=currentAttempt(l);if(active&&['verification_pending','customer_marked_paid','submitted'].includes(String(active.status||'').toLowerCase())){return toast('Active payment request hai. Pehle request verify/reject karein, phir amount/details edit karein')}
+ const btn=$('#eSave');btn.disabled=true;btn.innerHTML='<i class="mini-spin"></i> Saving…';
+ try{let photo=l.photo||'';if(window.editPhotoFile){$('#ePhotoState').innerHTML='<i class="mini-spin"></i> Uploading photo…';photo=await uploadPhoto(window.editPhotoFile)}const patch={name,phone,ackNo:ack,applicationId:l.applicationId||ack||'',applicationType:type,amount:Math.round(amount),utrMode:utr,utrRequired:utr==='required',photo,expiresAt,updatedAt:FS.serverTimestamp(),updatedBy:admin.uid,updatedByEmail:admin.email};
+   await db.collection('customerPaymentRequests').doc(id).update(patch);
+   if(l.applicationId)await db.collection('applications').doc(l.applicationId).update({customerPaymentAmount:Math.round(amount),customerPaymentStatus:l.status||'pending'}).catch(()=>{});
+   window.editPhotoFile=null;closeEditLinkModal();toast('Payment link updated');await loadData(true);
+ }catch(e){toast(e.message||'Update failed')}finally{btn.disabled=false;if($('#eSave'))$('#eSave').innerHTML='Save Changes'}
+}
+window.openEditLink=openEditLink;window.closeEditLinkModal=closeEditLinkModal;
+function editLinkAmount(id){openEditLink(id)}
+window.editLinkAmount=editLinkAmount;
+function copyText(t){navigator.clipboard?.writeText(t).then(()=>toast('Link copied')).catch(()=>{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();toast('Link copied')})}
+function copyLink(id){copyText(linkUrl(id))}
+function shareLink(id){const l=links.find(x=>x.id===id);if(!l)return;const msg=`Dear ${l.name||'Customer'},\n\nYour ${l.applicationType||'PAN Service'} payment request is ready.\n\nAmount: ${money(l.amount)}\n${l.ackNo?'ACK: '+l.ackNo+'\n':''}\nPlease complete your payment using the secure link below:\n${linkUrl(id)}\n\nAfter payment, enter your UTR and tap Payment Done.\n\nThank you,\nTECH SOURCE`;window.open('https://wa.me/'+waNumber(l.phone)+'?text='+encodeURIComponent(msg),'_blank')}
+function remind(id){const l=links.find(x=>x.id===id);if(!l)return;const msg=`Dear ${l.name||'Customer'},\n\nYour previous payment attempt could not be verified. Your payment link is active again.\n\nAmount: ${money(l.amount)}\n${l.ackNo?'ACK: '+l.ackNo+'\n':''}\nPlease make the payment again using the same secure link:\n${linkUrl(id)}\n\nThank you,\nTECH SOURCE`;window.open('https://wa.me/'+waNumber(l.phone)+'?text='+encodeURIComponent(msg),'_blank')}
+function openLink(id){window.open(linkUrl(id),'_blank')}
+
+function renderRequests(){const list=attempts.filter(a=>['verification_pending','customer_marked_paid','submitted'].includes(String(a.status||'').toLowerCase())).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));$('#requests').innerHTML=`<div class="panel"><div class="panel-head"><div><h3>Pending Payment Requests</h3><div class="hint">Every payment attempt gets a new Request ID.</div></div><div class="toolbar"><button class="btn soft" onclick="go('history')">Application History</button><input id="reqSearch" placeholder="🔎  Search name, number, ACK or Request ID"></div></div><div id="reqBody" class="table-wrap"></div></div>`;const draw=()=>{const t=textValue($('#reqSearch')).trim().toLowerCase();const x=list.filter(a=>[a.name,a.phone,a.ackNo,a.id,a.utr].join(' ').toLowerCase().includes(t));$('#reqBody').innerHTML=`<table class="table"><thead><tr><th>Request ID</th><th>Customer</th><th>Application</th><th>Amount</th><th>UTR</th><th>Date & Time</th><th>Action</th></tr></thead><tbody>${x.map(a=>`<tr><td><b>${esc(a.requestId||a.id)}</b></td><td><div class="person">${a.photo?`<img class="avatar" src="${esc(a.photo)}">`:''}<div><b>${esc(a.name||'Customer')}</b><small>${esc(a.phone||'')}</small></div></div></td><td>${esc(a.applicationType||'PAN Service')}<small style="display:block;color:#94a3b8">${esc(a.ackNo||a.applicationId||'Manual')}</small></td><td><b>${money(a.amount)}</b></td><td>${esc(a.utr||'—')}</td><td>${date(a.createdAt)}</td><td><div class="actions"><button class="btn success" onclick="verifyAttempt('${a.id}',true)">Accept</button><button class="btn danger" onclick="verifyAttempt('${a.id}',false)">Reject</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No pending requests.</td></tr>'}</tbody></table>`};$('#reqSearch').oninput=draw;draw()}
+async function verifyAttempt(id,ok){
+ const a=attempts.find(x=>x.id===id);if(!a)return;
+ if(!confirm(ok?'Accept this payment request?':'Reject this payment request?'))return;
+ try{
+  const link=a.linkId?links.find(x=>x.id===a.linkId):null;
+  if(ok){
+   const expected=Number(link?.amount||a.amount||0),submitted=Number(a.amount||0),mismatch=expected!==submitted;
+   if(mismatch&&!confirm(`Amount mismatch!
+Link amount: ₹${expected}
+Request amount: ₹${submitted}
+
+Accept anyway?`))return;
+   await db.collection('paymentAttempts').doc(id).update({status:'paid',paymentStatus:'paid',verifiedAt:FS.serverTimestamp(),verifiedBy:admin.email,amountVerified:submitted,amountMismatch:mismatch});
+   if(a.applicationId)await db.collection('applications').doc(a.applicationId).update({paymentStatus:'paid',paymentUtr:a.utr||'',paymentRequestId:id,paymentVerifiedAt:FS.serverTimestamp(),paymentVerifiedBy:admin.email,paymentAmountVerified:submitted}).catch(()=>{});
+   if(a.linkId)await db.collection('customerPaymentRequests').doc(a.linkId).update({status:'paid',paymentStatus:'paid',currentAttemptId:id,paidAt:FS.serverTimestamp()}).catch(()=>{});
+   toast(mismatch?'Payment accepted with amount mismatch':'Payment verified');
+  }else{
+   await db.collection('paymentAttempts').doc(id).update({status:'rejected',paymentStatus:'rejected',rejectedAt:FS.serverTimestamp(),rejectedBy:admin.email});
+   if(a.linkId)await db.collection('customerPaymentRequests').doc(a.linkId).update({status:'pending',paymentStatus:'pending',currentAttemptId:null,lastRejectedAttemptId:id,reopenedAt:FS.serverTimestamp()}).catch(()=>{});
+   toast('Payment rejected — link active again');
+  }
+  await loadData(true);
+ }catch(e){toast(e.message||String(e))}
 }
 
-window.payNow = function () {
-  if (!ack) {
-    alert("Ack number missing!");
-    return;
-  }
-  window.location.href = buildUpiLink();
-};
+async function viewApplicationPayment(id){
+ const a=apps.find(x=>x.id===id);if(!a)return;
+ const d=document.createElement('div');d.id='appDetailsModal';d.className='modal';d.innerHTML=`<div class="modal-card"><div class="modal-head"><div><h2>Payment Details</h2><div class="hint">Complete payment history & attempt timeline</div></div><button class="close" onclick="document.getElementById('appDetailsModal')?.remove()">×</button></div><div class="customer" style="margin-top:15px">${photoOf(a)?`<img class="details-photo" src="${esc(photoOf(a))}">`:''}<div><b>${esc(nameOf(a))}</b><div class="hint">${esc(phoneOf(a))}</div><div class="hint">ACK: ${esc(ackOf(a)||'—')}</div></div></div><div id="appPayDetail" style="margin-top:14px"><div class="processing"></div></div></div>`;document.body.appendChild(d);
+ try{const qs=await db.collection('paymentAttempts').where('applicationId','==',id).get();const af=qs.docs.map(x=>({id:x.id,...x.data()})).sort((x,y)=>(toDateObj(x.createdAt)?.getTime()||0)-(toDateObj(y.createdAt)?.getTime()||0));
+ const rows=af.map((x,i)=>{const st=String(x.status||'pending').toLowerCase();const cls=st==='paid'?'paid':st==='rejected'?'rejected':'';return `<div class="timeline-item ${cls}"><div class="timeline-dot">${i+1}</div><div class="timeline-box"><b>${esc(x.status||'pending')} • ${money(x.amount)}</b><small>Request ID: ${esc(x.requestId||x.id)}</small><br><small>UTR: ${esc(x.utr||'—')} • ${esc(date(x.createdAt))}</small>${x.amountMismatch?'<div class="hint" style="color:#b45309;font-weight:700;margin-top:4px">Amount mismatch was accepted by admin.</div>':''}</div></div>`}).join('');
+ $('#appPayDetail').innerHTML=`<div class="detail"><div><span>Current Payment Status</span><b>${esc(a.paymentStatus||'—')}</b></div><div><span>Current Amount</span><b>${money(a.customerPaymentAmount||a.paymentAmount||a.amount||0)}</b></div><div><span>Latest UTR</span><b>${esc(a.paymentUtr||a.utr||'—')}</b></div><div><span>Latest Request ID</span><b>${esc(a.paymentRequestId||'—')}</b></div></div><h3 style="margin:18px 0 8px">Attempt Timeline</h3><div class="timeline">${rows||'<div class="empty">No payment attempts found.</div>'}</div>`;
+ }catch(e){$('#appPayDetail').innerHTML='<div class="empty">Payment details could not be loaded.</div>'}
+}
+window.viewApplicationPayment=viewApplicationPayment;
 
-window.copyUPI = async function () {
-  try {
-    await navigator.clipboard.writeText(UPI_ID);
-    alert("UPI ID copied!");
-  } catch (err) {
-    const tempInput = document.createElement("input");
-    tempInput.value = UPI_ID;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    tempInput.remove();
-    alert("UPI ID copied!");
-  }
-};
+function renderSettings(){$('#settings').innerHTML=`<div class="panel"><div class="panel-head"><div><h3>Payment Settings</h3><div class="hint">These settings are used for newly opened payment pages.</div></div></div><div class="settings-box"><div class="grid2"><div class="field"><label>Business Name</label><input id="sBusiness" value="${esc(settings.businessName)}"></div><div class="field"><label>UPI ID</label><input id="sUpi" value="${esc(settings.upiId)}"></div><div class="field"><label>WhatsApp Number</label><input id="sWa" value="${esc(settings.whatsapp)}"></div></div><button class="btn primary" id="saveSet">Save Settings</button><p id="setMsg" class="hint"></p><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><div class="detail"><div><span>Admin</span><b>${esc(admin?.email||'')}</b></div><div><span>Database</span><b>Firebase Firestore</b></div><div><span>Application source</span><b>Old website applications collection</b></div><div><span>Payment attempts</span><b>Separate request IDs</b></div></div></div></div>`;$('#saveSet').onclick=async()=>{const d={businessName:$('#sBusiness').value.trim()||'TECH SOURCE',upiId:$('#sUpi').value.trim(),whatsapp:$('#sWa').value.trim(),updatedAt:FS.serverTimestamp(),updatedBy:admin.uid};try{await db.collection('serviceSettings').doc('pan').set(d,{merge:true});settings={...settings,...d};$('#setMsg').textContent='Settings saved to Firebase.';toast('Settings saved')}catch(e){$('#setMsg').textContent=e.message;toast('Save failed')}}}
 
-document.getElementById("qr").src =
-  "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(buildUpiLink());
+function paymentPage(){root.innerHTML=`<div class="customer-page"><div class="pay-card" id="payCard"><div class="pay-brand"><div class="brand-logo">TS</div><h2 style="margin:10px 0 3px">TECH SOURCE</h2><div class="hint">Secure PAN Service Payment • TECH SOURCE</div></div><div id="payContent"><div class="processing"></div><div class="pay-status">Loading secure payment request…</div></div></div></div>`;loadPayment()}
+let payCtx=null;
+async function loadPayment(){try{const s=await db.collection('customerPaymentRequests').doc(payId).get();if(!s.exists)return paymentError('Payment link not found.');const d={id:s.id,...s.data()};if(isExpired(d)){await db.collection('customerPaymentRequests').doc(payId).update({status:'expired',paymentStatus:'expired',expiredAt:FS.serverTimestamp()}).catch(()=>{});return paymentError('Payment link expired.');}if(d.status==='paid')return successScreen({...d,requestId:d.currentAttemptId||'Completed'},'This payment has already been completed successfully.');payCtx=d;renderPay(d);startCustomerRealtime(d.id)}catch(e){paymentError(e.message||'Unable to load payment link.')}}
+function startCustomerRealtime(linkId){clearCustomerRealtime();window._customerLinkUnsub=db.collection('customerPaymentRequests').doc(linkId).onSnapshot(s=>{if(!s.exists)return;const d={id:s.id,...s.data()};payCtx={...payCtx,...d};if(d.status==='paid'){successScreen({...d,requestId:d.currentAttemptId||'Completed'},'Your payment has been verified successfully.');clearCustomerRealtime();return}if(d.status==='pending'&&d.lastRejectedAttemptId){renderPay(d);$('#expiryLine')&&($('#expiryLine').innerHTML='<span style="color:#dc2626;font-weight:800">Previous request rejected — you can pay again.</span>');}},()=>{});window._customerAttemptUnsub=db.collection('paymentAttempts').where('linkId','==',linkId).limit(20).onSnapshot(s=>{const arr=s.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(toDateObj(b.createdAt)?.getTime()||0)-(toDateObj(a.createdAt)?.getTime()||0));const at=arr[0];if(at&&['verification_pending','customer_marked_paid'].includes(String(at.status||'').toLowerCase())){payCtx={...payCtx,currentAttemptId:at.id,status:'verification_pending'};if(document.getElementById('payUtr'))successScreen(at,'Your payment request has already been sent.');}if(at&&String(at.status||'').toLowerCase()==='paid'){successScreen(at,'Your payment has been verified successfully.');clearCustomerRealtime()}},()=>{})}
+function clearCustomerRealtime(){if(window._customerLinkUnsub){window._customerLinkUnsub();window._customerLinkUnsub=null}if(window._customerAttemptUnsub){window._customerAttemptUnsub();window._customerAttemptUnsub=null}}
+function paymentError(m){$('#payContent').innerHTML=`<div class="success-screen"><div class="check" style="background:#fee2e2;color:#dc2626">!</div><h1>Payment Unavailable</h1><p>${esc(m)}</p></div>`}
+function renderPay(d,after=false){const at=currentAttempt(d);if(at&&['verification_pending','customer_marked_paid'].includes(String(at.status))){return successScreen(at,'Your payment request has already been sent.');}const required=d.utrMode==='required';$('#payContent').innerHTML=`<div class="pay-body payment-layout"><div class="pay-trust"><span class="trust-chip"><i>✓</i> Secure Request</span><span class="trust-chip"><i>✓</i> UPI Payment</span><span class="trust-chip"><i>✓</i> Manual Verification</span></div><div class="customer hero-customer payment-customer">${d.photo?`<img src="${esc(d.photo)}" alt="Customer" class="customer-photo-zoom" data-photo="${esc(d.photo)}" data-name="${esc(d.name||'Customer')}" data-phone="${esc(d.phone||'')}" data-ack="${esc(d.ackNo||d.applicationId||'—')}" data-type="${esc(d.applicationType||'PAN Service')}" title="Tap to view photo">`:`<div class="success-avatar payment-avatar">${esc((d.name||'C').charAt(0).toUpperCase())}</div>`}<div class="customer-main"><b>${esc(d.name||'Customer')}</b><div class="phone-line">☎ <span>${esc(d.phone||'')}</span></div><span class="type-pill">${esc(d.applicationType||'New PAN')}</span></div><div class="customer-arrow">›</div></div><div class="detail payment-detail"><div><span>APPLICATION</span><b>▤ &nbsp;${esc(d.applicationType||'New PAN')}</b></div><div><span>ACK / ID</span><b>⌗ &nbsp;${esc(d.ackNo||d.applicationId||'—')}</b></div></div><div class="amount hero-amount payment-amount"><div class="rupee-icon">₹</div><div><small>Total Amount</small><b>${money(d.amount)}</b><div class="hint">Please pay the exact amount shown above.</div></div></div><div class="upi-card payment-upi"><div class="upi-title"><span class="line"></span>Scan &amp; Pay with any UPI App<span class="line"></span></div><div class="qr-zone" id="payQrZone"><div class="qr" id="payQr" title="Tap to zoom QR"></div></div><div class="upi-id-row"><div class="upi-mark">◢</div><div><span>UPI ID</span><b>${esc(settings.upiId)}</b></div><button class="copy-upi" onclick="copyText('${esc(settings.upiId)}')">▣ &nbsp; Copy</button></div></div><div class="pay-steps"><div class="pay-step"><b>1</b><strong>Scan QR</strong><span>Open any UPI app</span></div><em>›</em><div class="pay-step"><b>2</b><strong>Complete Payment</strong><span>Enter amount &amp; pay</span></div><em>›</em><div class="pay-step"><b>3</b><strong>Enter UTR</strong><span>Get transaction ID</span></div></div><div class="payment-form"><div class="field"><label>UTR / Transaction ID <small>${required?'Required':'Optional'}</small></label><div class="utr-wrap"><span>▣</span><input id="payUtr" inputmode="numeric" autocomplete="off" placeholder="Enter UTR after payment" ${required?'required':''}></div></div><div id="expiryLine" class="pay-status"></div><button id="donePay" class="btn primary pay-cta"><span>➤</span> PAYMENT DONE — SEND REQUEST <b>›</b></button><div class="success-note payment-note"><span>♢</span><div>After you submit, your payment request will be sent to <b>TECH SOURCE</b>. Payment will be verified manually before it is marked complete.</div></div></div><div class="payment-footer"><span></span> TECH SOURCE &nbsp;•&nbsp; Secure Payment Center <span></span></div></div>`;new QRCode($('#payQr'),{text:`upi://pay?pa=${encodeURIComponent(settings.upiId)}&pn=${encodeURIComponent(settings.businessName)}&am=${Number(d.amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('PAN Payment '+(d.ackNo||d.applicationId||''))}`,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});$('#payQr').onclick=toggleQRZoom;$('.customer-photo-zoom')?.addEventListener('click',e=>{e.stopPropagation();openCustomerPhoto(e.currentTarget)});startPayCountdown(d);$('#donePay').onclick=()=>submitPayment()}
+function toggleQRZoom(){
+ const q=$('#payQr');
+ if(!q)return;
+ const existing=document.getElementById('mediaLightbox');
+ if(existing){closeMediaZoom();return;}
+ const canvas=q.querySelector('canvas');
+ const img=q.querySelector('img');
+ const src=canvas?canvas.toDataURL('image/png'):(img?img.src:'');
+ if(!src)return;
+ const overlay=document.createElement('div');
+ overlay.id='mediaLightbox';
+ overlay.className='media-lightbox';
+ overlay.innerHTML=`<div class="media-lightbox-card qr-lightbox-card" role="dialog" aria-label="Zoomed payment QR">
+   <div class="qr-lightbox-title"><span class="line"></span><span>Scan &amp; Pay with any UPI App</span><span class="line"></span></div>
+   <div class="zoom-qr-wrap"><img class="zoom-qr-image" src="${src}" alt="Payment QR"></div>
+   <div class="media-lightbox-hint">Tap anywhere to close</div>
+ </div>`;
+ document.body.appendChild(overlay);
+ document.body.classList.add('qr-viewing');
+ const card=overlay.querySelector('.media-lightbox-card');
+ requestAnimationFrame(()=>overlay.classList.add('is-open'));
+ overlay.addEventListener('click',closeMediaZoom);
+}
+function openCustomerPhoto(el){
+ const src=el?.dataset?.photo;
+ if(!src)return;
+ const existing=document.getElementById('mediaLightbox');
+ if(existing)closeMediaZoom();
+ const name=el.dataset.name||'Customer';
+ const phone=el.dataset.phone||'—';
+ const ack=el.dataset.ack||'—';
+ const type=el.dataset.type||'PAN Service';
+ const overlay=document.createElement('div');
+ overlay.id='mediaLightbox';
+ overlay.className='media-lightbox';
+ overlay.innerHTML=`<div class="media-lightbox-card customer-photo-card" role="dialog" aria-label="Customer details">
+   <div class="customer-photo-large-wrap"><img class="customer-photo-large" src="${esc(src)}" alt="Customer photo"></div>
+   <div class="photo-detail-head"><strong>${esc(name)}</strong><span>Customer Details</span></div>
+   <div class="photo-details-grid">
+    <div><span>NAME</span><b>${esc(name)}</b></div>
+    <div><span>MOBILE</span><b>${esc(phone)}</b></div>
+    <div><span>ACK / ID</span><b>${esc(ack)}</b></div>
+    <div><span>APPLICATION</span><b>${esc(type)}</b></div>
+   </div>
+   <div class="media-lightbox-hint">Tap anywhere to close</div>
+ </div>`;
+ document.body.appendChild(overlay);
+ document.body.classList.add('qr-viewing');
+ const card=overlay.querySelector('.media-lightbox-card');
+ requestAnimationFrame(()=>overlay.classList.add('is-open'));
+ overlay.addEventListener('click',closeMediaZoom);
+}
+function closeMediaZoom(){
+ const overlay=document.getElementById('mediaLightbox');
+ if(!overlay)return;
+ overlay.classList.remove('is-open');
+ document.body.classList.remove('qr-viewing');
+ setTimeout(()=>overlay.remove(),280);
+}
+function closeQRZoom(){closeMediaZoom()}
 
-async function uploadToImgBB(file) {
-  const apiKey = "fa4ad05090c8cc3f9ade673a64a52235";
-  const formData = new FormData();
-  formData.append("image", file);
-
-  const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-    method: "POST",
-    body: formData
-  });
-
-  if (!res.ok) throw new Error("Image upload failed");
-
-  const data = await res.json();
-  if (data.success && data.data && data.data.url) return data.data.url;
-  throw new Error(data.error?.message || "Image upload failed");
+function startPayCountdown(d){clearInterval(window._paycd);if(!d.expiresAt){$('#expiryLine').textContent='';return}const tick=()=>{const s=Math.max(0,Math.floor((new Date(d.expiresAt).getTime()-Date.now())/1000));$('#expiryLine').innerHTML=s>0?`Link expires in <span class="countdown">${s}</span> seconds`:'<span style="color:#dc2626;font-weight:800">Payment link expired</span>';if(s<=0){clearInterval(window._paycd);$('#donePay').disabled=true}};tick();window._paycd=setInterval(tick,1000)}
+function showPaymentSubmittingLoader(){
+ const zone=document.getElementById('payQrZone');
+ if(zone){
+  zone.innerHTML='<div class="payment-submit-loader"><div class="submit-ring"><span></span><span></span><span></span><span></span></div><strong>Submitting Payment Request</strong><small>Please wait, your request is being securely sent…</small></div>';
+ }
+ const btn=document.getElementById('donePay');
+ if(btn){btn.classList.add('is-submitting');btn.textContent='PAYMENT REQUEST SUBMITTING…';}
 }
 
-window.submitPayment = async function () {
-  const txn = document.getElementById("txnId").value.trim();
-  const file = document.getElementById("screenshot").files[0];
+async function submitPayment(){
+ if(!payCtx)return;const btn=$('#donePay'),utr=$('#payUtr')?.value.trim()||'';if(payCtx.utrMode==='required'&&!utr)return toast('UTR required hai');
+ btn.disabled=true;showPaymentSubmittingLoader();
+ try{
+  const linkRef=db.collection('customerPaymentRequests').doc(payCtx.id),ref=db.collection('paymentAttempts').doc();
+  const requestId='REQ-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).slice(2,8).toUpperCase();
+  const data={linkId:payCtx.id,requestId,applicationId:payCtx.applicationId||'',ackNo:payCtx.ackNo||'',name:payCtx.name||'',phone:payCtx.phone||'',email:payCtx.email||'',photo:payCtx.photo||'',applicationType:payCtx.applicationType||'PAN Service',amount:Number(payCtx.amount||0),utr,utrRequired:payCtx.utrMode==='required',status:'verification_pending',paymentStatus:'verification_pending',createdAt:FS.serverTimestamp(),customerSubmittedAt:FS.serverTimestamp()};
+  await db.runTransaction(async tx=>{const snap=await tx.get(linkRef);if(!snap.exists)throw new Error('Payment link not found');const l=snap.data()||{};const st=String(l.status||'pending').toLowerCase();if(l.expiresAt&&new Date(l.expiresAt).getTime()<=Date.now()){tx.update(linkRef,{status:'expired',paymentStatus:'expired'});throw new Error('Payment link expired.');}if(['verification_pending','customer_marked_paid'].includes(st))throw new Error('Payment request already submitted. Please wait for verification.');if(st==='paid')throw new Error('Payment already completed.');tx.set(ref,data);tx.update(linkRef,{currentAttemptId:ref.id,status:'verification_pending',paymentStatus:'verification_pending',lastSubmittedAt:FS.serverTimestamp()});});
+  if(payCtx.applicationId)await db.collection('applications').doc(payCtx.applicationId).update({paymentStatus:'verification_pending',paymentUtr:utr,paymentRequestId:ref.id,paymentSubmittedAt:FS.serverTimestamp(),paymentAmountSubmitted:Number(payCtx.amount||0)}).catch(()=>{});
+  payCtx.currentAttemptId=ref.id;payCtx.status='verification_pending';payCtx.paymentStatus='verification_pending';startCustomerRealtime(payCtx.id);successScreen(data,'Your payment request has been sent successfully.');
+ }catch(e){btn.disabled=false;renderPay(payCtx);toast(e.message||'Request failed')}
+}
+function successScreen(a,msg){clearInterval(window._paycd);const photo=String(a.photo||payCtx?.photo||'');const name=String(a.name||payCtx?.name||'Customer');$('#payContent').innerHTML=`<div class="pay-body"><div class="success-top">${photo?`<img class="success-photo customer-photo-zoom" src="${esc(photo)}" alt="Customer photo" data-photo="${esc(photo)}" data-name="${esc(name)}" data-phone="${esc(a.phone||payCtx?.phone||'')}" data-ack="${esc(a.ackNo||payCtx?.ackNo||'—')}" data-type="${esc(a.applicationType||payCtx?.applicationType||'PAN Service')}" title="Tap to view photo">`:`<div class="success-avatar">${esc(name.charAt(0).toUpperCase())}</div>`}<div class="check">✓</div><h1>Payment Request Sent</h1><p>${esc(msg)}</p></div><div class="receipt-mini"><div><span>Customer</span><b>${esc(name)}</b></div><div><span>Amount</span><b>${money(a.amount)}</b></div><div><span>Request ID</span><b>${esc(a.requestId||a.id)}</b></div><div><span>Application</span><b>${esc(a.applicationType||'PAN Service')}</b></div>${a.ackNo?`<div><span>ACK</span><b>${esc(a.ackNo)}</b></div>`:''}${a.utr?`<div><span>UTR</span><b>${esc(a.utr)}</b></div>`:''}<div><span>Date & Time</span><b>${date(a.createdAt)||'Just now'}</b></div></div><div class="customer-payment-live">Live payment status</div><div class="success-note"><b style="color:#15803d">Verification Pending</b><br>Your request has reached TECH SOURCE. Please wait while the payment is verified.</div><div class="payment-footer">TECH SOURCE • Thank you for choosing us</div></div>`;$('.customer-photo-zoom')?.addEventListener('click',e=>{e.stopPropagation();openCustomerPhoto(e.currentTarget)})}
 
-  if (!ack) return alert("Ack number missing!");
-  if (!txn) return alert("Enter Transaction ID!");
-  if (!file) return alert("Upload Screenshot!");
-  if (!file.type.startsWith("image/")) return alert("Please upload a valid image screenshot!");
-
-  submitBtn.disabled = true;
-  payBtn.disabled = true;
-  submitBtn.innerText = "Submitting...";
-  setStatus("Status: Uploading payment proof");
-
-  try {
-    const imageUrl = await uploadToImgBB(file);
-    setStatus("Status: Updating application");
-
-    const q = query(collection(firestore, "applications"), where("ackNo", "==", ack));
-    const snapshot = await getDocs(q);
-
-    if (snapshot.empty) {
-      setStatus("Status: Application not found", "error");
-      alert("Application not found!");
-      return;
-    }
-
-    for (const docSnap of snapshot.docs) {
-      await updateDoc(doc(firestore, "applications", docSnap.id), {
-        paymentStatus: "pending",
-        paymentRequest: true,
-        txnId: txn,
-        paymentScreenshot: imageUrl,
-        paymentTime: new Date().toISOString()
-      });
-    }
-
-    alert("Payment submitted successfully!");
-    setStatus("Status: Submitted for Verification", "success");
-  } catch (err) {
-    setStatus("Status: Submission failed", "error");
-    alert("Error: " + err.message);
-  } finally {
-    submitBtn.disabled = false;
-    payBtn.disabled = false;
-    submitBtn.innerText = "Submit Payment";
-  }
-};
+// Payment page deliberately bypasses admin auth; dashboard/admin sections require verified admin.
+if(payId){paymentPage()}else{auth.onAuthStateChanged(async u=>{if(!u){loginView();return}try{if(!(await isAdminUser(u))){await auth.signOut();loginView('Access denied: admin account required.')}else{admin=u;shell();await loadData();subscribe()}}catch(e){await auth.signOut();loginView('Could not verify admin access.')}})}
 </script>
-</body>
-</html>
+</body></html>
