@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email ID Print</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  background: #f5f7fb;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #202124;
+}
+
+.editor {
+  width: 100%;
+  max-width: 470px;
+  margin: 35px auto;
+  padding: 26px;
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.06);
+}
+
+.editor h2 {
+  margin: 0 0 8px;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.editor p {
+  margin: 0 0 23px;
+  color: #687386;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+label {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.input-row {
+  display: flex;
+  gap: 9px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  height: 49px;
+  padding: 0 13px;
+  border: 1px solid #d9e0eb;
+  border-radius: 9px;
+  outline: none;
+  font-size: 16px;
+}
+
+input:focus {
+  border: 2px solid #4285f4;
+  padding: 0 12px;
+}
+
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 17px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+.paste,
+.secondary {
+  background: #eaf2ff;
+  color: #1a73e8;
+}
+
+.primary {
+  background: #1a73e8;
+  color: white;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 19px;
+}
+
+.actions button {
+  flex: 1;
+  min-height: 45px;
+}
+
+.hint {
+  color: #7b8494;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+
+#message {
+  display: none;
+  color: #b3261e;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+#message.show {
+  display: block;
+}
+
+.preview {
+  display: none;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #edf0f5;
+}
+
+.preview h3 {
+  margin: 0 0 12px;
+  color: #667085;
+  font-size: 12px;
+  letter-spacing: .7px;
+}
+
+.preview-email {
+  padding: 18px;
+  border: 1px solid #dce4ef;
+  border-radius: 10px;
+  background: #f8fbff;
+  text-align: center;
+  font-size: 21px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  color: #172b4d;
+}
+
+.print-page {
+  display: none;
+}
+
+/* PRINT SETTINGS */
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 0 !important;
+    background: #fff !important;
+    overflow: hidden !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .editor {
+    display: none !important;
+  }
+
+  .print-page {
+    display: block !important;
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 15mm 14mm;
+    overflow: hidden;
+    background: #fff;
+    color: #202124;
+    border: 0.6mm solid #b5d7ff;
+    border-radius: 0;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .google-logo {
+    text-align: center;
+    margin-top: 20mm;
+    margin-bottom: 8mm;
+    font-size: 36pt;
+    font-weight: 600;
+    letter-spacing: -2px;
+    line-height: 1.2;
+  }
+
+  .g-blue { color: #4285f4; }
+  .g-red { color: #ea4335; }
+  .g-yellow { color: #fbbc05; }
+  .g-green { color: #34a853; }
+
+  .heading {
+    text-align: center;
+    font-size: 28pt;
+    font-weight: 400;
+    margin: 0;
+    color: #202124;
+  }
+
+  .blue-line {
+    width: 24mm;
+    height: 1.2mm;
+    background: #4285f4;
+    border-radius: 5mm;
+    margin: 9mm auto;
+  }
+
+  .description {
+    text-align: center;
+    max-width: 165mm;
+    margin: 0 auto;
+    font-size: 15pt;
+    line-height: 1.65;
+    color: #3c4658;
+  }
+
+  /* EMAIL CARD */
+
+  .email-card {
+    margin: 25mm 3mm 0;
+    padding: 8mm 7mm;
+    min-height: 36mm;
+    border: 0.4mm solid #a5caff;
+    border-radius: 4mm;
+    background: #f5faff;
+    display: flex;
+    align-items: center;
+    gap: 7mm;
+  }
+
+  /* FIXED MAIL IMAGE SIZE */
+
+  .mail-icon {
+    width: 15mm;
+    height: 15mm;
+    min-width: 15mm;
+    max-width: 15mm;
+    flex: 0 0 15mm;
+    border-radius: 50%;
+    background: #e5f1ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .mail-icon img {
+    display: block;
+    width: 8mm !important;
+    height: 8mm !important;
+    max-width: 8mm !important;
+    max-height: 8mm !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    object-fit: contain;
+    flex: 0 0 8mm;
+  }
+
+  .email-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .email-label {
+    font-size: 13pt;
+    color: #64748b;
+    margin-bottom: 3mm;
+  }
+
+  .email-value {
+    font-size: 22pt;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #101b42;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* SAFE EMAIL */
+
+  .safe-section {
+    margin: 13mm 3mm 0;
+    padding: 7mm;
+    background: #f1f7ff;
+    border-radius: 4mm;
+    display: flex;
+    align-items: center;
+    gap: 7mm;
+  }
+
+  .shield {
+    width: 15mm;
+    height: 15mm;
+    min-width: 15mm;
+    flex: 0 0 15mm;
+    border-radius: 50%;
+    background: #e0edff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21pt;
+  }
+
+  .safe-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .safe-title {
+    font-size: 16pt;
+    font-weight: 600;
+    color: #1a73e8;
+    margin-bottom: 3mm;
+  }
+
+  .safe-description {
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #3c4658;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="editor">
+
+  <h2>Email ID Print</h2>
+
+  <p>
+    Enter an email address below. Paste an email ID
+    or type a username to complete it automatically.
+  </p>
+
+  <form id="emailForm">
+
+    <label for="emailInput">Email address</label>
+
+    <div class="input-row">
+
+      <input
+        type="text"
+        id="emailInput"
+        placeholder="Enter email ID"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        required
+      >
+
+      <button type="button" class="paste" id="pasteBtn">
+        Paste
+      </button>
+
+    </div>
+
+    <div class="hint">
+      Examples: rahul → rahul@gmail.com
+      <br>
+      rahul@ → rahul@gmail.com
+      <br>
+      rahul@gmail → rahul@gmail.com
+      <br>
+      rahul @ gmail → rahul@gmail.com
+    </div>
+
+    <div id="message" role="status"></div>
+
+    <div class="actions">
+
+      <button type="submit" class="secondary">
+        Preview
+      </button>
+
+      <button type="button" class="primary" id="printBtn">
+        Print / PDF
+      </button>
+
+    </div>
+
+  </form>
+
+  <section class="preview" id="preview">
+
+    <h3>PRINT PREVIEW</h3>
+
+    <div class="preview-email" id="previewEmail"></div>
+
+    <div class="actions">
+      <button type="button" class="primary" id="previewPrintBtn">
+        Print / PDF
+      </button>
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- FINAL A4 PRINT PAGE -->
+
+<section class="print-page">
+
+  <div class="google-logo">
+    <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
+  </div>
+
+  <h1 class="heading">Sign in</h1>
+
+  <div class="blue-line"></div>
+
+  <p class="description">
+    Use your Google Account. The account will be
+    added to this device and available to other
+    Google apps.
+  </p>
+
+  <div class="email-card">
+
+    <div class="mail-icon">
+      <img
+        src="https://res.cloudinary.com/dsnuatuc8/image/upload/f_auto,q_auto/v1790160814/communication_lxiifv.png"
+        alt="Mail"
+      >
+    </div>
+
+    <div class="email-content">
+
+      <div class="email-label">Your Email Address</div>
+
+      <div class="email-value" id="printEmail"></div>
+
+    </div>
+
+  </div>
+
+  <div class="safe-section">
+
+    <div class="shield">🔒</div>
+
+    <div class="safe-text">
+
+      <div class="safe-title">
+        Keep this email ID safe
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+(() => {
+  "use strict";
+
+  const input = document.getElementById("emailInput");
+  const message = document.getElementById("message");
+  const preview = document.getElementById("preview");
+  const previewEmail = document.getElementById("previewEmail");
+  const printEmail = document.getElementById("printEmail");
+  const emailForm = document.getElementById("emailForm");
+
+  /*
+   ADVANCED EMAIL NORMALIZER
+
+   rahul                 -> rahul@gmail.com
+   rahul@                -> rahul@gmail.com
+   rahul@gmail           -> rahul@gmail.com
+   rahul@gmail.com       -> rahul@gmail.com
+   rahul @ gmail . com   -> rahul@gmail.com
+   rahul @ gmail.com     -> rahul@gmail.com
+
+   Other complete domains are preserved.
+  */
+
+  function normalizeEmail(raw) {
+
+    let email = String(raw || "")
+      .trim()
+      .replace(/\s+/g, "")
+      .toLowerCase();
+
+    if (!email) return "";
+
+    // Remove accidental mailto prefix
+    email = email.replace(/^mailto:/i, "");
+
+    // Common Gmail spelling corrections
+    const gmailCorrections = {
+      "gmai.com": "gmail.com",
+      "gmial.com": "gmail.com",
+      "gamil.com": "gmail.com",
+      "gmail.con": "gmail.com",
+      "gmail.co": "gmail.com",
+      "gmail.coom": "gmail.com",
+      "gmail.comm": "gmail.com",
+      "gmail.om": "gmail.com",
+      "gmailcom": "gmail.com"
+    };
+
+    // No @ means username only
+    if (!email.includes("@")) {
+
+      email = email.replace(/^@+/, "");
+
+      if (!email) return "";
+
+      // Username followed by gmail without @
+      const gmailMatch = email.match(/^(.+?)(gmail(?:\.com)?)$/);
+
+      if (gmailMatch) {
+        email = gmailMatch[1] + "@gmail.com";
+      } else {
+        email += "@gmail.com";
+      }
+    }
+
+    // Handle missing domain after @
+    if (email.endsWith("@")) {
+      email += "gmail.com";
+    }
+
+    // Split local and domain
+    const parts = email.split("@");
+
+    if (parts.length !== 2) {
+      return email;
+    }
+
+    let local = parts[0];
+    let domain = parts[1];
+
+    // Correct missing Gmail suffix
+    if (domain === "gmail") {
+      domain = "gmail.com";
+    }
+
+    // Correct common Gmail typos
+    if (gmailCorrections[domain]) {
+      domain = gmailCorrections[domain];
+    }
+
+    // Handle gmail without dot com
+    if (domain === "gmailcom") {
+      domain = "gmail.com";
+    }
+
+    return local + "@" + domain;
+  }
+
+
+  function showMessage(text) {
+    message.textContent = text;
+    message.classList.toggle("show", Boolean(text));
+  }
+
+
+  function validateEmail(email) {
+
+    if (!email) {
+      return "Please enter an email ID.";
+    }
+
+    // Prevent multiple @ signs and invalid spaces
+    if (/\s/.test(email) || (email.match(/@/g) || []).length !== 1) {
+      return "Email format sahi nahi hai.";
+    }
+
+    const parts = email.split("@");
+    const local = parts[0];
+    const domain = parts[1];
+
+    if (!local || !domain) {
+      return "Email username ya domain missing hai.";
+    }
+
+    if (local.length > 64 || email.length > 254) {
+      return "Email address bahut lamba hai.";
+    }
+
+    if (
+      local.startsWith(".") ||
+      local.endsWith(".") ||
+      local.includes("..")
+    ) {
+      return "Username mein dot ki position sahi nahi hai.";
+    }
+
+    // Common email local-part characters
+    if (!/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(local)) {
+      return "Username mein invalid character hai.";
+    }
+
+    // Require a domain with a valid-looking extension
+    if (
+      !/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(domain)
+    ) {
+      return "Email domain sahi nahi hai. Example: name@gmail.com";
+    }
+
+    return "";
+  }
+
+
+  function prepareEmail() {
+
+    const email = normalizeEmail(input.value);
+    const error = validateEmail(email);
+
+    if (error) {
+      showMessage(error);
+      input.focus();
+      return false;
+    }
+
+    input.value = email;
+
+    previewEmail.textContent = email;
+    printEmail.textContent = email;
+
+    preview.style.display = "block";
+
+    showMessage("");
+
+    return true;
+  }
+
+
+  // Preview
+  emailForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    prepareEmail();
+  });
+
+
+  // Print / PDF
+  function printNow() {
+
+    if (!prepareEmail()) return;
+
+    window.print();
+  }
+
+  document.getElementById("printBtn")
+    .addEventListener("click", printNow);
+
+  document.getElementById("previewPrintBtn")
+    .addEventListener("click", printNow);
+
+
+  // Paste from clipboard
+  document.getElementById("pasteBtn")
+    .addEventListener("click", async function() {
+
+      showMessage("");
+
+      try {
+
+        if (!navigator.clipboard ||
+            !navigator.clipboard.readText) {
+          throw new Error("Clipboard unavailable");
+        }
+
+        const text = await navigator.clipboard.readText();
+
+        if (!text.trim()) {
+          showMessage("Clipboard khali hai.");
+          return;
+        }
+
+        input.value = text.trim();
+
+        prepareEmail();
+
+      } catch (error) {
+
+        showMessage(
+          "Paste permission nahi mili. Input par long-press karke Paste chunein."
+        );
+
+        input.focus();
+      }
+    });
+
+
+  // Hide error and update preview when edited
+  input.addEventListener("input", function() {
+    showMessage("");
+    preview.style.display = "none";
+  });
+
+
+  // Auto-correct when user leaves input
+  input.addEventListener("blur", function() {
+
+    const value = input.value.trim();
+
+    if (value) {
+      input.value = normalizeEmail(value);
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
