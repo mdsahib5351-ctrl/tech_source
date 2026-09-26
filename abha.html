@@ -1,0 +1,3769 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Card Data & Photo Generator</title>
+
+<!-- PDF LIBRARY -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@600;700;800&display=swap');
+
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#16a34a;
+    --text:#172033;
+    --muted:#667085;
+    --border:#e2e8f0;
+    --bg:#f5f7fb;
+    --card:#ffffff;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Noto Sans Devanagari",Arial,sans-serif;
+}
+
+button,
+input,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* ==============================
+   HEADER
+============================== */
+
+.topbar{
+    height:72px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.brandIcon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    color:white;
+    display:grid;
+    place-items:center;
+    font-size:21px;
+    font-weight:800;
+}
+
+.brandTitle{
+    font-size:17px;
+    font-weight:800;
+}
+
+.brandSub{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:1px;
+}
+
+.ready{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#15803d;
+    font-size:12px;
+    font-weight:700;
+}
+
+.readyDot{
+    width:8px;
+    height:8px;
+    background:#22c55e;
+    border-radius:50%;
+}
+
+/* ==============================
+   APP
+============================== */
+
+.app{
+    max-width:1180px;
+    margin:auto;
+    padding:28px 18px 50px;
+}
+
+/* ==============================
+   DASHBOARD
+============================== */
+
+.hero{
+    background:
+        radial-gradient(circle at 90% 10%,rgba(96,165,250,.24),transparent 32%),
+        linear-gradient(135deg,#eff6ff,#f8fafc);
+    border:1px solid #dbeafe;
+    border-radius:24px;
+    padding:42px;
+    min-height:270px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:30px;
+}
+
+.heroText{
+    max-width:650px;
+}
+
+.eyebrow{
+    color:var(--primary);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+
+.hero h1{
+    font-size:36px;
+    margin:0 0 10px;
+    line-height:1.2;
+}
+
+.hero p{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.7;
+}
+
+.createBtn{
+    border:0;
+    background:var(--primary);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:12px;
+    font-weight:800;
+    box-shadow:0 8px 20px rgba(37,99,235,.22);
+    transition:.2s;
+    white-space:nowrap;
+}
+
+.createBtn:hover{
+    background:var(--primary-dark);
+    transform:translateY(-1px);
+}
+
+.dashboardTitle{
+    margin:28px 0 14px;
+    font-size:17px;
+    font-weight:800;
+}
+
+.serviceGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.serviceCard{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:20px;
+    box-shadow:0 3px 14px rgba(15,23,42,.04);
+}
+
+.serviceIcon{
+    width:42px;
+    height:42px;
+    display:grid;
+    place-items:center;
+    background:#eff6ff;
+    color:var(--primary);
+    border-radius:12px;
+    font-size:19px;
+    margin-bottom:14px;
+}
+
+.serviceCard h3{
+    margin:0 0 5px;
+    font-size:15px;
+}
+
+.serviceCard p{
+    margin:0;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.6;
+}
+
+/* ==============================
+   FORM PAGE
+============================== */
+
+.pageHeader{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:20px;
+}
+
+.backBtn{
+    width:42px;
+    height:42px;
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:11px;
+    font-size:20px;
+}
+
+.pageHeader h2{
+    margin:0;
+    font-size:22px;
+}
+
+.pageHeader p{
+    margin:3px 0 0;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.formLayout{
+    display:grid;
+    grid-template-columns:1fr 330px;
+    gap:18px;
+}
+
+.formCard{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 4px 18px rgba(15,23,42,.04);
+}
+
+.sectionHead{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding-bottom:13px;
+    margin-bottom:15px;
+    border-bottom:1px solid #edf0f4;
+}
+
+.sectionNumber{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    background:#eff6ff;
+    color:var(--primary);
+    display:grid;
+    place-items:center;
+    font-size:12px;
+    font-weight:800;
+}
+
+.sectionHead h3{
+    margin:0;
+    font-size:15px;
+}
+
+.sectionHead span{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-top:1px;
+}
+
+.fieldGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.field{
+    margin-bottom:13px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:6px;
+}
+
+.field input,
+.field select{
+    width:100%;
+    height:43px;
+    border:1px solid #d6dee9;
+    border-radius:10px;
+    background:#fff;
+    padding:0 11px;
+    color:var(--text);
+    outline:none;
+    transition:.2s;
+}
+
+.field input:focus,
+.field select:focus{
+    border-color:#60a5fa;
+    box-shadow:0 0 0 3px rgba(37,99,235,.08);
+}
+
+.field input[readonly]{
+    background:#f8fafc;
+    color:#64748b;
+}
+
+.photoUpload{
+    border:1.5px dashed #bfd0e5;
+    background:#f8fbff;
+    border-radius:14px;
+    padding:17px;
+}
+
+.photoRow{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.photoThumb{
+    width:76px;
+    height:92px;
+    border-radius:10px;
+    background:#e8eef6;
+    object-fit:cover;
+    border:1px solid #d6dee9;
+}
+
+.photoInfo{
+    flex:1;
+}
+
+.photoInfo strong{
+    display:block;
+    font-size:13px;
+}
+
+.photoInfo span{
+    color:var(--muted);
+    font-size:11px;
+    display:block;
+    margin-top:4px;
+}
+
+.photoButtons{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+}
+
+.smallBtn{
+    border:1px solid var(--border);
+    background:#fff;
+    padding:8px 11px;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:700;
+}
+
+.primarySmall{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+}
+
+/* ==============================
+   SIDE INFO
+============================== */
+
+.sideCard{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+    height:max-content;
+    position:sticky;
+    top:92px;
+}
+
+.sideCard h3{
+    margin:0 0 14px;
+    font-size:15px;
+}
+
+.infoRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 0;
+    border-bottom:1px solid #f0f2f5;
+}
+
+.infoRow:last-child{
+    border-bottom:0;
+}
+
+.infoIcon{
+    width:32px;
+    height:32px;
+    background:#f1f5f9;
+    border-radius:9px;
+    display:grid;
+    place-items:center;
+    font-size:14px;
+}
+
+.infoRow strong{
+    display:block;
+    font-size:12px;
+}
+
+.infoRow span{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    margin-top:2px;
+}
+
+.continueArea{
+    margin-top:18px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    display:flex;
+    justify-content:flex-end;
+    gap:9px;
+}
+
+.secondaryBtn,
+.primaryBtn{
+    border:0;
+    border-radius:10px;
+    padding:11px 17px;
+    font-weight:800;
+}
+
+.secondaryBtn{
+    background:#eef2f7;
+    color:#263246;
+}
+
+.primaryBtn{
+    background:var(--primary);
+    color:#fff;
+}
+
+.primaryBtn:disabled,
+.secondaryBtn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+
+/* ==============================
+   CROP MODAL
+============================== */
+
+.cropOverlay,
+.previewOverlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.72);
+    backdrop-filter:blur(5px);
+    z-index:100;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+}
+
+.cropModal{
+    width:min(820px,96vw);
+    max-height:94vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:20px;
+    padding:18px;
+}
+
+.modalHead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.modalHead h3{
+    margin:0;
+    font-size:17px;
+}
+
+.closeBtn{
+    border:0;
+    background:#f1f5f9;
+    width:35px;
+    height:35px;
+    border-radius:9px;
+    font-size:18px;
+}
+
+.cropStage{
+    background:#20252d;
+    border-radius:14px;
+    min-height:300px;
+    padding:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:auto;
+}
+
+#cropCanvas{
+    display:block;
+    max-width:100%;
+    max-height:62vh;
+    touch-action:none;
+    cursor:move;
+}
+
+.cropBottom{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.cropBottom label{
+    font-size:12px;
+    font-weight:700;
+}
+
+.cropBottom input{
+    flex:1;
+    min-width:160px;
+}
+
+/* ==============================
+   PREVIEW POPUP
+============================== */
+
+.previewModal{
+    width:min(1050px,96vw);
+    max-height:95vh;
+    overflow:auto;
+    background:#f8fafc;
+    border-radius:22px;
+    padding:18px;
+}
+
+.previewHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.previewHeader h2{
+    margin:0;
+    font-size:19px;
+}
+
+.previewHeader p{
+    margin:3px 0 0;
+    font-size:11px;
+    color:var(--muted);
+}
+
+.previewArea{
+    background:#e8edf4;
+    border:1px solid #dce3ec;
+    border-radius:16px;
+    min-height:450px;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:auto;
+}
+
+.previewScale{
+    transform-origin:center center;
+}
+
+#stage{
+    position:relative;
+    width:969px;
+    height:1200px;
+    background:#fff;
+    overflow:hidden;
+    box-shadow:0 14px 40px rgba(15,23,42,.2);
+}
+
+#bg{
+    position:absolute;
+    inset:0;
+    width:969px;
+    height:1200px;
+    object-fit:fill;
+}
+
+.cardText{
+    position:absolute;
+    white-space:nowrap;
+    overflow:hidden;
+    font-family:"Times New Roman",Times,serif;
+    font-size:20px;
+    font-weight:800;
+    line-height:32px;
+    color:#111;
+}
+
+.hindi{
+    font-family:"Noto Serif Devanagari","Nirmala UI",Arial,sans-serif;
+    font-weight:800;
+}
+
+#pEnglish{left:262px;top:219px;width:242px;height:32px}
+#pHindi{left:262px;top:248px;width:242px;height:32px}
+#pCard{left:260px;top:326px;width:242px;height:32px}
+#pEmail{left:259px;top:413px;width:362px;height:32px}
+#pDob{left:353px;top:516px;width:152px;height:32px}
+#pMobile{left:695px;top:516px;width:152px;height:32px}
+#pGender{left:58px;top:513px;width:152px;height:32px}
+
+#photo{
+    position:absolute;
+    left:65px;
+    top:194px;
+    width:142px;
+    height:174px;
+    object-fit:cover;
+}
+
+#qr{
+    position:absolute;
+    left:714px;
+    top:294px;
+    width:168px;
+    height:168px;
+    background:#fff;
+}
+
+.previewFooter{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-top:14px;
+}
+
+.previewActions{
+    display:flex;
+    gap:8px;
+}
+
+.downloadJpg{
+    background:#2563eb;
+    color:#fff;
+}
+
+.downloadPdf{
+    background:#16a34a;
+    color:#fff;
+}
+
+/* ==============================
+   EXPORT STATUS
+============================== */
+
+.exportStatus{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.35);
+    backdrop-filter:blur(2px);
+    z-index:250;
+}
+
+.exportStatus.show{
+    display:flex;
+}
+
+.exportBox{
+    background:#fff;
+    border-radius:14px;
+    padding:16px 20px;
+    box-shadow:0 15px 40px rgba(15,23,42,.2);
+    font-size:13px;
+    font-weight:700;
+}
+
+.spinner{
+    width:18px;
+    height:18px;
+    border:3px solid #dbeafe;
+    border-top-color:#2563eb;
+    border-radius:50%;
+    display:inline-block;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+/* ==============================
+   TOAST
+============================== */
+
+.toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:#172033;
+    color:#fff;
+    padding:11px 17px;
+    border-radius:10px;
+    font-size:12px;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+    z-index:300;
+    max-width:90vw;
+    text-align:center;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+
+@media(max-width:900px){
+
+    .serviceGrid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .formLayout{
+        grid-template-columns:1fr;
+    }
+
+    .sideCard{
+        position:static;
+    }
+
+    .hero{
+        padding:30px;
+    }
+}
+
+@media(max-width:600px){
+
+    .topbar{
+        height:64px;
+        padding:0 13px;
+    }
+
+    .brandSub{
+        display:none;
+    }
+
+    .ready{
+        font-size:10px;
+    }
+
+    .app{
+        padding:15px 9px 35px;
+    }
+
+    .hero{
+        padding:25px 20px;
+        display:block;
+    }
+
+    .hero h1{
+        font-size:27px;
+    }
+
+    .hero p{
+        font-size:12px;
+    }
+
+    .createBtn{
+        margin-top:20px;
+        width:100%;
+    }
+
+    .serviceGrid{
+        grid-template-columns:1fr;
+    }
+
+    .fieldGrid{
+        grid-template-columns:1fr;
+        gap:0;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .formCard{
+        padding:15px;
+    }
+
+    .continueArea{
+        flex-direction:column-reverse;
+    }
+
+    .continueArea button{
+        width:100%;
+    }
+
+    .previewModal{
+        padding:10px;
+        border-radius:17px;
+    }
+
+    .previewArea{
+        min-height:300px;
+        padding:10px;
+    }
+
+    .previewFooter{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .previewActions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+    }
+
+    .previewActions button{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="brandIcon">ID</div>
+
+        <div>
+            <div class="brandTitle">
+                Card Data & Photo Generator
+            </div>
+
+            <div class="brandSub">
+                Professional card creation tool
+            </div>
+        </div>
+
+    </div>
+
+    <div class="ready">
+        <span class="readyDot"></span>
+        Ready
+    </div>
+
+</header>
+
+
+<main class="app">
+
+<!-- =========================
+     DASHBOARD
+========================= -->
+
+<section id="dashboardPage">
+
+    <div class="hero">
+
+        <div class="heroText">
+
+            <div class="eyebrow">
+                CARD STUDIO
+            </div>
+
+            <h1>
+                Create your card easily
+            </h1>
+
+            <p>
+                Apni details bharen, photo crop karein aur
+                final card ko JPG ya PDF format me download karein.
+            </p>
+
+        </div>
+
+        <button class="createBtn" id="createCardBtn">
+            ＋ Create Card
+        </button>
+
+    </div>
+
+
+    <div class="dashboardTitle">
+        Available Tools
+    </div>
+
+
+    <div class="serviceGrid">
+
+        <div class="serviceCard">
+            <div class="serviceIcon">▣</div>
+
+            <h3>Card Generator</h3>
+
+            <p>
+                Personal details aur photo ke saath
+                printable card create karein.
+            </p>
+        </div>
+
+
+        <div class="serviceCard">
+            <div class="serviceIcon">⌕</div>
+
+            <h3>QR Information</h3>
+
+            <p>
+                Card details se QR code automatically
+                generate hota hai.
+            </p>
+        </div>
+
+
+        <div class="serviceCard">
+            <div class="serviceIcon">⇩</div>
+
+            <h3>JPG / PDF Export</h3>
+
+            <p>
+                Final card ko high-quality JPG ya PDF
+                format me save karein.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CREATE CARD PAGE
+========================= -->
+
+<section id="formPage" class="hidden">
+
+    <div class="pageHeader">
+
+        <button class="backBtn" id="backDashboardBtn">
+            ←
+        </button>
+
+        <div>
+            <h2>Create New Card</h2>
+
+            <p>
+                Neeche card ki required details fill karein.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="formLayout">
+
+        <div>
+
+            <!-- PERSONAL -->
+
+            <div class="formCard">
+
+                <div class="sectionHead">
+
+                    <div class="sectionNumber">
+                        01
+                    </div>
+
+                    <div>
+                        <h3>Personal Information</h3>
+                        <span>Basic card holder details</span>
+                    </div>
+
+                </div>
+
+
+                <div class="fieldGrid">
+
+                    <div class="field">
+
+                        <label>English Name</label>
+
+                        <input
+                            id="nameEn"
+                            type="text"
+                            placeholder="Enter name in English"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Hindi Name</label>
+
+                        <input
+                            id="nameHi"
+                            type="text"
+                            placeholder="हिंदी में नाम लिखें"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Date of Birth</label>
+
+                        <input id="dob" type="date">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Gender</label>
+
+                        <select id="gender">
+
+                            <option value="">
+                                Select Gender
+                            </option>
+
+                            <option value="Male / पुरुष">
+                                Male / पुरुष
+                            </option>
+
+                            <option value="Female / महिला">
+                                Female / महिला
+                            </option>
+
+                            <option value="O">
+                                Other (O)
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Mobile Number</label>
+
+                        <input
+                            id="mobile"
+                            type="tel"
+                            inputmode="numeric"
+                            maxlength="10"
+                            placeholder="Enter 10 digit mobile"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Abha Adress</label>
+
+                        <input
+                            id="email"
+                            type="text"
+                            placeholder="Abha address"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CARD INFORMATION -->
+
+            <div class="formCard" style="margin-top:16px">
+
+                <div class="sectionHead">
+
+                    <div class="sectionNumber">
+                        02
+                    </div>
+
+                    <div>
+                        <h3>Card Information</h3>
+                        <span>Card number and generated information</span>
+                    </div>
+
+                </div>
+
+
+                <div class="fieldGrid">
+
+                    <div class="field">
+
+                        <label>Abha Number</label>
+
+                        <input
+                            id="cardNumber"
+                            type="text"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Number</label>
+
+                        <button
+                            class="secondaryBtn"
+                            id="regenBtn"
+                            type="button"
+                            style="height:43px;width:100%"
+                        >
+                            Regenerate Card Number
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOCATION -->
+
+            <div class="formCard" style="margin-top:16px">
+
+                <div class="sectionHead">
+
+                    <div class="sectionNumber">
+                        03
+                    </div>
+
+                    <div>
+                        <h3>Location Details</h3>
+                        <span>State, district and LGD information</span>
+                    </div>
+
+                </div>
+
+
+                <div class="fieldGrid">
+
+                    <div class="field">
+
+                        <label>State</label>
+
+                        <select id="state"></select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>State LGD</label>
+
+                        <input id="stateLgd" readonly>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>District</label>
+
+                        <select id="district"></select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>District LGD</label>
+
+                        <input id="distLgd" readonly>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PHOTO -->
+
+            <div class="formCard" style="margin-top:16px">
+
+                <div class="sectionHead">
+
+                    <div class="sectionNumber">
+                        04
+                    </div>
+
+                    <div>
+                        <h3>Card Photo</h3>
+                        <span>Upload and crop your photo</span>
+                    </div>
+
+                </div>
+
+
+                <div class="photoUpload">
+
+                    <div class="photoRow">
+
+                        <img
+                            id="photoThumb"
+                            class="photoThumb"
+                            alt=""
+                        >
+
+                        <div class="photoInfo">
+
+                            <strong>
+                                Add card holder photo
+                            </strong>
+
+                            <span>
+                                JPG, PNG or WEBP image
+                            </span>
+
+                            <div class="photoButtons">
+
+                                <button
+                                    class="smallBtn primarySmall"
+                                    id="uploadPhotoBtn"
+                                    type="button"
+                                >
+                                    Choose Photo
+                                </button>
+
+                                <button
+                                    class="smallBtn"
+                                    id="cropBtn"
+                                    type="button"
+                                >
+                                    Crop / Adjust
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <input
+                        id="photoInput"
+                        type="file"
+                        accept="image/*"
+                        hidden
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="continueArea">
+
+                <button
+                    class="secondaryBtn"
+                    id="cancelFormBtn"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    class="primaryBtn"
+                    id="continueBtn"
+                    type="button"
+                >
+                    Continue to Preview →
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- SIDE INFORMATION -->
+
+        <aside class="sideCard">
+
+            <h3>Creation Steps</h3>
+
+            <div class="infoRow">
+
+                <div class="infoIcon">1</div>
+
+                <div>
+                    <strong>Fill Details</strong>
+                    <span>Enter card information</span>
+                </div>
+
+            </div>
+
+
+            <div class="infoRow">
+
+                <div class="infoIcon">2</div>
+
+                <div>
+                    <strong>Add Photo</strong>
+                    <span>Upload and crop photo</span>
+                </div>
+
+            </div>
+
+
+            <div class="infoRow">
+
+                <div class="infoIcon">3</div>
+
+                <div>
+                    <strong>Preview</strong>
+                    <span>Check final card</span>
+                </div>
+
+            </div>
+
+
+            <div class="infoRow">
+
+                <div class="infoIcon">4</div>
+
+                <div>
+                    <strong>Download</strong>
+                    <span>JPG or PDF</span>
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =========================
+     CROP MODAL
+========================= -->
+
+<div class="cropOverlay" id="cropOverlay">
+
+    <div class="cropModal">
+
+        <div class="modalHead">
+
+            <h3>Crop Card Photo</h3>
+
+            <button class="closeBtn" id="cancelCrop">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="cropStage">
+
+            <canvas id="cropCanvas"></canvas>
+
+        </div>
+
+
+        <div class="cropBottom">
+
+            <label>Zoom</label>
+
+            <input
+                id="zoom"
+                type="range"
+                min="1"
+                max="5"
+                step=".01"
+                value="1"
+            >
+
+            <button
+                class="secondaryBtn"
+                id="fitBtn"
+                type="button"
+            >
+                Fit
+            </button>
+
+            <button
+                class="primaryBtn"
+                id="applyCrop"
+                type="button"
+            >
+                Add Photo
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     PREVIEW MODAL
+========================= -->
+
+<div class="previewOverlay" id="previewOverlay">
+
+    <div class="previewModal">
+
+        <div class="previewHeader">
+
+            <div>
+
+                <h2>Card Preview</h2>
+
+                <p>
+                    Final card check karein aur download karein.
+                </p>
+
+            </div>
+
+            <button class="closeBtn" id="closePreview">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="previewArea">
+
+            <div
+                class="previewScale"
+                id="previewScale"
+            >
+
+                <div id="stage">
+
+                    <img
+                        id="bg"
+                        src="assets/bg.png"
+                        alt=""
+                    >
+
+                    <img
+                        id="photo"
+                        alt=""
+                    >
+
+                    <div id="pEnglish" class="cardText"></div>
+
+                    <div id="pHindi" class="cardText hindi"></div>
+
+                    <div id="pCard" class="cardText"></div>
+
+                    <div id="pEmail" class="cardText"></div>
+
+                    <div id="pDob" class="cardText"></div>
+
+                    <div id="pMobile" class="cardText"></div>
+
+                    <div id="pGender" class="cardText"></div>
+
+                    <img id="qr" alt="">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="previewFooter">
+
+            <button
+                class="secondaryBtn"
+                id="editDetailsBtn"
+                type="button"
+            >
+                ← Edit Details
+            </button>
+
+
+            <div class="previewActions">
+
+                <button
+                    class="secondaryBtn downloadJpg"
+                    id="downloadJpgBtn"
+                    type="button"
+                >
+                    ↓ Download JPG
+                </button>
+
+
+                <button
+                    class="secondaryBtn downloadPdf"
+                    id="downloadPdfBtn"
+                    type="button"
+                >
+                    ↓ Download PDF
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     EXPORT LOADING
+========================= -->
+
+<div class="exportStatus" id="exportStatus">
+
+    <div class="exportBox">
+
+        <span class="spinner"></span>
+
+        <span id="exportStatusText">
+            Preparing download...
+        </span>
+
+    </div>
+
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+
+function toast(message){
+
+    const el = $("toast");
+
+    el.textContent = message;
+
+    el.classList.add("show");
+
+    clearTimeout(window.__toastTimer);
+
+    window.__toastTimer =
+        setTimeout(
+            () => el.classList.remove("show"),
+            3000
+        );
+}
+
+
+function showExportStatus(message){
+
+    $("exportStatusText").textContent =
+        message;
+
+    $("exportStatus").classList.add("show");
+
+}
+
+
+function hideExportStatus(){
+
+    $("exportStatus").classList.remove("show");
+
+}
+
+
+function sleep(ms){
+
+    return new Promise(
+        resolve => setTimeout(resolve,ms)
+    );
+
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
+$("createCardBtn").addEventListener(
+    "click",
+    () => {
+
+        $("dashboardPage").classList.add("hidden");
+
+        $("formPage").classList.remove("hidden");
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    }
+);
+
+
+function goDashboard(){
+
+    $("formPage").classList.add("hidden");
+
+    $("dashboardPage").classList.remove("hidden");
+
+    $("previewOverlay").style.display =
+        "none";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+$("backDashboardBtn").addEventListener(
+    "click",
+    goDashboard
+);
+
+
+$("cancelFormBtn").addEventListener(
+    "click",
+    goDashboard
+);
+
+
+/* =========================================================
+   CARD NUMBER
+========================================================= */
+
+function generateCardNumber(){
+
+    const a =
+        Math.floor(
+            1000 + Math.random()*9000
+        );
+
+    const b =
+        Math.floor(
+            1000 + Math.random()*9000
+        );
+
+    const c =
+        Math.floor(
+            1000 + Math.random()*9000
+        );
+
+    return `91-${a}-${b}-${c}`;
+
+}
+
+
+function setNewCardNumber(){
+
+    const card =
+        generateCardNumber();
+
+    $("cardNumber").value =
+        card;
+
+
+    if(!$("email").dataset.manual){
+
+        $("email").value =
+            card.replaceAll("-","") +
+            "@abdm";
+
+    }
+
+    render();
+
+}
+
+
+$("regenBtn").addEventListener(
+    "click",
+    () => {
+
+        $("email").dataset.manual = "";
+
+        setNewCardNumber();
+
+        toast("New card number generated.");
+
+    }
+);
+
+
+$("email").addEventListener(
+    "input",
+    () => {
+
+        $("email").dataset.manual = "1";
+
+        render();
+
+    }
+);
+
+
+/* =========================================================
+   STATE / DISTRICT
+========================================================= */
+
+const states = [
+
+    ["BIHAR","10"],
+    ["ANDHRA PRADESH","28"],
+    ["ARUNACHAL PRADESH","12"],
+    ["ASSAM","18"],
+    ["CHHATTISGARH","22"],
+    ["GOA","30"],
+    ["GUJARAT","24"],
+    ["HARYANA","6"],
+    ["HIMACHAL PRADESH","2"],
+    ["JHARKHAND","20"],
+    ["KARNATAKA","29"],
+    ["KERALA","32"],
+    ["MADHYA PRADESH","23"],
+    ["MAHARASHTRA","27"],
+    ["MANIPUR","14"],
+    ["MEGHALAYA","17"],
+    ["MIZORAM","15"],
+    ["NAGALAND","13"],
+    ["ODISHA","21"],
+    ["PUNJAB","3"],
+    ["RAJASTHAN","8"],
+    ["SIKKIM","11"],
+    ["TAMIL NADU","33"],
+    ["TELANGANA","36"],
+    ["TRIPURA","16"],
+    ["UTTAR PRADESH","9"],
+    ["UTTARAKHAND","5"],
+    ["WEST BENGAL","19"],
+    ["DELHI","7"],
+    ["JAMMU & KASHMIR","1"],
+    ["LADAKH","37"],
+    ["PUDUCHERRY","34"],
+    ["CHANDIGARH","4"],
+    ["LAKSHADWEEP","31"],
+    ["ANDAMAN & NICOBAR ISLANDS","35"],
+    ["DADRA & NAGAR HAVELI AND DAMAN & DIU","38"]
+
+];
+
+
+const biharDistricts = [
+
+    ["ARARIA","188"],
+    ["ARWAL","611"],
+    ["AURANGABAD","189"],
+    ["BANKA","190"],
+    ["BEGUSARAI","191"],
+    ["BHAGALPUR","192"],
+    ["BHOJPUR","193"],
+    ["BUXAR","194"],
+    ["DARBHANGA","195"],
+    ["GAYA","196"],
+    ["GOPALGANJ","197"],
+    ["JAMUI","198"],
+    ["JEHANABAD","199"],
+    ["KAIMUR (BHABHUA)","200"],
+    ["KATIHAR","201"],
+    ["KHAGARIA","202"],
+    ["KISHANGANJ","203"],
+    ["LAKHISARAI","204"],
+    ["MADHEPURA","205"],
+    ["MADHUBANI","206"],
+    ["MUNGER","207"],
+    ["MUZAFFARPUR","208"],
+    ["NALANDA","209"],
+    ["NAWADA","210"],
+    ["PASHCHIM CHAMPARAN","211"],
+    ["PATNA","212"],
+    ["PURBI CHAMPARAN","213"],
+    ["PURNIA","214"],
+    ["ROHTAS","215"],
+    ["SAHARSA","216"],
+    ["SAMASTIPUR","217"],
+    ["SARAN","218"],
+    ["SHEIKHPURA","219"],
+    ["SHEOHAR","220"],
+    ["SITAMARHI","221"],
+    ["SIWAN","222"],
+    ["SUPAUL","223"],
+    ["VAISHALI","224"]
+
+];
+
+
+function loadStates(){
+
+    $("state").innerHTML = "";
+
+    states.forEach(item => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = item[0];
+
+        option.textContent = item[0];
+
+        option.dataset.lgd = item[1];
+
+        $("state").appendChild(option);
+
+    });
+
+    $("state").value = "BIHAR";
+
+    loadDistricts();
+
+}
+
+
+function loadDistricts(){
+
+    $("district").innerHTML = "";
+
+    const state =
+        $("state").value;
+
+
+    if(state === "BIHAR"){
+
+        biharDistricts.forEach(item => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = item[0];
+
+            option.textContent = item[0];
+
+            option.dataset.lgd = item[1];
+
+            $("district").appendChild(option);
+
+        });
+
+    }else{
+
+        const option =
+            document.createElement("option");
+
+        option.value = "";
+
+        option.textContent =
+            "District data not loaded";
+
+        $("district").appendChild(option);
+
+    }
+
+    updateLGD();
+
+}
+
+
+function updateLGD(){
+
+    const stateOption =
+        $("state").selectedOptions[0];
+
+    const districtOption =
+        $("district").selectedOptions[0];
+
+
+    $("stateLgd").value =
+        stateOption?.dataset.lgd || "";
+
+    $("distLgd").value =
+        districtOption?.dataset.lgd || "";
+
+    render();
+
+}
+
+
+$("state").addEventListener(
+    "change",
+    loadDistricts
+);
+
+
+$("district").addEventListener(
+    "change",
+    updateLGD
+);
+
+
+/* =========================================================
+   DOB
+========================================================= */
+
+function getDOB(){
+
+    const value =
+        $("dob").value;
+
+    if(!value){
+        return "";
+    }
+
+    const [year,month,day] =
+        value.split("-");
+
+    return `${day}-${month}-${year}`;
+
+}
+
+
+/* =========================================================
+   QR DATA
+========================================================= */
+
+function getQRData(){
+
+    return {
+
+        name:$("nameEn").value.trim(),
+
+        gender:
+            $("gender").value.startsWith("Male")
+                ? "M"
+                : $("gender").value.startsWith("Female")
+                    ? "F"
+                    : "O",
+
+        dateOfBirth:getDOB(),
+
+        mobile:$("mobile").value.trim(),
+
+        abhaNumber:$("cardNumber").value,
+
+        abhaAddress:$("email").value.trim(),
+
+        statelgd:$("stateLgd").value,
+
+        state:$("state").value,
+
+        distlgd:$("distLgd").value,
+
+        district:$("district").value,
+
+        address:""
+
+    };
+
+}
+
+
+let qrRequestId = 0;
+
+
+/*
+    IMPORTANT:
+    QR is loaded through fetch -> Blob -> ObjectURL.
+    This prevents the external QR image from directly
+    tainting the export canvas when CORS permits it.
+*/
+
+async function loadQRImage(){
+
+    const data =
+        JSON.stringify(
+            getQRData()
+        );
+
+
+    const url =
+        "https://quickchart.io/qr" +
+        "?size=168" +
+        "&margin=0" +
+        "&ecLevel=M" +
+        "&text=" +
+        encodeURIComponent(data);
+
+
+    try{
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method:"GET",
+                    mode:"cors",
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "QR server returned " +
+                response.status
+            );
+
+        }
+
+
+        const blob =
+            await response.blob();
+
+
+        const objectURL =
+            URL.createObjectURL(blob);
+
+
+        try{
+
+            const image =
+                await loadImage(
+                    objectURL,
+                    false
+                );
+
+
+            $("qr").src =
+                objectURL;
+
+            $("qr").dataset.ready =
+                "1";
+
+            return image;
+
+        }finally{
+
+            /*
+              Do not revoke immediately because the
+              preview still uses this URL.
+              It will be replaced on the next QR update.
+            */
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "QR loading failed:",
+            error
+        );
+
+
+        $("qr").removeAttribute("src");
+
+        $("qr").dataset.ready =
+            "0";
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   GENERIC IMAGE LOADER
+========================================================= */
+
+function loadImage(src,useCrossOrigin=false){
+
+    return new Promise(
+        (resolve,reject) => {
+
+            const image =
+                new Image();
+
+
+            if(useCrossOrigin){
+
+                image.crossOrigin =
+                    "anonymous";
+
+            }
+
+
+            image.onload = () => {
+
+                resolve(image);
+
+            };
+
+
+            image.onerror = () => {
+
+                reject(
+                    new Error(
+                        "Image could not be loaded."
+                    )
+                );
+
+            };
+
+
+            image.src =
+                src;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+let renderTimer = null;
+
+
+function render(){
+
+    $("pEnglish").textContent =
+        $("nameEn").value;
+
+    $("pHindi").textContent =
+        $("nameHi").value;
+
+    $("pCard").textContent =
+        $("cardNumber").value;
+
+    $("pEmail").textContent =
+        $("email").value;
+
+    $("pDob").textContent =
+        getDOB();
+
+    $("pMobile").textContent =
+        $("mobile").value;
+
+    $("pGender").textContent =
+        $("gender").value;
+
+
+    clearTimeout(renderTimer);
+
+
+    renderTimer =
+        setTimeout(
+            () => {
+
+                loadQRImage();
+
+            },
+            120
+        );
+
+}
+
+
+[
+    "nameEn",
+    "nameHi",
+    "dob",
+    "mobile",
+    "gender"
+].forEach(id => {
+
+    $(id).addEventListener(
+        "input",
+        render
+    );
+
+});
+
+
+/* =========================================================
+   PHOTO
+========================================================= */
+
+let sourceImage = null;
+
+let cropZoom = 1;
+
+let cropCenterX = 0;
+
+let cropCenterY = 0;
+
+let cropDragging = false;
+
+let lastPointerX = 0;
+
+let lastPointerY = 0;
+
+
+const cropCanvas =
+    $("cropCanvas");
+
+const cropCtx =
+    cropCanvas.getContext("2d");
+
+
+$("uploadPhotoBtn").addEventListener(
+    "click",
+    () => $("photoInput").click()
+);
+
+
+$("photoInput").addEventListener(
+    "change",
+    event => {
+
+        const file =
+            event.target.files[0];
+
+        if(!file){
+            return;
+        }
+
+
+        if(!file.type.startsWith("image/")){
+
+            toast(
+                "Please select a JPG, PNG or WEBP image."
+            );
+
+            return;
+
+        }
+
+
+        const url =
+            URL.createObjectURL(file);
+
+
+        const image =
+            new Image();
+
+
+        image.onload = () => {
+
+            sourceImage =
+                image;
+
+
+            $("photoThumb").src =
+                url;
+
+
+            openCrop();
+
+        };
+
+
+        image.onerror = () => {
+
+            URL.revokeObjectURL(url);
+
+            toast(
+                "Photo could not be loaded."
+            );
+
+        };
+
+
+        image.src =
+            url;
+
+    }
+);
+
+
+$("cropBtn").addEventListener(
+    "click",
+    () => {
+
+        if(!sourceImage){
+
+            $("photoInput").click();
+
+            return;
+
+        }
+
+        openCrop();
+
+    }
+);
+
+
+function openCrop(){
+
+    if(!sourceImage){
+        return;
+    }
+
+
+    cropZoom = 1;
+
+    $("zoom").value = 1;
+
+    cropCenterX =
+        sourceImage.width / 2;
+
+    cropCenterY =
+        sourceImage.height / 2;
+
+
+    $("cropOverlay").style.display =
+        "flex";
+
+
+    drawCrop();
+
+}
+
+
+function drawCrop(){
+
+    if(!sourceImage){
+        return;
+    }
+
+
+    const maxW =
+        Math.min(
+            760,
+            Math.max(
+                300,
+                window.innerWidth - 70
+            )
+        );
+
+
+    const maxH =
+        Math.min(
+            600,
+            window.innerHeight * .60
+        );
+
+
+    const imageScale =
+        Math.min(
+            maxW / sourceImage.width,
+            maxH / sourceImage.height
+        );
+
+
+    const displayW =
+        Math.round(
+            sourceImage.width * imageScale
+        );
+
+
+    const displayH =
+        Math.round(
+            sourceImage.height * imageScale
+        );
+
+
+    cropCanvas.width =
+        Math.max(300,displayW);
+
+    cropCanvas.height =
+        Math.max(300,displayH);
+
+
+    cropCtx.clearRect(
+        0,
+        0,
+        cropCanvas.width,
+        cropCanvas.height
+    );
+
+
+    const scale =
+        imageScale * cropZoom;
+
+
+    const dw =
+        sourceImage.width * scale;
+
+    const dh =
+        sourceImage.height * scale;
+
+
+    const dx =
+        cropCanvas.width/2 -
+        cropCenterX * scale;
+
+    const dy =
+        cropCanvas.height/2 -
+        cropCenterY * scale;
+
+
+    cropCtx.drawImage(
+        sourceImage,
+        dx,
+        dy,
+        dw,
+        dh
+    );
+
+
+    const ratio =
+        149/184;
+
+
+    let frameH =
+        cropCanvas.height * .72;
+
+    let frameW =
+        frameH * ratio;
+
+
+    if(frameW > cropCanvas.width*.72){
+
+        frameW =
+            cropCanvas.width*.72;
+
+        frameH =
+            frameW/ratio;
+
+    }
+
+
+    const fx =
+        (cropCanvas.width-frameW)/2;
+
+    const fy =
+        (cropCanvas.height-frameH)/2;
+
+
+    cropCtx.save();
+
+    cropCtx.fillStyle =
+        "rgba(0,0,0,.48)";
+
+
+    cropCtx.beginPath();
+
+    cropCtx.rect(
+        0,
+        0,
+        cropCanvas.width,
+        cropCanvas.height
+    );
+
+    cropCtx.rect(
+        fx,
+        fy,
+        frameW,
+        frameH
+    );
+
+    cropCtx.fill("evenodd");
+
+
+    cropCtx.strokeStyle =
+        "#22c55e";
+
+    cropCtx.lineWidth = 3;
+
+    cropCtx.strokeRect(
+        fx,
+        fy,
+        frameW,
+        frameH
+    );
+
+
+    cropCtx.strokeStyle =
+        "rgba(255,255,255,.7)";
+
+    cropCtx.lineWidth = 1;
+
+    cropCtx.beginPath();
+
+    cropCtx.moveTo(
+        fx+frameW/2,
+        fy
+    );
+
+    cropCtx.lineTo(
+        fx+frameW/2,
+        fy+frameH
+    );
+
+    cropCtx.moveTo(
+        fx,
+        fy+frameH/2
+    );
+
+    cropCtx.lineTo(
+        fx+frameW,
+        fy+frameH/2
+    );
+
+    cropCtx.stroke();
+
+    cropCtx.restore();
+
+}
+
+
+$("zoom").addEventListener(
+    "input",
+    () => {
+
+        cropZoom =
+            Number($("zoom").value);
+
+        drawCrop();
+
+    }
+);
+
+
+cropCanvas.addEventListener(
+    "pointerdown",
+    event => {
+
+        cropDragging = true;
+
+        lastPointerX =
+            event.clientX;
+
+        lastPointerY =
+            event.clientY;
+
+        cropCanvas.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+);
+
+
+cropCanvas.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!cropDragging){
+            return;
+        }
+
+
+        const dx =
+            event.clientX-lastPointerX;
+
+        const dy =
+            event.clientY-lastPointerY;
+
+
+        lastPointerX =
+            event.clientX;
+
+        lastPointerY =
+            event.clientY;
+
+
+        const displayScale =
+            cropCanvas.width /
+            sourceImage.width;
+
+
+        cropCenterX -=
+            dx /
+            (displayScale*cropZoom);
+
+        cropCenterY -=
+            dy /
+            (displayScale*cropZoom);
+
+
+        cropCenterX =
+            Math.max(
+                0,
+                Math.min(
+                    sourceImage.width,
+                    cropCenterX
+                )
+            );
+
+
+        cropCenterY =
+            Math.max(
+                0,
+                Math.min(
+                    sourceImage.height,
+                    cropCenterY
+                )
+            );
+
+
+        drawCrop();
+
+    }
+);
+
+
+cropCanvas.addEventListener(
+    "pointerup",
+    () => cropDragging=false
+);
+
+
+cropCanvas.addEventListener(
+    "pointercancel",
+    () => cropDragging=false
+);
+
+
+$("fitBtn").addEventListener(
+    "click",
+    () => {
+
+        cropZoom=1;
+
+        $("zoom").value=1;
+
+        cropCenterX =
+            sourceImage.width/2;
+
+        cropCenterY =
+            sourceImage.height/2;
+
+        drawCrop();
+
+    }
+);
+
+
+/* =========================================================
+   APPLY CROP
+========================================================= */
+
+$("applyCrop").addEventListener(
+    "click",
+    () => {
+
+        if(!sourceImage){
+            return;
+        }
+
+
+        const ratio =
+            149/184;
+
+
+        let cropW =
+            sourceImage.width/cropZoom;
+
+        let cropH =
+            cropW/ratio;
+
+
+        if(
+            cropH >
+            sourceImage.height/cropZoom
+        ){
+
+            cropH =
+                sourceImage.height/cropZoom;
+
+            cropW =
+                cropH*ratio;
+
+        }
+
+
+        let sx =
+            cropCenterX-cropW/2;
+
+        let sy =
+            cropCenterY-cropH/2;
+
+
+        sx =
+            Math.max(
+                0,
+                Math.min(
+                    sourceImage.width-cropW,
+                    sx
+                )
+            );
+
+
+        sy =
+            Math.max(
+                0,
+                Math.min(
+                    sourceImage.height-cropH,
+                    sy
+                )
+            );
+
+
+        const output =
+            document.createElement("canvas");
+
+
+        /*
+          Higher working resolution.
+          This gives better export quality than the
+          previous 596 x 736 output.
+        */
+
+        output.width =
+            1192;
+
+        output.height =
+            1472;
+
+
+        const ctx =
+            output.getContext("2d");
+
+
+        ctx.imageSmoothingEnabled =
+            true;
+
+        ctx.imageSmoothingQuality =
+            "high";
+
+
+        ctx.drawImage(
+            sourceImage,
+            sx,
+            sy,
+            cropW,
+            cropH,
+            0,
+            0,
+            output.width,
+            output.height
+        );
+
+
+        const dataURL =
+            output.toDataURL(
+                "image/jpeg",
+                .98
+            );
+
+
+        $("photo").src =
+            dataURL;
+
+
+        $("photoThumb").src =
+            dataURL;
+
+
+        $("cropOverlay").style.display =
+            "none";
+
+
+        toast(
+            "Photo successfully added."
+        );
+
+    }
+);
+
+
+$("cancelCrop").addEventListener(
+    "click",
+    () => {
+
+        $("cropOverlay").style.display =
+            "none";
+
+    }
+);
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+function resizePreview(){
+
+    if(
+        $("previewOverlay").style.display !==
+        "flex"
+    ){
+        return;
+    }
+
+
+    const area =
+        document.querySelector(".previewArea");
+
+
+    const availableW =
+        area.clientWidth - 20;
+
+
+    const availableH =
+        Math.max(
+            280,
+            window.innerHeight - 250
+        );
+
+
+    const scale =
+        Math.min(
+            availableW/969,
+            availableH/1200,
+            1
+        );
+
+
+    $("previewScale").style.transform =
+        `scale(${scale})`;
+
+
+    area.style.height =
+        Math.min(
+            700,
+            1200*scale+40
+        ) + "px";
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizePreview
+);
+
+
+function openPreview(){
+
+    render();
+
+    $("previewOverlay").style.display =
+        "flex";
+
+
+    requestAnimationFrame(
+        resizePreview
+    );
+
+}
+
+
+$("continueBtn").addEventListener(
+    "click",
+    () => {
+
+        if(!$("nameEn").value.trim()){
+
+            toast(
+                "Please enter English Name."
+            );
+
+            $("nameEn").focus();
+
+            return;
+
+        }
+
+
+        if(!$("photo").naturalWidth){
+
+            toast(
+                "Please add and crop a photo first."
+            );
+
+            return;
+
+        }
+
+
+        openPreview();
+
+    }
+);
+
+
+$("closePreview").addEventListener(
+    "click",
+    () => {
+
+        $("previewOverlay").style.display =
+            "none";
+
+    }
+);
+
+
+$("editDetailsBtn").addEventListener(
+    "click",
+    () => {
+
+        $("previewOverlay").style.display =
+            "none";
+
+    }
+);
+
+
+/* =========================================================
+   WAIT FOR IMAGE
+========================================================= */
+
+async function waitForImageElement(img){
+
+    if(!img){
+        return null;
+    }
+
+
+    if(img.complete && img.naturalWidth > 0){
+
+        return img;
+
+    }
+
+
+    return new Promise(
+        (resolve,reject) => {
+
+            const timeout =
+                setTimeout(
+                    () => {
+
+                        reject(
+                            new Error(
+                                "Image loading timed out."
+                            )
+                        );
+
+                    },
+                    10000
+                );
+
+
+            img.onload = () => {
+
+                clearTimeout(timeout);
+
+                resolve(img);
+
+            };
+
+
+            img.onerror = () => {
+
+                clearTimeout(timeout);
+
+                reject(
+                    new Error(
+                        "Image failed to load."
+                    )
+                );
+
+            };
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   EXPORT CANVAS
+========================================================= */
+
+async function createCardCanvas(){
+
+    /*
+      Update visible text first.
+    */
+
+    render();
+
+
+    /*
+      Give browser a moment to update QR request.
+    */
+
+    await sleep(150);
+
+
+    /*
+      Try to make sure QR is ready.
+      Failure does NOT stop export.
+    */
+
+    try{
+
+        if($("qr").dataset.ready !== "1"){
+
+            await loadQRImage();
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "QR unavailable during export:",
+            error
+        );
+
+    }
+
+
+    /*
+      Wait for local background image.
+    */
+
+    let bgImage = null;
+
+
+    try{
+
+        bgImage =
+            await waitForImageElement(
+                $("bg")
+            );
+
+    }catch(error){
+
+        console.warn(
+            "Background unavailable:",
+            error
+        );
+
+    }
+
+
+    /*
+      Wait for photo.
+    */
+
+    let photoImage = null;
+
+
+    try{
+
+        photoImage =
+            await waitForImageElement(
+                $("photo")
+            );
+
+    }catch(error){
+
+        throw new Error(
+            "Card photo is not ready."
+        );
+
+    }
+
+
+    /*
+      Create export canvas.
+    */
+
+    const canvas =
+        document.createElement("canvas");
+
+
+    canvas.width =
+        969;
+
+    canvas.height =
+        1200;
+
+
+    const ctx =
+        canvas.getContext("2d",{
+            alpha:false
+        });
+
+
+    ctx.imageSmoothingEnabled =
+        true;
+
+    ctx.imageSmoothingQuality =
+        "high";
+
+
+    /*
+      Background
+    */
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    if(
+        bgImage &&
+        bgImage.naturalWidth > 0
+    ){
+
+        try{
+
+            ctx.drawImage(
+                bgImage,
+                0,
+                0,
+                969,
+                1200
+            );
+
+        }catch(error){
+
+            console.warn(
+                "Background drawing failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+      Photo
+    */
+
+    ctx.drawImage(
+        photoImage,
+        65,
+        194,
+        142,
+        174
+    );
+
+
+    /*
+      Text helper
+    */
+
+    function drawText(
+        value,
+        x,
+        y,
+        width,
+        fontFamily,
+        size=20
+    ){
+
+        ctx.font =
+            `800 ${size}px ${fontFamily}`;
+
+        ctx.fillStyle =
+            "#111";
+
+        ctx.textBaseline =
+            "top";
+
+        ctx.textAlign =
+            "left";
+
+
+        ctx.fillText(
+            value || "",
+            x,
+            y,
+            width
+        );
+
+    }
+
+
+    drawText(
+        $("nameEn").value,
+        262,
+        219,
+        242,
+        '"Times New Roman"',
+        20
+    );
+
+
+    drawText(
+        $("nameHi").value,
+        262,
+        248,
+        242,
+        '"Noto Serif Devanagari","Nirmala UI",Arial',
+        20
+    );
+
+
+    drawText(
+        $("cardNumber").value,
+        260,
+        326,
+        242,
+        '"Times New Roman"',
+        20
+    );
+
+
+    drawText(
+        $("email").value,
+        259,
+        413,
+        362,
+        '"Times New Roman"',
+        20
+    );
+
+
+    drawText(
+        getDOB(),
+        353,
+        516,
+        152,
+        '"Times New Roman"',
+        20
+    );
+
+
+    drawText(
+        $("mobile").value,
+        695,
+        516,
+        152,
+        '"Times New Roman"',
+        20
+    );
+
+
+    drawText(
+        $("gender").value,
+        58,
+        513,
+        152,
+        '"Times New Roman"',
+        20
+    );
+
+
+    /*
+      QR
+    */
+
+    const qr =
+        $("qr");
+
+
+    if(
+        qr &&
+        qr.naturalWidth > 0
+    ){
+
+        try{
+
+            ctx.drawImage(
+                qr,
+                714,
+                294,
+                168,
+                168
+            );
+
+        }catch(error){
+
+            /*
+              QR failure must never break export.
+            */
+
+            console.warn(
+                "QR could not be drawn:",
+                error
+            );
+
+        }
+
+    }
+
+
+    return canvas;
+
+}
+
+
+/* =========================================================
+   DOWNLOAD BLOB
+========================================================= */
+
+function downloadBlob(
+    blob,
+    filename
+){
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href =
+        url;
+
+    link.download =
+        filename;
+
+    link.style.display =
+        "none";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    /*
+      Give Android/browser enough time
+      to start the download before cleanup.
+    */
+
+    setTimeout(
+        () => {
+
+            link.remove();
+
+            URL.revokeObjectURL(url);
+
+        },
+        1500
+    );
+
+}
+
+
+/* =========================================================
+   JPG DOWNLOAD
+========================================================= */
+
+$("downloadJpgBtn").addEventListener(
+    "click",
+    async () => {
+
+        if(
+            $("downloadJpgBtn").disabled
+        ){
+            return;
+        }
+
+
+        $("downloadJpgBtn").disabled =
+            true;
+
+
+        showExportStatus(
+            "Preparing high-quality JPG..."
+        );
+
+
+        try{
+
+            const canvas =
+                await createCardCanvas();
+
+
+            /*
+              toBlob is more memory-friendly
+              than directly creating a huge data URL.
+            */
+
+            const blob =
+                await new Promise(
+                    (resolve,reject) => {
+
+                        canvas.toBlob(
+                            result => {
+
+                                if(!result){
+
+                                    reject(
+                                        new Error(
+                                            "JPG creation failed."
+                                        )
+                                    );
+
+                                    return;
+
+                                }
+
+                                resolve(result);
+
+                            },
+                            "image/jpeg",
+                            0.98
+                        );
+
+                    }
+                );
+
+
+            const number =
+                $("cardNumber").value
+                    .replaceAll("-","")
+                    .trim();
+
+
+            downloadBlob(
+                blob,
+                (number || "card") +
+                ".jpg"
+            );
+
+
+            toast(
+                "JPG downloaded successfully."
+            );
+
+
+        }catch(error){
+
+            console.error(
+                "JPG EXPORT ERROR:",
+                error
+            );
+
+
+            toast(
+                "JPG download failed: " +
+                (error.message || "Unknown error")
+            );
+
+        }finally{
+
+            hideExportStatus();
+
+            $("downloadJpgBtn").disabled =
+                false;
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PDF DOWNLOAD
+========================================================= */
+
+$("downloadPdfBtn").addEventListener(
+    "click",
+    async () => {
+
+        if(
+            $("downloadPdfBtn").disabled
+        ){
+            return;
+        }
+
+
+        $("downloadPdfBtn").disabled =
+            true;
+
+
+        showExportStatus(
+            "Preparing high-quality PDF..."
+        );
+
+
+        try{
+
+            /*
+              Verify jsPDF loaded.
+            */
+
+            if(
+                !window.jspdf ||
+                !window.jspdf.jsPDF
+            ){
+
+                throw new Error(
+                    "PDF library could not load. Please check internet connection."
+                );
+
+            }
+
+
+            const canvas =
+                await createCardCanvas();
+
+
+            /*
+              Use PNG for PDF.
+              This keeps text/photo edges cleaner
+              than compressing the canvas twice.
+            */
+
+            const image =
+                canvas.toDataURL(
+                    "image/png"
+                );
+
+
+            const {
+                jsPDF
+            } =
+                window.jspdf;
+
+
+            /*
+              Original card physical ratio:
+              969 x 1200
+            */
+
+            const pdfWidth =
+                85.6;
+
+
+            const pdfHeight =
+                pdfWidth *
+                (1200/969);
+
+
+            const pdf =
+                new jsPDF({
+
+                    orientation:
+                        pdfWidth > pdfHeight
+                        ? "landscape"
+                        : "portrait",
+
+                    unit:"mm",
+
+                    format:[
+                        pdfWidth,
+                        pdfHeight
+                    ],
+
+                    compress:true
+
+                });
+
+
+            pdf.addImage(
+                image,
+                "PNG",
+                0,
+                0,
+                pdfWidth,
+                pdfHeight,
+                undefined,
+                "NONE"
+            );
+
+
+            const number =
+                $("cardNumber").value
+                    .replaceAll("-","")
+                    .trim();
+
+
+            pdf.save(
+                (number || "card") +
+                ".pdf"
+            );
+
+
+            toast(
+                "PDF downloaded successfully."
+            );
+
+
+        }catch(error){
+
+            console.error(
+                "PDF EXPORT ERROR:",
+                error
+            );
+
+
+            toast(
+                "PDF download failed: " +
+                (error.message || "Unknown error")
+            );
+
+        }finally{
+
+            hideExportStatus();
+
+            $("downloadPdfBtn").disabled =
+                false;
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ESCAPE KEY
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key !== "Escape"){
+            return;
+        }
+
+
+        if(
+            $("cropOverlay").style.display ===
+            "flex"
+        ){
+
+            $("cropOverlay").style.display =
+                "none";
+
+        }
+
+
+        if(
+            $("previewOverlay").style.display ===
+            "flex"
+        ){
+
+            $("previewOverlay").style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+$("photoThumb").src =
+    "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="76"
+             height="92"
+             viewBox="0 0 76 92">
+
+            <rect
+                width="76"
+                height="92"
+                rx="10"
+                fill="#e8eef6"/>
+
+            <circle
+                cx="38"
+                cy="34"
+                r="13"
+                fill="#94a3b8"/>
+
+            <path
+                d="M18 75
+                   C20 58 56 58 58 75"
+                fill="#94a3b8"/>
+
+        </svg>
+    `);
+
+
+setNewCardNumber();
+
+loadStates();
+
+render();
+
+</script>
+
+</body>
+</html>
