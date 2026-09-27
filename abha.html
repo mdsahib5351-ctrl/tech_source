@@ -891,6 +891,56 @@ button{
         width:100%;
     }
 }
+
+/* =========================================================
+   PREMIUM V3 UI OVERRIDES
+========================================================= */
+:root{--primary:#2563eb;--primary2:#1d4ed8;--ink:#172033;--soft:#f5f8fc;--line:#e2e8f0;--muted:#64748b;}
+body{background:linear-gradient(180deg,#f8fbff 0%,#f3f6fb 100%);color:var(--ink)}
+.topbar{height:72px;background:rgba(255,255,255,.92);border-bottom:1px solid #e7edf5;box-shadow:0 5px 24px rgba(15,23,42,.05);backdrop-filter:blur(14px)}
+.brandIcon{box-shadow:0 8px 18px rgba(37,99,235,.18)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff 0%,#f3f7ff 100%);border:1px solid #e2eaf4;box-shadow:0 16px 45px rgba(30,64,175,.08)}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-90px;top:-110px;background:rgba(37,99,235,.07);pointer-events:none}
+.heroText,.createBtn{position:relative;z-index:1}
+.hero h1{letter-spacing:-.8px;font-weight:850}
+.eyebrow{letter-spacing:1.8px;color:#2563eb;font-weight:800}
+.createBtn{border-radius:13px;box-shadow:0 10px 25px rgba(37,99,235,.22);transition:.2s}
+.createBtn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(37,99,235,.25)}
+.dashboardTitle{font-size:16px;font-weight:850;margin:30px 0 14px}
+.serviceCard{border:1px solid #e3eaf3;box-shadow:0 10px 28px rgba(15,23,42,.045);transition:.2s;background:rgba(255,255,255,.94)}
+.serviceCard:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(15,23,42,.08);border-color:#d4e1f2}
+.serviceIcon{box-shadow:0 7px 18px rgba(37,99,235,.1)}
+.pageHeader{background:#fff;border:1px solid #e4eaf2;border-radius:16px;padding:15px 18px;box-shadow:0 8px 25px rgba(15,23,42,.045);margin-bottom:16px}
+.formCard,.sideCard{border-color:#e2e8f0;box-shadow:0 9px 28px rgba(15,23,42,.045)}
+.sectionNumber{box-shadow:0 5px 13px rgba(37,99,235,.12)}
+.field label{color:#334155;font-size:11px;letter-spacing:.1px}
+.field input,.field select{height:46px;border-color:#dbe3ed;border-radius:11px;background:#fff}
+.field input:hover,.field select:hover{border-color:#c4d2e3}
+.field input:focus,.field select:focus{border-color:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.09)}
+.hindiInputWrap,.editableNumberWrap{display:flex;gap:7px;align-items:center}
+.hindiInputWrap input,.editableNumberWrap input{flex:1;min-width:0}
+.autoHindiBtn,.inlineEditBtn{height:46px;border:1px solid #d8e1ec;background:#f7faff;color:#2563eb;border-radius:11px;padding:0 12px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer}
+.autoHindiBtn:hover,.inlineEditBtn:hover{background:#eff6ff;border-color:#bcd2f0}
+.inlineEditBtn.active{background:#2563eb;color:#fff;border-color:#2563eb}
+.fieldHint,.translitStatus{font-size:10px;color:#7b8798;margin-top:5px;min-height:13px}
+.translitStatus.loading{color:#2563eb}.translitStatus.ok{color:#15803d}.translitStatus.error{color:#b45309}
+.suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.suggestionChip{border:1px solid #dbe5f0;background:#f8fbff;border-radius:999px;padding:5px 9px;font-size:11px;color:#1e40af;cursor:pointer}
+.suggestionChip:hover{background:#eff6ff;border-color:#bfdbfe}
+.cropOverlay,.previewOverlay{background:rgba(8,15,30,.78);backdrop-filter:blur(10px);padding:12px}
+.cropModal{width:min(900px,97vw);border:1px solid rgba(255,255,255,.6);border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.3);padding:16px;background:#fbfdff}
+.cropStage{background:radial-gradient(circle at 50% 30%,#344052,#161d28);border:1px solid #3b4657;min-height:350px;max-height:68vh;padding:16px;border-radius:17px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+#cropCanvas{border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.cropBottom{background:#fff;border:1px solid #e4eaf2;border-radius:14px;padding:10px;margin-top:12px}
+.cropZoomGroup{display:flex;align-items:center;gap:7px;flex:1;min-width:230px}.cropZoomGroup label{margin-right:2px}.cropZoomGroup input{min-width:100px}.zoomMini{width:31px;height:31px;border:1px solid #d8e1ec;background:#f8fafc;border-radius:8px;font-weight:800;cursor:pointer}.zoomValue{min-width:44px;text-align:right;font-size:10px;color:#64748b;font-weight:800}
+.previewModal{width:min(1120px,98vw);background:#f7f9fc;border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 100px rgba(0,0,0,.34);border-radius:24px;padding:15px}
+.previewHeader{padding:4px 4px 12px}.previewHeaderActions{display:flex;align-items:center;gap:10px}.previewZoomTools{display:flex;align-items:center;gap:4px;background:#fff;border:1px solid #e1e8f1;padding:4px;border-radius:11px;box-shadow:0 4px 14px rgba(15,23,42,.05)}.previewZoomTools button{height:29px;min-width:29px;border:0;background:#f3f6fa;border-radius:7px;font-weight:800;color:#334155;cursor:pointer}.previewZoomTools button:hover{background:#e8eef7}.previewZoomTools #previewZoomFit{padding:0 9px;font-size:10px}.previewZoomTools span{min-width:42px;text-align:center;font-size:10px;font-weight:800;color:#64748b}
+.previewArea{min-height:500px;max-height:calc(95vh - 210px);overflow:auto;background:linear-gradient(145deg,#e9eef5,#dfe6ef);box-shadow:inset 0 0 0 1px #d6dee8}
+.previewScale{transition:transform .18s ease}
+#stage{box-shadow:0 20px 55px rgba(15,23,42,.28)}
+.previewFooter{border-top:1px solid #e1e7ef;padding-top:12px}.secondaryBtn,.primaryBtn{border-radius:10px;font-weight:800;border:1px solid transparent;min-height:42px;cursor:pointer}.secondaryBtn{border-color:#dce4ee}.downloadJpg,.downloadPdf{box-shadow:0 7px 17px rgba(15,23,42,.1)}
+@media(max-width:600px){.hindiInputWrap,.editableNumberWrap{align-items:stretch}.autoHindiBtn,.inlineEditBtn{padding:0 9px}.previewZoomTools{display:none}.previewArea{min-height:320px;padding:8px}.cropStage{min-height:280px}.cropZoomGroup{min-width:100%}.cropBottom .secondaryBtn,.cropBottom .primaryBtn{flex:1}.previewHeader{align-items:flex-start}}
+
 </style>
 </head>
 
@@ -1067,11 +1117,17 @@ button{
 
                         <label>Hindi Name</label>
 
-                        <input
-                            id="nameHi"
-                            type="text"
-                            placeholder="हिंदी में नाम लिखें"
-                        >
+                        <div class="hindiInputWrap">
+                            <input
+                                id="nameHi"
+                                type="text"
+                                placeholder="हिंदी में नाम लिखें"
+                                autocomplete="off"
+                            >
+                            <button class="autoHindiBtn" id="autoHindiBtn" type="button">↻ Auto Hindi</button>
+                        </div>
+                        <div class="translitStatus" id="translitStatus"></div>
+                        <div class="suggestions" id="hindiSuggestions"></div>
 
                     </div>
 
@@ -1168,11 +1224,17 @@ button{
 
                         <label>Abha Number</label>
 
-                        <input
-                            id="cardNumber"
-                            type="text"
-                            readonly
-                        >
+                        <div class="editableNumberWrap">
+                            <input
+                                id="cardNumber"
+                                type="text"
+                                inputmode="numeric"
+                                maxlength="17"
+                                readonly
+                            >
+                            <button class="inlineEditBtn" id="editCardNumberBtn" type="button">Edit</button>
+                        </div>
+                        <div class="fieldHint" id="cardNumberHint">Generated automatically • Edit if required</div>
 
                     </div>
 
@@ -1445,23 +1507,27 @@ button{
 
         <div class="cropBottom">
 
-            <label>Zoom</label>
-
-            <input
-                id="zoom"
-                type="range"
-                min="1"
-                max="5"
-                step=".01"
-                value="1"
-            >
+            <div class="cropZoomGroup">
+                <label>Zoom</label>
+                <button class="zoomMini" id="zoomOutBtn" type="button">−</button>
+                <input
+                    id="zoom"
+                    type="range"
+                    min="1"
+                    max="5"
+                    step=".01"
+                    value="1"
+                >
+                <button class="zoomMini" id="zoomInBtn" type="button">+</button>
+                <span class="zoomValue" id="zoomValue">100%</span>
+            </div>
 
             <button
                 class="secondaryBtn"
                 id="fitBtn"
                 type="button"
             >
-                Fit
+                Fit / Reset
             </button>
 
             <button
@@ -1499,9 +1565,15 @@ button{
 
             </div>
 
-            <button class="closeBtn" id="closePreview">
-                ×
-            </button>
+            <div class="previewHeaderActions">
+                <div class="previewZoomTools">
+                    <button id="previewZoomOut" type="button" title="Zoom out">−</button>
+                    <span id="previewZoomValue">100%</span>
+                    <button id="previewZoomIn" type="button" title="Zoom in">+</button>
+                    <button id="previewZoomFit" type="button" title="Fit card">Fit</button>
+                </div>
+                <button class="closeBtn" id="closePreview">×</button>
+            </div>
 
         </div>
 
@@ -1788,6 +1860,37 @@ $("email").addEventListener(
 
 
 /* =========================================================
+   EDITABLE ABHA NUMBER
+========================================================= */
+
+$("editCardNumberBtn").addEventListener("click",()=>{
+    const input=$("cardNumber");
+    const btn=$("editCardNumberBtn");
+    if(input.readOnly){
+        input.readOnly=false;
+        input.focus();
+        input.select();
+        btn.textContent="Save";
+        btn.classList.add("active");
+        $("cardNumberHint").textContent="Manual mode • Save to apply your number";
+    }else{
+        input.value=input.value.trim();
+        input.readOnly=true;
+        btn.textContent="Edit";
+        btn.classList.remove("active");
+        $("cardNumberHint").textContent="Saved • This number will be used in the QR data";
+        render();
+        toast("ABHA Number updated.");
+    }
+});
+
+$("cardNumber").addEventListener("input",()=>{
+    $("cardNumberHint").textContent="Editing manually • Click Save when finished";
+    render();
+});
+
+
+/* =========================================================
    STATE / DISTRICT
 ========================================================= */
 
@@ -2004,6 +2107,16 @@ function getDOB(){
    QR DATA
 ========================================================= */
 
+function getQRDate(){
+
+    const value = $("dob").value;
+    if(!value) return "";
+    const [year,month,day] = value.split("-");
+    // QR format intentionally has no leading zeroes.
+    return `${Number(day)}-${Number(month)}-${year}`;
+}
+
+
 function getQRData(){
 
     return {
@@ -2017,7 +2130,7 @@ function getQRData(){
                     ? "F"
                     : "O",
 
-        dateOfBirth:getDOB(),
+        dateOfBirth:getQRDate(),
 
         mobile:$("mobile").value.trim(),
 
@@ -2257,6 +2370,81 @@ function render(){
 
 
 /* =========================================================
+   ONLINE ENGLISH → HINDI TRANSLITERATION
+========================================================= */
+
+let translitTimer=null;
+let translitController=null;
+let translitBusy=false;
+let hindiManual=false;
+
+function hasHindi(text){ return /[\u0900-\u097F]/.test(text||""); }
+function setTranslitStatus(text,type=""){ const el=$("translitStatus"); el.textContent=text; el.className="translitStatus"+(type?" "+type:""); }
+function clearSuggestions(){ $("hindiSuggestions").innerHTML=""; }
+
+function showHindiSuggestions(items){
+    const box=$("hindiSuggestions");
+    box.innerHTML="";
+    [...new Set(items.filter(Boolean))].slice(0,5).forEach(item=>{
+        const b=document.createElement("button");
+        b.type="button"; b.className="suggestionChip"; b.textContent=item;
+        b.addEventListener("click",()=>{
+            $("nameHi").value=item; hindiManual=true; render();
+            setTranslitStatus("Hindi name selected.","ok"); clearSuggestions();
+        });
+        box.appendChild(b);
+    });
+}
+
+async function transliterateName(force=false){
+    const text=$("nameEn").value.trim();
+    if(!text){ clearSuggestions(); setTranslitStatus(""); return; }
+    if(hasHindi(text)) return;
+    if(!force && hindiManual && $("nameHi").value.trim()) return;
+    if(translitController) translitController.abort();
+    translitController=new AbortController();
+    setTranslitStatus("Online Hindi suggestions loading…","loading");
+    try{
+        const url="https://inputtools.google.com/request?text="+encodeURIComponent(text)+"&itc=hi-t-i0-und&num=5";
+        const response=await fetch(url,{method:"GET",cache:"no-store",signal:translitController.signal});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const data=await response.json();
+        const candidates=(data && data[1] && data[1][0] && Array.isArray(data[1][0][1])) ? data[1][0][1] : [];
+        if(!candidates.length) throw new Error("No suggestion");
+        showHindiSuggestions(candidates);
+        if(force || !hindiManual || !$("nameHi").value.trim()){
+            $("nameHi").value=candidates[0];
+            render();
+        }
+        setTranslitStatus("Online Hindi transliteration ready.","ok");
+    }catch(error){
+        if(error.name==="AbortError") return;
+        setTranslitStatus("Online suggestion unavailable. Hindi can still be typed manually.","error");
+    }
+}
+
+$("nameEn").addEventListener("input",()=>{
+    hindiManual=false;
+    clearTimeout(translitTimer);
+    const text=$("nameEn").value.trim();
+    if(!text){ $("nameHi").value=""; clearSuggestions(); setTranslitStatus(""); render(); return; }
+    translitTimer=setTimeout(()=>transliterateName(false),350);
+});
+
+$("nameHi").addEventListener("input",()=>{
+    hindiManual=true;
+    clearSuggestions();
+    setTranslitStatus($("nameHi").value.trim()?"Manual Hindi name":"");
+    render();
+});
+
+$("autoHindiBtn").addEventListener("click",()=>{
+    hindiManual=false;
+    transliterateName(true);
+});
+
+
+/* =========================================================
    PHOTO
 ========================================================= */
 
@@ -2380,6 +2568,7 @@ function openCrop(){
     cropZoom = 1;
 
     $("zoom").value = 1;
+    updateCropZoomUI();
 
     cropCenterX =
         sourceImage.width / 2;
@@ -2597,6 +2786,20 @@ $("zoom").addEventListener(
     }
 );
 
+function updateCropZoomUI(){
+    $("zoomValue").textContent = Math.round(cropZoom*100)+"%";
+}
+
+$("zoomOutBtn").addEventListener("click",()=>{
+    cropZoom=Math.max(1,Math.round((cropZoom-.1)*100)/100);
+    $("zoom").value=cropZoom; updateCropZoomUI(); drawCrop();
+});
+
+$("zoomInBtn").addEventListener("click",()=>{
+    cropZoom=Math.min(5,Math.round((cropZoom+.1)*100)/100);
+    $("zoom").value=cropZoom; updateCropZoomUI(); drawCrop();
+});
+
 
 cropCanvas.addEventListener(
     "pointerdown",
@@ -2700,6 +2903,7 @@ $("fitBtn").addEventListener(
         cropZoom=1;
 
         $("zoom").value=1;
+        updateCropZoomUI();
 
         cropCenterX =
             sourceImage.width/2;
@@ -2861,6 +3065,26 @@ $("cancelCrop").addEventListener(
    PREVIEW
 ========================================================= */
 
+let previewZoom=1;
+function setPreviewZoom(value){
+    previewZoom=Math.max(.45,Math.min(2.5,value));
+    $("previewScale").style.transform=`scale(${previewZoom})`;
+    $("previewZoomValue").textContent=Math.round(previewZoom*100)+"%";
+    const area=$("previewArea");
+    area.style.minHeight=Math.min(720,Math.max(320,1200*previewZoom*.55+40))+"px";
+}
+function fitPreviewZoom(){
+    const area=$("previewArea");
+    const availableW=Math.max(180,area.clientWidth-20);
+    const availableH=Math.max(280,window.innerHeight-250);
+    const fit=Math.min(availableW/969,availableH/1200,1);
+    setPreviewZoom(Math.max(.45,fit));
+}
+
+$("previewZoomOut").addEventListener("click",()=>setPreviewZoom(previewZoom-.1));
+$("previewZoomIn").addEventListener("click",()=>setPreviewZoom(previewZoom+.1));
+$("previewZoomFit").addEventListener("click",fitPreviewZoom);
+
 function resizePreview(){
 
     if(
@@ -2893,9 +3117,9 @@ function resizePreview(){
             1
         );
 
-
-    $("previewScale").style.transform =
-        `scale(${scale})`;
+    previewZoom=scale;
+    $("previewScale").style.transform=`scale(${previewZoom})`;
+    $("previewZoomValue").textContent=Math.round(previewZoom*100)+"%";
 
 
     area.style.height =
